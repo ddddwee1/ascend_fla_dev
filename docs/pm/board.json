@@ -5158,6 +5158,14 @@
         {
           "at": "2026-09-26T08:51",
           "summary": "STATUS（issue #93 评论 5844750292，session dev-20260926T010004Z-0375dde8，PR #134 仍 draft）。备用环境搭建遇阻，**尚未跑通任何设备 case**：CPU 专项 119 passed、source pin/输入/literal norm 身份核对仍一致；两次完整 workload 启动都在首个 vendor 编译前后停止——v1 缺 vendor 声明的 decorator 依赖（已在私有 venv 补齐）、v2 是 CANN 9.2 头文件与固定 library 头重复定义 `g_coreType`（未改 pin 或生成文件）；换到已完整安装的 CANN 9.1.0-beta.1 后（v3）编译出了首个 CCE kernel 和自定义算子包，但卡在安装器默认日志目录的只读边界，仍无设备 case 跑起来。next：把安装器日志的宿主机存储绑定到授权私有目录（容器根保持只读，HOME/固定源码不变）后重试。明确声明：不把编译成功或 CPU 专项当设备验收；主设备此前两轮数值结果因隔离缺口仅算诊断，不算验收；备用环境的完整双 bd 原网格/补充网格/逐位比较/同卡测量/最终 DONE 全部未完成。`blockers` 字段明确写'无范围或预算变更请求'——纯环境搭建阻塞，非技术争议。"
+        },
+        {
+          "at": "2026-09-26T09:23",
+          "summary": "STATUS（issue #93 评论 5844988588，session dev-20260926T010004Z-0375dde8，PR #134 仍 draft）。备用环境终于跑通、**隔离干净**：原 256 例在 bd1/bd2 全部完成，普通类逐梯度 A/B 最大相对 L2 均=4.1356284098271835e-6（预算内），各 66,581,570 个披露元素完整保留，仍如实标'披露完整，nonPASS'。bd1 采样 345 次、bd2 采样 320 次，**未知外来 context 均为 0**；四阶段产物运行前后100 个哈希一致。遇到一个 NPUCachingAllocator 的 32 字节 padding 警告，追到 torch_npu 2.12 实际源码（git fa0f83fe）定位到 `AddPadSize`/`round_size`——CANN9.1beta 走兼容分配分支，只增加物理分配容量，判定为良性；未抑制警告、未改运行设置。环境：Docker Python3.12.14/Torch2.12.0+cu130/torch_npu2.12.0/CANN9.1.0-beta.1；bd1/bd2 分别在 Ascend950PR_957bV100/9579V100 两张不同物理卡上跑，回执分开记录。已启动 73 例补充网格。"
+        },
+        {
+          "at": "2026-09-26T09:30",
+          "summary": "STATUS（issue #93 评论 5845056949，同 PR，仍 draft）。原 256 例与补充 73 例均已在 bd1/bd2 完整执行，四份回执前后健康/空闲、未知外来 context 为 0、编译产物哈希一致；两套网格的输入/20 阶段/7 公共梯度跨 bd 逐位一致。原 256 例普通类最大相对 L2=4.1356284098271835e-6，逐元素披露完整保留，整体 nonPASS，冻结分类/64 倍阈值/1e-4 预算均未改动。next：已开始同卡 T1024/4096 三轮baseline/candidate/baseline 测量（10 warmup/50 samples），随后最终证据审计、PR 转 ready、新 DONE。申领人已启动每 300 秒自查 PR/看板节奏，会及时处理返工。心跳正常，进展顺利。"
         }
       ],
       "result": null,
