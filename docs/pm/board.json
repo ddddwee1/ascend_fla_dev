@@ -5110,6 +5110,10 @@
         {
           "at": "2026-09-26T02:54",
           "summary": "STATUS（issue #93 评论 5842550729，session dev-20260926T010004Z-0375dde8）。完整 256-case 分类校准结束，A↔B 普通类预算全部满足（最大 ordinary 相对 L2 2.9902082636512436e-6，c3_h1_hv2_m7/dg_atk）；披露类仍在，如实标'数值披露完整，非通过'，512 份 A/B 完整披露 JSONL 已无损压缩+SHA256，可逐位置复核。四阶段实现首版完成（读/写 key 梯度分离、ATK final cotangent 每 H 仅播种一次），公共入口只做校验/分配/调度。bd1/bd2 各四个 CCE 源码生成成功，静态 balance 检查无问题，UB 分配数字均在 profile 范围内。主机测试 113 passed。明确声明：source emission/静态 balance 不等于厂商编译或 NPU 验收，尚无 NPU 通过声明。next：真机 T4096 全量首次执行。心跳正常。"
+        },
+        {
+          "at": "2026-09-26T03:53",
+          "summary": "STATUS（issue #93 评论 5842941127，session dev-20260926T010004Z-0375dde8）。**首次真机数字**：A5/CCE 四阶段厂商编译 + 完整 bd1 真机矩阵，256/256 required_checks_complete，覆盖全部冻结分组/边界/三路 cotangent 子集。设备：soc=a5 / Ascend950PR_9589V100 / CANN 9.2.0 / compiler stamp 20260805_101249091 / opp 含 ascend950,ascend910b,ascend910_93 / Python 3.12.13 / torch 2.12.0+cpu / torch_npu 2.12.0。普通类 literal FP32 A vs 独立 FP32 B 最大相对 L2 3.872425474189693e-6（c3_h1_hv2_m7/composition/dg_atk vs A），未放宽 1e-4 预算。披露类 66,581,570 个元素，完整位置/值以无损 start/count JSONL 留存（发布前已把 gzip 证据展开为 UTF-8 JSON/JSONL 并核对 SHA256 不变，不发布 gzip），整体仍如实标'数值披露完整，非通过'。持锁纪律：1253 次占用采样、2 次可解释的 foreign 标签（同任务 retirement，非外部占用）。主机全套 1352 passed/10 skipped，板端 Docker 任务回归 115 passed。冻结六文件与生产 kernel 哈希未变。next：独立进程/独立 build 跑 bd2 完整 256-case 矩阵，随后 bd1/bd2 逐位对照，再做 T1024/T4096 三轮同卡性能测量。尚无 PR。心跳正常。"
         }
       ],
       "result": null,
