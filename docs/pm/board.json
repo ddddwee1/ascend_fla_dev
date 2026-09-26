@@ -3076,7 +3076,7 @@
       "wave": "W-A2",
       "soc": "a2",
       "priority": "P1",
-      "status": "assigned",
+      "status": "in_progress",
       "gate": null,
       "model": [
         "kimi-linear-48b-a3b",
@@ -3151,6 +3151,10 @@
         {
           "at": "2026-09-25T05:26",
           "summary": "STATUS（05:26:34Z，MikejR2904，issue #44）：onboarding + 规划完成，还没写 kernel 代码。读了 AGENTS.md / PROTOCOL / START / A2-K1 规格 / a2_gdn_abi.md §1-6，核对了 A5 gdn_chunk_{fwd,bwd} 移植源（kernels/{pipeline,stages}.py、contract.json、ops/gdn_chunk_{fwd,bwd}.py）。在 task/A2-K1 分支（off upstream main）推到 fork MikejR2904/ascend_fla_dev_a2，新增 kernels/projects/a2/gdn_chunk_fwd/DESIGN.md：六项 ABI 缺口 1.1-1.7 对应到实现方式，L0C settle barrier 落点（fwd inverse / bwd finalize / bwd wu），测试计划（fp32 双 oracle、HV≠H 非对称 H=2/HV=4、分段 chaining、bd1==bd4 逐位、删 barrier 负对照），并记下了三条铁律（算子名加后缀、避开 C++ 关键字形参名、不支持就报错）。next：读 A5 gdn_chunk_fwd 的 stage 结构与 contract，搭 A2 单元骨架（HV 轴 + barrier 落点），在 910B3 上跑起双 oracle 测试。ETA 34h。\n两条 open_questions（PM 直接按规格回复，无需问用户，见下条 PM 回复评论）：\n①final_state 出货只用 fp32-state 还是两版都留——规格 §1.5 标题本身就是「final_state FP32（不是上游的 BF16）」，出货默认就是 fp32-state；bf16-state 版只是为了报 bf16 对 fp32 的差值证据，不是出货选项。\n②A2 的 MAX_GATE_SPAN 是否留空/标「未测（Batch B）」——规格「不在本批次的范围」一节已明确写此字段留空或标未测，门控跨度标定是 Batch B，另立任务。"
+        },
+        {
+          "at": "2026-09-26T03:00",
+          "summary": "STATUS（issue #44 评论 5842590000，MikejR2904）。范围发现：a5 gdn_chunk_{fwd,bwd} 移植源是 @vf（寄存器 value-function）kernel（fwd 6 处、bwd 13 处），a2 facade 没有 @vf——与 A2-03 当年对 KDA 的发现同类。已核实：已交付的 a2 单元（kda_fwd_stable 等、gdn2_recurrent 的 A2 移植）全部是 tensor-vector 重写，零 @vf，是本任务唯一可参照的先例。结论：Batch A 要保留 a5 的算法/ABI 不变，但每个 stage 都要按 a2 tensor-vector 模型重写——比规格原来估的'M（接线 + 机械 settle）'工作量大，向量侧重写才是主要工作量。正面：a5 单元本来就带 HV 轴（v/g/beta/initial_state 按 HV 索引），1.1 GQA/GVA 机制已基本具备，不用从零设计。产出：task/A2-K1 分支 + kernels/projects/a2/gdn_chunk_fwd/DESIGN.md 已推到 fork（含 barrier 落点、测试计划、这条 @vf 发现、两条已裁定问题的记录），尚无 kernel 代码。ETA 从此前的 34h 上修，具体数字待搭好 gdn_chunk_prepare 的 tensor-vector 重写并过双 oracle 验证后再给。PM 备注：ACK 于 2026-09-24T11:12，距今约 40h，逼近 timebox_h=40 但尚未过 50%（60h）——本轮不构成需要上报用户的超时，下一轮若仍无代码且总耗时过 60h 则升级处理（参照 A2-03 的拆分先例）。assigned -> in_progress（此前 ACK 时漏转，随本次一并补正）。"
         }
       ],
       "result": null
@@ -5102,6 +5106,10 @@
         {
           "at": "2026-09-26T02:06",
           "summary": "STATUS（issue #93 评论 5842234445，session dev-20260926T010004Z-0375dde8）。分支 task/PK-05 从 main 8c2b415 建立；独立解析参考、literal FLA hash 不变。正式代码 6/6 FP64 gradcheck 通过（ratio1/2 × normal/below/above clamp，不用跨 kink 中心差分）；NOTE 5842101164 的分类代码与七路局部尺度公式已落盘，11/11 公共形状 pilot 普通类预算满足，披露类清单保留（如实标'数值披露完整，非通过'，不写全数值 PASS）。剩余 245/256 个 case 的 CPU 校准（T4096、分组比 1/2/4/8、七种 cotangent）在跑，完成后才开始 kernel authoring，再上 A5 真机。主机基线 1239 passed/10 skipped。尚未编译 kernel、未上 NPU。心跳正常，无需 PING。"
+        },
+        {
+          "at": "2026-09-26T02:54",
+          "summary": "STATUS（issue #93 评论 5842550729，session dev-20260926T010004Z-0375dde8）。完整 256-case 分类校准结束，A↔B 普通类预算全部满足（最大 ordinary 相对 L2 2.9902082636512436e-6，c3_h1_hv2_m7/dg_atk）；披露类仍在，如实标'数值披露完整，非通过'，512 份 A/B 完整披露 JSONL 已无损压缩+SHA256，可逐位置复核。四阶段实现首版完成（读/写 key 梯度分离、ATK final cotangent 每 H 仅播种一次），公共入口只做校验/分配/调度。bd1/bd2 各四个 CCE 源码生成成功，静态 balance 检查无问题，UB 分配数字均在 profile 范围内。主机测试 113 passed。明确声明：source emission/静态 balance 不等于厂商编译或 NPU 验收，尚无 NPU 通过声明。next：真机 T4096 全量首次执行。心跳正常。"
         }
       ],
       "result": null,
