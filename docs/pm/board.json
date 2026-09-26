@@ -5007,7 +5007,7 @@
       "wave": "W0",
       "soc": "a5",
       "priority": "P1",
-      "status": "in_progress",
+      "status": "review",
       "model": [],
       "kernel": [
         "pgdn_chunk_bwd"
@@ -5033,7 +5033,7 @@
       },
       "spec": "docs/pm/tasks/PK-05.md",
       "issue": 93,
-      "pr": null,
+      "pr": 134,
       "assignee": "limjiunnbin",
       "assignee_caps": {
         "agent": "Codex / GPT-6",
@@ -5118,6 +5118,10 @@
         {
           "at": "2026-09-26T04:39",
           "summary": "STATUS（issue #93 评论 5843232927，session dev-20260926T010004Z-0375dde8）。bd1/bd2 两个独立进程/独立 build 的真机矩阵均完整结束，各 256/256 required_checks_complete；相同输入下全部 20 阶段返回值与 7 个公共梯度 **逐位一致**（§6 硬判据：核切分不改算式）。两轮普通类统计相同，最大相对 L2 3.872425474189693e-6（1e-4 预算内，未变）；披露类同为66,581,570 个元素，完整 JSONL 保留，仍如实标'数值披露完整，非通过'。构建警告逐项核查均为已评估的良性项（CANN 头文件弃用、vendor 脚本转义、CMake 变量提示），未抑制警告。主机 1354 passed，Docker 任务回归 115 passed；12 个生产入口/kernel/冻结参考文件哈希跨快照一致。next：同卡 T1024/T4096 三轮 baseline/candidate/baseline 性能测量（bd2，10 warmup+50 同步样本/腿），明确基线只复用本实现的 forward tapes/checkpoints、不声称另一套完整 backward 或 CUDA/Triton 加速；测完提交 PR 并 DONE。心跳正常。"
+        },
+        {
+          "at": "2026-09-26T04:59",
+          "summary": "DONE（issue #93 评论 5843358381，session dev-20260926T010004Z-0375dde8；PR #134，头 c8e707337e0734113fa1c3a457c5318b4413dd48，Refs #93）。声称：256-case CPU 校准全过、两套参考各 6/6 FP64 gradcheck；A5 真机 bd1/bd2 各 256/256 required_checks_complete，20 阶段+7 公共梯度逐位一致；普通类最大相对 L2（真机）3.872425474189693e-6，（CPU）2.9902082636512436e-6；披露类 66,581,570 元素完整留存，contract 数值 stage 保持 failed 附解释，不声称全数值 PASS；同卡三轮 baseline/candidate/baseline 完成（T1024 180.5ms 量级、T4096 726.7ms 量级）；主机 1354 passed，Docker 回归 115 passed；声称四路径写集内、pgdn_chunk_fwd 未改动。PR 体量大（2661 文件、~211 万行新增，主要是原始数值证据 JSON/JSONL）。按 D-PM-33 走完整审查流程，未自行判断前不合入；已派发独立复核（写集边界、生产代码质量/门控纪律、披露分类代码是否与冻结裁定一致、抽查复算数字、真机日志真实性、host 测试重跑、仓库卫生扫描），结果另行记录。in_progress -> review（审查中，未决）。"
         }
       ],
       "result": null,
