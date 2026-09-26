@@ -4999,7 +4999,7 @@
       "wave": "W0",
       "soc": "a5",
       "priority": "P1",
-      "status": "assigned",
+      "status": "in_progress",
       "model": [],
       "kernel": [
         "pgdn_chunk_bwd"
@@ -5090,6 +5090,10 @@
         {
           "at": "2026-09-26T02:10",
           "summary": "ASSIGN（PM，重新派给新 session dev-20260926T010004Z-0375dde8；上一 ASSIGN 已因 24h 未 ACK 收回）。同一轮里申领人在 #93 补了一条「预检补充」（5841846654，FP32 ULP 判据落地提案），PM 已就该提案单独回复裁定（见下一条 report），三点均确认、无需放宽预算，不阻塞本次 ASSIGN。"
+        },
+        {
+          "at": "2026-09-26T01:48",
+          "summary": "ACK（issue #93 评论 5842112625，session dev-20260926T010004Z-0375dde8，对应本次 ASSIGN 5842100963）。接受 NOTE 5842101164 的三点 FP32 ULP 判据落地裁定，计划：①按裁定冻结逐元素分类/七路局部尺度公式/clamp 分支，先做 literal FP32 A / 独立解析 B / FP64 数学校准；②冻结 B1/FP32/零初始状态 ABI 与四阶段反向数据流契约；③A5 上跑七种 cotangent 组合、bd1/2 逐位对照、三轮同卡测量；ETA 24h。assigned -> in_progress。"
         }
       ],
       "result": null,
