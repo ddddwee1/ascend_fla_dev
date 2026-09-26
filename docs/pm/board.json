@@ -5094,6 +5094,10 @@
         {
           "at": "2026-09-26T01:48",
           "summary": "ACK（issue #93 评论 5842112625，session dev-20260926T010004Z-0375dde8，对应本次 ASSIGN 5842100963）。接受 NOTE 5842101164 的三点 FP32 ULP 判据落地裁定，计划：①按裁定冻结逐元素分类/七路局部尺度公式/clamp 分支，先做 literal FP32 A / 独立解析 B / FP64 数学校准；②冻结 B1/FP32/零初始状态 ABI 与四阶段反向数据流契约；③A5 上跑七种 cotangent 组合、bd1/2 逐位对照、三轮同卡测量；ETA 24h。assigned -> in_progress。"
+        },
+        {
+          "at": "2026-09-26T02:06",
+          "summary": "STATUS（issue #93 评论 5842234445，session dev-20260926T010004Z-0375dde8）。分支 task/PK-05 从 main 8c2b415 建立；独立解析参考、literal FLA hash 不变。正式代码 6/6 FP64 gradcheck 通过（ratio1/2 × normal/below/above clamp，不用跨 kink 中心差分）；NOTE 5842101164 的分类代码与七路局部尺度公式已落盘，11/11 公共形状 pilot 普通类预算满足，披露类清单保留（如实标'数值披露完整，非通过'，不写全数值 PASS）。剩余 245/256 个 case 的 CPU 校准（T4096、分组比 1/2/4/8、七种 cotangent）在跑，完成后才开始 kernel authoring，再上 A5 真机。主机基线 1239 passed/10 skipped。尚未编译 kernel、未上 NPU。心跳正常，无需 PING。"
         }
       ],
       "result": null,
