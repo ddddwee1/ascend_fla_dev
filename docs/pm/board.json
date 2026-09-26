@@ -5114,6 +5114,10 @@
         {
           "at": "2026-09-26T03:53",
           "summary": "STATUS（issue #93 评论 5842941127，session dev-20260926T010004Z-0375dde8）。**首次真机数字**：A5/CCE 四阶段厂商编译 + 完整 bd1 真机矩阵，256/256 required_checks_complete，覆盖全部冻结分组/边界/三路 cotangent 子集。设备：soc=a5 / Ascend950PR_9589V100 / CANN 9.2.0 / compiler stamp 20260805_101249091 / opp 含 ascend950,ascend910b,ascend910_93 / Python 3.12.13 / torch 2.12.0+cpu / torch_npu 2.12.0。普通类 literal FP32 A vs 独立 FP32 B 最大相对 L2 3.872425474189693e-6（c3_h1_hv2_m7/composition/dg_atk vs A），未放宽 1e-4 预算。披露类 66,581,570 个元素，完整位置/值以无损 start/count JSONL 留存（发布前已把 gzip 证据展开为 UTF-8 JSON/JSONL 并核对 SHA256 不变，不发布 gzip），整体仍如实标'数值披露完整，非通过'。持锁纪律：1253 次占用采样、2 次可解释的 foreign 标签（同任务 retirement，非外部占用）。主机全套 1352 passed/10 skipped，板端 Docker 任务回归 115 passed。冻结六文件与生产 kernel 哈希未变。next：独立进程/独立 build 跑 bd2 完整 256-case 矩阵，随后 bd1/bd2 逐位对照，再做 T1024/T4096 三轮同卡性能测量。尚无 PR。心跳正常。"
+        },
+        {
+          "at": "2026-09-26T04:39",
+          "summary": "STATUS（issue #93 评论 5843232927，session dev-20260926T010004Z-0375dde8）。bd1/bd2 两个独立进程/独立 build 的真机矩阵均完整结束，各 256/256 required_checks_complete；相同输入下全部 20 阶段返回值与 7 个公共梯度 **逐位一致**（§6 硬判据：核切分不改算式）。两轮普通类统计相同，最大相对 L2 3.872425474189693e-6（1e-4 预算内，未变）；披露类同为66,581,570 个元素，完整 JSONL 保留，仍如实标'数值披露完整，非通过'。构建警告逐项核查均为已评估的良性项（CANN 头文件弃用、vendor 脚本转义、CMake 变量提示），未抑制警告。主机 1354 passed，Docker 任务回归 115 passed；12 个生产入口/kernel/冻结参考文件哈希跨快照一致。next：同卡 T1024/T4096 三轮 baseline/candidate/baseline 性能测量（bd2，10 warmup+50 同步样本/腿），明确基线只复用本实现的 forward tapes/checkpoints、不声称另一套完整 backward 或 CUDA/Triton 加速；测完提交 PR 并 DONE。心跳正常。"
         }
       ],
       "result": null,
