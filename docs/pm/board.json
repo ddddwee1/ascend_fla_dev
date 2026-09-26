@@ -3839,7 +3839,7 @@
       "wave": "W0",
       "soc": "a5",
       "priority": "P1",
-      "status": "assigned",
+      "status": "in_progress",
       "model": [
         "gdn2-1.3b-fineweb-edu-100b"
       ],
@@ -3901,6 +3901,10 @@
         {
           "at": "2026-09-25T13:35",
           "summary": "48h 无 STATUS，按 PROTOCOL §5 发 PING（issue #63）。核对了 #63 自 ACK（2026-09-23T13:24:41Z）起的全部评论，只有 ACK 这一条，之后 48h10m 没有任何 STATUS/RISK/BLOCKED。再等 24h 无回应按 §5 收回、回 open、分支保留。"
+        },
+        {
+          "at": "2026-09-26T02:37",
+          "summary": "STATUS（issue #63 评论 5842435143，session gd202-a5-realdevice-1；PING 后回应，取消收回）。真机：机器 B，Ascend950PR / CANN 9.2.0 / opp 含 ascend950,ascend910b,ascend910_93 / compiler 2026-08-04T16:57:23+08:00 / Python 3.12.13 / torch 2.12.0+cpu / torch_npu 2.12.0，物理卡 1，持锁执行。①两台 A5 opp 普查均含 ascend950，torch_npu 计算算子可用，§5 的 D2H 绕行不需要。②GD2-01 契约全集真机通过：a5.gdn2_chunk_fwd 的 board/aclnn stage 从 untested 升级为 passed（12 cases）。③bd∈{1,2,4,8} 在 t64/t65/t192（整 chunk/尾块/奇数 chunk）三个形状上输出 o/final_state 逐位相同（bitwise hash 一致）。尚未：12 个 case 的逐条 rel-L2/max_abs（目前只有 harness 总判 passed:true）、95B 整网端到端、性能三明治——如实标注未做，无整网/性能数字。assigned -> in_progress（此前 ACK 时漏转，本次一并补正，非实质变化）。"
         }
       ],
       "result": null
