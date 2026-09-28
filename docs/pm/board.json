@@ -3302,6 +3302,10 @@
         {
           "at": "2026-09-28T18:12",
           "summary": "STATUS（issue #44 评论 5875825622，MikejR2904；首行格式不对——em dash 被转成乱码字节，poll 标了'首行格式不对'警告，PM 直接读原文核实，内容仍按数据采信）。前向（prepare/scores/wy/scan/output）全部 a2 向量侧，逐 stage 真机 910B3 board 验证过，整条流水线也在功能 sim 上对双 oracle（grouped_recurrent + block_solve）端到端过，o/final_state ~3e-7（GVA HV=4/H=2）。反向：checkpoints（边界状态）sim ~5e-8、group_reduce（GVA dq/dk 求和）sim 逐位、replay（逐 token d 磁带）sim 通过且 board 能编译运行；reverse（adjoint scan）算法完整但被真实技术问题卡住——单体 kernel 让 sim 的 auto_sync 信用预算死锁，board cce 编译超时(>560s)，申领人已做二分排除（不是 row-build 计数、不是 dg，是某个累积上限），两个信号一致指向同一结论：要把 reverse 拆成几个小 kernel（dq | recurrence+dv | dg | dk），已写进 gdn_chunk_bwd/DESIGN.md。方法说明：8 张 910B3 被其他用户占用（34-64GB HBM，90-160% AICore），board 验证只能见缝插针，sim 验证为主——按 D-PM-28 记录不上报不仲裁。整体是真实进展 + 有据可查的技术阻塞（kernel 复杂度需要拆分），不是空转，不改变超时判断本身，心跳计时按此重置。"
+        },
+        {
+          "at": "2026-09-28T23:35",
+          "summary": "STATUS（issue #44 评论 5880725321，MikejR2904；首行格式不对——em dash 又被转成乱码，poll 标了警告，PM 直接读原文核实）。之前卡住的 reverse kernel 分解已完成：replay -> reverse_rec（递推，产出 dv/dh0/back_tape）-> {dq, dbeta, dg, dk_bz, dk_ddr} -> group_reduce，dh0 与非零 dht 路径都在 recurrence kernel 里。前向+反向现在都在功能 sim 上对双 oracle（正向：grouped_recurrent+block_solve；反向：解析 adjoint ref/reference.py）端到端过：o~3.3e-7/final_state~3.0e-7，dq/dk/dv/dg/dbeta 均 ~1.2e-7~1.7e-7。前向仍是逐 stage 真机 910B3 board 验证过；**反向目前只有 sim 验证，还没有真机 board 端到端**——8 张 910B3 仍被其他用户占用（按 D-PM-28 记录不上报不仲裁）。申领人原话'kernel-level correctness is complete'，剩余工作是给 fwd+bwd 建 unit 脚手架（contract/unit.py/pipeline、算子命名、barrier 位点）并在卡空出来后跑真机 board 双oracle e2e。全部工作在其 fork（MikejR2904/ascend_fla_dev_a2，task/A2-K1）。真实进展，非空转；心跳按此重置。"
         }
       ],
       "result": null
