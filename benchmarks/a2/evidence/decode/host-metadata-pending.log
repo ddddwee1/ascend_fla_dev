@@ -1,0 +1,23 @@
+.....................F...........                                        [100%]
+=================================== FAILURES ===================================
+____________________ test_unqualified_socs_raise_on_use[a2] ____________________
+
+soc = 'a2'
+
+    @pytest.mark.parametrize("soc", ["a2", "a3"])
+    def test_unqualified_socs_raise_on_use(soc):
+        cap = platform.capability(soc)
+        assert cap["qualified"] is False
+        if soc == "a2":
+>           assert cap["supported_block_dim"] == {"chunk": (1, 2)}
+E           AssertionError: assert {'chunk': (1,...code': (1, 2)} == {'chunk': (1, 2)}
+E
+E             Omitting 1 identical items, use -vv to show
+E             Left contains 1 more item:
+E             {'decode': (1, 2)}
+E             Use -v to get more diff
+
+tests/test_platform.py:56: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_platform.py::test_unqualified_socs_raise_on_use[a2] - Asser...
+1 failed, 32 passed in 3.81s

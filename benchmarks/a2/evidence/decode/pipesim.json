@@ -1,0 +1,124 @@
+{
+  "backend": "cce",
+  "cases": [
+    {
+      "block_dim": 1,
+      "comparison": {
+        "final_state": {
+          "comparison": {
+            "atol": 1e-06,
+            "max_relative_l2": 1e-05,
+            "mode": "allclose",
+            "reason": "final_state is FP32 end to end; the A5 decode budget is kept (A2 kernel measured 4e-8..1e-7 on device).",
+            "rtol": 1e-05
+          },
+          "max_abs_error": 1.4901161193847656e-08,
+          "passed": true,
+          "relative_l2_error": 5.225100686409518e-08
+        },
+        "o": {
+          "actual_dtype": "bfloat16",
+          "comparison": {
+            "atol": 0.0001,
+            "max_relative_l2": 0.005,
+            "mode": "allclose",
+            "reason": "o is written in BF16 (D-PM-35); its floor is the BF16 rounding of the FP32 result, measured 1.63e-3..1.71e-3 relative L2. The budget is about 3x that floor, fixed before the unit runs.",
+            "reference_dtype": "float32",
+            "rtol": 0.01
+          },
+          "max_abs_error": 2.980045974254608e-05,
+          "passed": true,
+          "reference_dtype": "float32",
+          "relative_l2_error": 0.0017190588335175797
+        }
+      },
+      "execution_evidence": [
+        {
+          "backend_executed": false,
+          "block_dim": 1,
+          "deadlock": null,
+          "device": "a2",
+          "event_balance": [],
+          "hazards": [],
+          "kernel": "kda_fused_recurrent_a2_kernel",
+          "launcher": "pipesim",
+          "model": "lowered events and hazards",
+          "model_cycles": 39910,
+          "requested_backend": "cce",
+          "sim_processes": "fork",
+          "stage": "pipesim"
+        }
+      ],
+      "id": "single_token_gva",
+      "parameters": {
+        "B": 1,
+        "H": 1,
+        "HV": 2,
+        "T": 1
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 1e-06,
+            "max_relative_l2": 1e-05,
+            "mode": "allclose",
+            "reason": "final_state is FP32 end to end; the A5 decode budget is kept (A2 kernel measured 4e-8..1e-7 on device).",
+            "rtol": 1e-05
+          },
+          "dtype": "float32",
+          "sha256": "def58092a3f9737e1b9cf7b3101a1f4da7b3881bed68c1cf7a29608d252739b7",
+          "shape": [
+            1,
+            2,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 0.0001,
+            "max_relative_l2": 0.005,
+            "mode": "allclose",
+            "reason": "o is written in BF16 (D-PM-35); its floor is the BF16 rounding of the FP32 result, measured 1.63e-3..1.71e-3 relative L2. The budget is about 3x that floor, fixed before the unit runs.",
+            "reference_dtype": "float32",
+            "rtol": 0.01
+          },
+          "dtype": "float32",
+          "sha256": "d9fc12c88d3620e1587e810bae7c025e7524b9bd1f1b1c061698fc0b680abf1d",
+          "shape": [
+            1,
+            1,
+            2,
+            128
+          ]
+        }
+      },
+      "seed": 2026
+    }
+  ],
+  "command": "check",
+  "contract_sha256": "1f982117445b65c94f07099bd3626298ca45792e1c63ca0dfa488bb25de852b4",
+  "device": "a2",
+  "dsl_imported": true,
+  "imports": {
+    "ascriptor": "<private-path>/__init__.py",
+    "ascriptor.a2": "<private-path>/a2.py",
+    "unit": "<private-path>/unit.py"
+  },
+  "kernel_imported": false,
+  "launcher": "pipesim",
+  "passed": true,
+  "runner_sha256": "8e91d95ed0294ddbfc204957b8bf77606a79123655fc096963b94658b633566b",
+  "schema": "ascriptor.unit-result/1",
+  "simulator_imported": true,
+  "stage": "pipesim",
+  "started_at": "2026-09-28T02:21:22.829443+00:00",
+  "unit": "a2.kda_fused_recurrent",
+  "versions": {
+    "ascriptor": null,
+    "numpy": "1.26.4",
+    "python": "3.11.15",
+    "torch": "2.10.0+cpu"
+  }
+}

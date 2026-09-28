@@ -238,8 +238,9 @@
    "device": "a2",
    "backend": "cce",
    "stage": "board",
-   "status": "untested",
-   "note": "All 8 cases were run on an Ascend 910B3 (CANN 9.0.0) through the aclnn launcher and matched their budgets (evidence/unit/aclnn.json). They are recorded as observations: AGENTS.md section 2 says an A2 number is not an operator conclusion before A2-11, so this row stays untested."
+   "status": "passed",
+   "scope": "A2-14 independent rerun: 16 accuracy cases at each bd=1,2 (all eight original cases plus H=HV32 and H16/HV32, T=1/4/8/16), actual unit.execute/direct launcher bitwise agreement, immutable device inputs, segmented T16 and chunk128 + 64 single-token continuation. See benchmarks/a2/evidence/decode/bd1.log, bd2.log, matching JSON receipts and cross-bd.json; report docs/research/a2_decode.md. Only this measured grid is qualified; public dispatch remains unqualified.",
+   "note": "AGENTS.md section 2 / A2-11 premises: (1) current compatibility pins library90cfcdc720bbcd66e8bd4361c4dd4fbc1a2a57b5 and kernelsb3b3f9c16df7c4626ed3c081032a1be5a753d0b1, actual imported library bytes verified; Ascend910B3 / CANN9.0.0 compiler+OPP timestamp20260428_134817545, built-in ascend910b/ascend910_93 recorded in each native receipt. (2) Fresh full A2 static accumulate guard tests passed. (3) FP32 split-K barrier repair is present in the selected library pin and established by A2-11; this vector-only decode does not invoke it. (4) Fresh AST scan of kernels/step.py finds zero matmul calls, so neither BF16/FP16 split-K nor a handwritten FP32 MMAD chain is exercised; no claim that the hardware defects disappeared. The companion chunk path retains its explicit barriers and passed the fresh continuation workload. Primary golden is independent Torch CPU FP32; Torch NPU FP32 is the second oracle; existing FP64-internal unit reference is retained as an additional diagnostic. Budgets, ABI and domain unchanged."
   }
  ],
  "provenance": {
