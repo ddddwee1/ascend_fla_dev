@@ -5395,6 +5395,10 @@
         {
           "at": "2026-09-28T12:59",
           "summary": "STATUS（issue #94 评论 5870356414，session dev-20260928T020159Z-609dfa8f）。已确认 oracle A/B 裁定（NOTE 5870217647，PM 的更正回复），冻结 A=原样 hash 核验的 pinned `naive_recurrent_gated_delta_rule`、B=独立 FP32 bmm 递推；保留此前 88 组校准与 FP64 记录，不重跑。新增 prefill/分段验收脚本的 CPU 校准：14 组场景/56 条续接链（前缀 64/128/4032，suffix 64，width 1/3/7/16），逐 token 比较；44 组 S16 输入的 132 次分段比较逐位一致；故意漏传 state 在首 token 全部被检出（负控制有效）。主机/Docker 最大相对 L2=1.129173212695534e-6 / 1.1218276553216875e-6，CPU 测试两边各 83 passed。**明确声明**这是验收脚本自己的 CPU 校准，不冒充实际 chunk→decode 设备验证。next：已开始从零写 CCE 纯向量 kernel（原生 FP32/BF16、scalar g/beta、每 value head 独占 FP32 state），静态检查/源码发射完成后在持锁窗口跑完整 B1/S16/H16/HV32 workload。UB 预算细节在核实中（BF16 共享 FP32 递推 VF 后显式 RNE 落盘，额外 8KiB 输出 staging，合计 113KiB，原 105KiB 只是初步估计）。心跳正常。"
+        },
+        {
+          "at": "2026-09-28T13:26",
+          "summary": "STATUS（issue #94 评论 5870802824，session dev-20260928T020159Z-609dfa8f，fork commit 922caf0）。**首个真机 kernel 里程碑**：按更正后的规格实现单 launch 纯向量 GDN recurrent，原生 FP32/BF16、scalar g/beta、连续分组、S1..16、None/非零初态、新 FP32 K-major state；host 只做校验/分配/dispatch，无归一化/扩头/dtype 转换/CPU 兜底。两个 typed entry 静态检查 0 error/0 warning，UB 97KiB/113KiB。**首次真机执行就是完整 B1/S16/H16/HV32 双 dtype workload**（没有先缩小形状），同时跑了对应的 torch_npu 组合参考；未跑 CUDA/Triton。中途遇到共享设备被别的任务占用，正确处理：记录后换到重新核实 Healthy/空闲的设备重做隔离网格，没碰别人的进程或卡（D-PM-28，不升级）。**bd1/2/4 各 88 例全部通过**，前后空闲、期间 0 外来 context；**bd1/2 的 88 组输入及全部返回 o/state 哈希逐位一致**（bd 之间逐位相同，硬判据初步满足）；44 组 BF16 各自与同输入 native FP32 的 RNE 输出/FP32 state 逐位一致。真机后的 sim/pipesim 定点检查通过，无 hazard/deadlock。数字：网格最大相对 L2=2.170130340355715e-7（FP32 预算 1e-4 内，留了近 3 个数量级余量）；BF16 输出质量相对 L2≈0.0016592（只作存储质量报告，不判 FP32 阈值）；44 个canonical FP32 case 通过，主机 84 tests passed。next：bd8/16/28 + 全网格跨 bd 审计；实际 chunk→decode 直传 NPU state 的 14 组/56 链逐 token 验证、132 次分段比较；S1/S16 × FP32/BF16 同卡三轮三明治；主机回归+证据/写集/隐私审计后提 PR。心跳正常，进展非常快。"
         }
       ],
       "result": null,
