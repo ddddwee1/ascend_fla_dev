@@ -201,6 +201,12 @@ allclose check, and seed1/span128 fails k_scaled and s_base allclose checks, at
 both bd values. Their relative L2 errors are tiny (1.02e-8, 3.66e-9, 1.87e-11),
 but **allclose and relative L2 are conjunctive**; a small normwise error does
 not waive those failures. The other four case pairs pass all 33 stage checks.
+`allclose-localization/` locates one failing element in each affected stage:
+span106.5 s_base native130 versus CPU50.25; span128 s_base native-1.09375 versus
+CPU-0.1513671875; and span128 k_scaled differs by one BF16 ULP near an exponent
+scaling midpoint. The large intermediate norms mask these local differences in
+relative L2. Their exact coordinates, values and original allclose allowances
+remain recorded failures; the optional FP64 scalar calculation is diagnostic only.
 
 ## Pair-matmul replay diagnosis
 
@@ -322,6 +328,9 @@ after the full native run completes, invoke it in the accepted native environmen
 under a health check and lock with `--bd 1 --out "$A213_OUT/seed-npu-reference"`.
 It reads the retained bd1 inputs and CPU golden tensors and executes the full
 Torch NPU FP32 reference, with no custom kernel launch.
+Copy and run `allclose-localization/analyze_allclose_localization.py` beside the
+other scratch analysis scripts in the accepted CPU environment to locate those
+preserved seed1 checkpoint failures.
 
 ## Torch NPU format notification
 
