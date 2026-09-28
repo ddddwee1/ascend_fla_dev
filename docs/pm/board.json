@@ -4013,6 +4013,10 @@
         {
           "at": "2026-09-28T03:44",
           "summary": "STATUS（issue #63 评论 5862942687，同 session，head 不变）。95B checkpoint 端到端（`torch` 与 `cce` 两条后端，FP32，8 token）都跑通：退出码 0，`last_token_argmax` 一致，`logits_max/min` 相差1.9e-6/5.7e-6（相对约 5e-7），`cache_check` 各自内部一致性 0.0（**不是**跨后端比较，明确澄清不要误读）。**明确声明尚未完成的部分**：还没做两条后端之间 logits 的逐元素相对 L2，所以现在不能说 'FP32 预算 1e-3 已满足'——只是摘要统计指向差距很小。`load/forward_seconds` 的数字不当性能结论（单次墙钟，非三明治）。next：落盘两条后端 logits/cache，算相对 L2 对 1e-3（FP32）与 1e-2（BF16）判定，然后出证据包开 draft PR。"
+        },
+        {
+          "at": "2026-09-28T13:22",
+          "summary": "STATUS（issue #63 评论 5870723778，session gd202-a5-realdevice-1，head d4be06a）。补上了跨后端的 logits 逐元素比对（`torch` 与 `cce` 各自落盘、一后端一进程，避免 CANN 每进程只解析一次算子名的坑）：真实 95B checkpoint/机器 B/FP32/8 token，`logits` 形状 (1,8,32000) 后端间相对 L2=4.094682e-05、max_abs=9.155273e-04，均在 1e-3 预算内（约为预算的 1/24）；8 个 token argmax 全部一致。**明确区分**：这是 torch↔cce 直接比对，不是上次说的各后端自己的 `cache_check`。**未满足验收的两条如实披露**：①落盘脚本里 cache 张量没拿到（'cache absent'），后端间 cache 比对还没有数字，任务预算要求 logits+cache 两者，只报 logits 不算通过；②BF16 那一轮（预算 1e-2）还没跑。在补齐前，95B 端到端**不算通过**，只是 FP32 logits 这一半过了。next：修落盘脚本的 cache 处理并重跑、BF16 一轮、证据出包开 draft PR。心跳正常。"
         }
       ],
       "result": null
