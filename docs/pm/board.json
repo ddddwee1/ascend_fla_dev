@@ -5007,7 +5007,7 @@
       "wave": "W0",
       "soc": "a5",
       "priority": "P1",
-      "status": "review",
+      "status": "done",
       "model": [],
       "kernel": [
         "pgdn_chunk_bwd"
@@ -5170,9 +5170,24 @@
         {
           "at": "2026-09-26T09:40",
           "summary": "DONE #2（issue #93 评论 5845138982 + PR #134 评论 5845191111，session dev-20260926T010004Z-0375dde8；PR #134 已转 ready，head 4404eb31006302301c495f7f0e294f410966ffed；commits c8e7073→51563ff→670f490→14ab94b→4404eb3）。声称：修复 670f490 后，原 256 例 + 补充 73 例在 bd1/bd2 全部重新完整验收，普通类 A/B 最大相对 L2=4.1356284098271835e-6（预算内不变）；20 阶段+7 公共梯度跨 bd 逐位一致；披露元素 bd1=bd2=67,662,570（=原 66,581,570 + 补充 73 例的 1,081,000，算术吻合，非新增异常）；仍标'披露完整，非通过'，分类/64×阈值/预算/reserved_paths 均未改。同卡 T1024/4096 三轮 B/C/B 测量完成（T1024 候选≈12.98ms、T4096 候选≈55.7ms，基线数量级更小，基线口径同前一版）。原 RISK 5843602206 的三个密集 clamp 失败例声称分支差异已归零。主机 1358 passed/10 skipped，备用Docker 119 passed。按 D-PM-33 走完整审查，不因申领人自述而免检——重点核对：①c8e7073→4404eb3 之间代码 diff 是否仅限 ATK kernel 修复、无写集外改动；②原三个失败例是否真的归零；③关键数字独立复算；④host 测试与写集边界重跑确认。已派发独立复核，结果另记。in_progress -> review。"
+        },
+        {
+          "at": "2026-09-28T01:45",
+          "summary": "合入（PM，按 D-PM-33，用户明确指示'你来合入'后完成）。PR #134 merge commit 790d148c（`GH_TOKEN=$(gh auth token -u ascend-fla-pm-bot) gh pr merge --match-head-commit 4404eb3`，`limjiunnbin` 账号无 MergePullRequest 权限，同 A2-02 先例）。main 全量回归（排除 torch_npu）1329 passed/25 skipped/14 failed，14 个失败全部是本机缺 ascriptor 包的既有环境缺口，与 PK-05 无关，PK-05 自身测试 0 failure。docs/handoff.md 已补写这次的 silent-wrong-result 发现修复过程与合入权限踩坑记录。review -> done。"
         }
       ],
-      "result": null,
+      "result": {
+        "commits": [
+          "790d148c"
+        ],
+        "evidence": [
+          "PR #134",
+          "kernels/projects/a5/pgdn_chunk_bwd/evidence/",
+          "tests/test_pgdn_chunk_bwd.py",
+          "docs/research/pgdn_chunk_bwd_gate_range.md"
+        ],
+        "numbers": "A5 Ascend950PR（两张物理卡，957b 用于 bd1、9579 用于 bd2）/CANN 9.1.0-beta.1/9.2.0，B1/K=V128/FP32：冻结 256-case CPU 校准 + 修复后 329 例（原 256 + 补充 73 例密集 clamp 边界）在 bd1/bd2 全部通过，普通类逐梯度 A/B 最大相对 L2=4.1356284098271835e-6（1e-4 预算内），20 阶段+7 公共梯度跨 bd 逐位一致（用逐 case sha256 独立复算，非汇总字段，0 mismatch，两张不同物理卡）；披露元素 bd1=bd2=67,662,570，逐位置/值/局部尺度/阈值完整留存，contract.json 数值 stage 显式 status:failed，如实标'数值披露完整，非通过'，不声称全数值 PASS。真实发现的 silent-wrong-result：设备端 norm 归约的 128 路一次性 cadd() 与 literal PyTorch AVX2 的8 路独立累加+顺序求和不一致，密集 q/k 缩近 FP32 clamp 边界（1e-12）时 5-6/64 行走错分支，dq/dk 相对 L2 达 0.03；修复后原三例（同一输入哈希）分支差异归零，PM 独立核对 PyTorch 该 pin 版本的 ReduceOpsKernel.cpp 源码确认修复模式真实、非巧合，且候选排除过 FMA/4 路/16 路等替代方案。同卡 T1024/T4096 三轮 baseline/candidate/baseline 完成，仅作前向准备状态成本对照，不代表另一套完整反向后端或加速比。PM 独立复核（两轮，均在独立 worktree 派子 agent 做，不信自述）：写集边界干净（10 个改动文件全在写集内，公共入口签名/冻结分类代码 ref/classification.py/64×阈值/1e-4 预算逐 diff 确认未改）；关键数字均从原始 JSON 独立复算吻合；host 测试本 PR 0 failure。合入后 main 全量（本机排除 torch_npu、无 ascriptor 包）1329 passed/25 skipped/14 failed——14 个失败全部是本机缺 ascriptor 包的既有环境缺口（与 PK-05 无关，PK-05 自身测试 0 failure）。"
+      },
       "origin": {
         "kind": "request",
         "issue": 89,
