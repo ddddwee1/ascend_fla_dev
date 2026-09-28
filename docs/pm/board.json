@@ -5305,7 +5305,7 @@
       "wave": "W0",
       "soc": "a5",
       "priority": "-",
-      "status": "assigned",
+      "status": "in_progress",
       "model": [],
       "kernel": [
         "gdn_fused_recurrent"
@@ -5371,6 +5371,22 @@
         {
           "at": "2026-09-28T07:30",
           "summary": "ASSIGN（PM）。规格已写完（docs/pm/tasks/GDA-04.md），照 GDA-03（反向）与 A2-14（decode 资格化）的先例，但明确这是**从零建 kernel**（`kernels/projects/a5/gdn_fused_recurrent/` 目前不存在，`ops.json` 缺口表标 `ascriptor_asset: none`），工作量预期接近 GDA-01，不是 A2-14 那种轻量资格化。已把申领人只读预检的四点发现（T 必须 64 倍数、prepare 的进程约束、g≤0 不保证稳定、近零分母口径）吸收进规格。关键 ABI 决定：`initial_state`/`final_state` 用 `[B,HV,128,128]` FP32 K 在前（对齐 chunk 的 `final_state` 布局）；`g/beta` 是标量 `[B,S,HV]`（不是 KDA 那种逐通道展开）；chunk 前向不支持非零 initial_state，所以 prefill→decode 验证只能是单方向（chunk 从零起→decode 续接）。写集：kernels/projects/a5/gdn_fused_recurrent/**、ascend_fla/ops/gdn_fused_recurrent.py、tests/test_gdn_fused_recurrent.py、docs/research/gdn_fused_recurrent_gate_range.md。"
+        },
+        {
+          "at": "2026-09-28T11:58",
+          "summary": "ACK（issue #94 评论 5869377709，session dev-20260928T020159Z-609dfa8f，对应 ASSIGN 5868462542）。计划：①冻结 token-major/标量门控/state ABI、S_MAX 与精度口径，先校准双参考+FP64 对照；②从零建 GDN recurrent CCE Vector 单元，原生 FP32/BF16，转换/分组在 kernel 内；③完整 workload 先上板，扫短 S/分组/bd/非零 state；④验证 chunk→decode 续接、decode 分段串接、同卡三轮三明治；⑤写集内交付代码/测试/证据/文档，PR 后 DONE。ETA 24h。assigned -> in_progress。"
+        },
+        {
+          "at": "2026-09-28T12:00",
+          "summary": "STATUS（issue #94 评论 5869407455）。已核对 board session 一致，隔离工作树建好；按最新规格原生支持 BF16/FP32。定位到 oracle A 的来源问题并发 RISK（见下）；继续做不依赖该问题的 B 参考、输入/比较器、ABI/环境准备。按 stage 给了工作量估计：ABI/来源/校准 3h、从零建单元 5h、完整真机网格 9h、同卡三明治 4h、双环境回归+证据+PR 3h（合计 24h，与 timebox 吻合）。next：`S_MAX` 拟选 16（片上缓冲依据），`bd` 候选 {1,2,4,8,16,28} 由真机实测收敛（验收前不声称已支持）；首个完整 workload 拟 B1/S16/H16/HV32/K=V128/非零 state，FP32 与 BF16。尚无数字（未跑 kernel）。"
+        },
+        {
+          "at": "2026-09-28T11:58",
+          "summary": "RISK contradicts-handoff（issue #94 评论 5869386476）：规格把 oracle A 写成 fla 的 `fused_recurrent_gated_delta_rule` CPU FP32 自动实现，但 pinned 源码（`fla/ops/gated_delta_rule/fused_recurrent.py:11-12` import triton、`:29` `@triton.jit`、`:184-249` 发射 Triton kernel）只有 Triton 分支，没有 CPU 实现；语义对应且是 CPU FP32 的是同目录 `naive.py::naive_recurrent_gated_delta_rule`。PM 核实属实（已读源码确认 import triton/@triton.jit，且该函数与本任务限定语义对应）——**这与 GDA-03（GDN 反向）已经用过的同一个函数是一致的先例，PM 写规格时的表述不准确，不是申领人的错误**。裁定：oracle A 改用 pin 住的 `naive_recurrent_gated_delta_rule`（原样加载、hash 核验，不改一个字）；`fused_recurrent.py` 只作分组/布局/flags 的语义参照，不执行（避免声称跑了 Triton/CUDA）；B 仍是独立 CPU FP32 推导，不 import A；FP64 用抬升版本的 A + 独立 FP64 版本的 B 做小形状校准，明确标注'lifted'。规格 docs/pm/tasks/GDA-04.md 已同步更正（新增'关于 oracle A 的更正'一节）。此裁定不改预算、不改写集，不是偷换金标准，是修正 PM 自己规格里的一处不精确表述。"
+        },
+        {
+          "at": "2026-09-28T12:12",
+          "summary": "STATUS（issue #94 评论 5869600700）。已完成不依赖 A 身份争议的部分：公共 ABI 校验、独立 B 参考、88 组固定网格（FP32/BF16 原生存储、ratio1/2/4/8、S∈{1,2,3,7,15,16}、72 个 value-head 工作项、None/非零 state、门控/量程边界）+ 比较器，先用申领人提议的 literal naive 做预校准（身份当时待裁定，现已裁定通过）。数字：主机 Python3.11.15/Torch2.10.0+cpu，88 组 A/B 最大相对 L2=1.8991640892534126e-7，3 组 FP64 lifted-A/独立-B 最大相对 L2=2.082554894892825e-16；Docker Python3.12.14/Torch2.12.0+cu130，同 88 组最大相对 L2=2.0076726144241469e-7，3 组 FP64 最大相对 L2=2.174836294858946e-16（两边各自独立生成输入，未跨环境混用随机数）。公共 ABI/拒绝路径/初始态不变/独立解析/比较器负控制：主机 69 passed。尚无 kernel 代码或设备数值运行。next：Docker 侧重跑 ABI 测试、完成 ABI/量程文档草案；收到 oracle 裁定（已给）后开始 CCE kernel。同卡基线拟用真实 torch_npu 组成的 GDN 逐 token 递推（会先验证该基线确实执行对应数学任务）。心跳正常。"
         }
       ],
       "result": null,

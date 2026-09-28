@@ -52,12 +52,26 @@ none`——**这条和 A2-14 不一样：A2-14 是资格化一个已经存在的
      完成（D-PM-35/37：host 侧只做校验/分配/launch，不做 `.float()`/`.to(dtype)`）。`g/beta` 恒 FP32。
    - 归一化：同 GDA-01/03，GDN 的 naive 与本仓前向都不对 `q/k` 归一化，decode 同样不做，不支持
      `use_qk_l2norm_in_kernel` 这类可选项，需要就显式拒绝。
-2. **双 oracle**：**A** = fla 的 `fused_recurrent_gated_delta_rule` CPU FP32 自动实现（语义权威，
-   pin 的确切版本写进 ABI 冻结表）；**B** = 本任务独立写的 CPU FP32 逐 token 递推（不复用 A 的实现，
-   不 import A）。两者先在小形状上过一次 FP64 数值 gradcheck 或至少 FP64 参考互相对照，证明 A、B 自己
-   是对的，再往下走（同 GDA-03 口径 1）。**吸取 A2-14 的教训**：如果打算像 A2-14 那样另写一个"显式
-   FP32 逐元素算术"的独立参考当主金标准，就把这条明确写进冻结表，不要事后被指出"实现细节和声称的不
-   一致"才补。
+2. **双 oracle（2026-09-28 更正，见下方"关于 oracle A 的更正"一节，以这里为准）**：**A** = pin 住的
+   fla `fla/ops/gated_delta_rule/naive.py::naive_recurrent_gated_delta_rule`（CPU FP32，原样加载、
+   hash 核验，不改一个字；语义权威——它不做 q/k 归一化，先缩放 q、衰减 state、用 k 读出修正、beta 乘
+   delta、更新 state 再输出，与本任务限定的 fused recurrent 数学语义对应）；**B** = 本任务独立写的
+   CPU FP32 逐 token 递推（不复用 A 的实现，不 import A）。两者先用 FP64 抬升版本的 A（lifted，明确
+   标注是抬升实现而非声称原始 naive 支持 FP64）与独立 FP64 版本的 B 互相对照，证明 A、B 自己是对的，
+   再往下走（同 GDA-03 口径 1）。`fla/ops/gated_delta_rule/fused_recurrent.py` 只作分组/布局/默认
+   flags 的语义参照，**不执行**（它是纯 Triton kernel，执行了就违反"不声称 CUDA/Triton"）。**吸取
+   A2-14 的教训**：如果打算像 A2-14 那样另写一个"显式 FP32 逐元素算术"的独立参考当主金标准，就把这条
+   明确写进冻结表，不要事后被指出"实现细节和声称的不一致"才补。
+
+### 关于 oracle A 的更正（2026-09-28，申领人 RISK contradicts-handoff，PM 已读源码核实并采纳）
+
+本节最初把 A 写成"fla 的 `fused_recurrent_gated_delta_rule` CPU FP32 自动实现"，**这个说法不准确**：
+PM 核实过 pin 住的 `fla/ops/gated_delta_rule/fused_recurrent.py`（`import triton`/`@triton.jit`），
+它是**纯 Triton kernel，没有 CPU 分支**，公开入口最终走 `FusedRecurrentFunction.apply` 分发到 Triton；
+不存在"CPU FP32 自动实现"这个东西。真正与本任务语义对应、且是 CPU FP32 的是同目录下
+`naive.py::naive_recurrent_gated_delta_rule`——这与 **GDA-03（GDN 反向）已经用过的同一个函数**是
+一致的先例，不是临时发明。**裁定**：oracle A 改用 `naive_recurrent_gated_delta_rule`，上面"范围"
+一节的第 2 条已经改过来，按那条执行；`fused_recurrent.py` 仅作只读语义参照，不运行。
 3. **prefill→decode 一致性**（`AGENTS.md` §6 硬判据，A2-14 已验证过同类模式，可以照抄测试结构）：
    - 用 `chunk_gdn` 跑一段前缀（长度取 64 的倍数，例如 128），`initial_state=None`，拿到 `final_state`；
    - 把这个 `final_state` 喂给 `fused_recurrent_gdn` 继续单步/短步递推若干步；
