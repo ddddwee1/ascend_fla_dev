@@ -168,7 +168,7 @@ _Used by Qwen3-Next; six ABI gaps to close (phase 4, unrelated to this). **GDN/P
 | task | issue | SoC | dtype | status | note |
 |---|---|---|---|---|---|
 | A2-20 | [#45](https://github.com/ddddwee1/ascend_fla_dev/issues/45) | `a2` | bf16、fp32 | 🔒 gated (kernel-batch-approval) | ★ start |
-| GDA-04 | [#94](https://github.com/ddddwee1/ascend_fla_dev/issues/94) | `a5` | bf16、fp32 | ⬜ open | ★ start |
+| GDA-04 | [#94](https://github.com/ddddwee1/ascend_fla_dev/issues/94) | `a5` | bf16、fp32 | 🔵 assigned | ★ start |
 
 </details>
 
