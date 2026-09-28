@@ -1,4 +1,4 @@
-"""Proposed literal CPU A; source identity is explicit (PM RISK pending).
+"""Literal CPU A approved by PM issue94 comment5870217647.
 
 The pinned fused-recurrent implementation is Triton, not a CPU backend. This
 adapter loads the literal naive implementation; it never executes Triton.

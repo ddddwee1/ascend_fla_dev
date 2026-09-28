@@ -1,4 +1,4 @@
-"""Before-kernel A/B calibration; source-selection approval is separate."""
+"""Before-kernel A/B calibration with the PM-approved literal naive A."""
 import argparse,json,platform
 from pathlib import Path
 import torch
@@ -26,7 +26,7 @@ def calibrate():
         fp64.append(dict(shape=[b,s,h,hv,k,v],metrics={n:metric(ref[n],a[n]) for n in a}))
     max32=max(m['relative_l2'] for r in records for m in r['A_vs_B'].values())
     max64=max(m['relative_l2'] for r in fp64 for m in r['metrics'].values())
-    return dict(kind='CPU calibration, not device acceptance',oracle_identity='proposed literal naive A, PM RISK pending',
+    return dict(kind='CPU calibration, not device acceptance',oracle_identity='literal naive A; PM issue94 comment5870217647',
                 fla_pin=PIN,oracle_sha256=SHA256,python=platform.python_version(),torch=torch.__version__,
                 cases=records,fp64_lift_cases=fp64,max_fp32_A_B_relative_l2=max32,max_fp64_relative_l2=max64,
                 calibrated=max32<=1e-5 and max64<=1e-12)

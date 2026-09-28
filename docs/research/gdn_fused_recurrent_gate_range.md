@@ -1,8 +1,9 @@
 # GDN recurrent ABI and qualification ledger
 
-Task GDA-04, specification at `e8a845b`. This is an implementation-preflight
-record, not a completed qualification. Kernel/device evidence is pending.
-The CPU A identity clarification is tracked in issue #94 comment 5869386476.
+Task GDA-04, specification at `ad2184a`. This is an implementation-preflight
+record, not a completed qualification. The kernel is implemented; complete
+multi-bd, native integration and timing acceptance is still in progress.
+PM approved the exact CPU A identity in [issue #94 comment 5870217647](https://github.com/ddddwee1/ascend_fla_dev/issues/94#issuecomment-5870217647).
 
 ## ABI
 
@@ -49,15 +50,15 @@ store using RNE. No input normalization, clipping, head copies or casts occur
 in the public host path. In particular beta multiplies delta before the state
 write; a beta*k reassociation is not silently borrowed from KDA decode.
 
-## CPU references and pending identity clarification
+## CPU references and approved identity
 
 FLA pin: `e52dbc0ea19d3a40d7ab7f9eed855d2b473994d2`.
 The pinned `fused_recurrent_gated_delta_rule` calls a Triton kernel; there is
-no CPU branch. The proposed A therefore loads the literal
+no CPU branch. A loads the literal
 `naive_recurrent_gated_delta_rule` from the same pin, verified against SHA256
 `d1cf17992349fd3e94af999b22e3d3a81be4a2d1881ce5b70a3457257166e0cb`.
 Only test-side contiguous group expansion adapts its equal-head signature.
-This source selection remains subject to the explicit PM clarification above.
+PM explicitly accepted the existing88-case calibration without rerunning it.
 No CUDA/Triton execution is claimed.
 
 B is `ref/reference.py`: independent per-token batched matrix products, with
@@ -72,7 +73,7 @@ FP64-preserving.
 | Python3.11.15 / Torch2.10.0+cpu |88|1.8991640892534126e-7|3|2.082554894892825e-16|
 | Python3.12.14 / Torch2.12.0+cu130 |88|2.0076726144241469e-7|3|2.174836294858946e-16|
 
-These are preliminary reference-calibration results, not device acceptance.
+These are approved reference-calibration results, not device acceptance.
 Each environment generated and consumed its own actual input tensors.
 The full grid and deterministic seeds are defined before kernel source in
 `ref/reference.py`. A/B must stay below1e-5 before kernel development; the
@@ -122,7 +123,29 @@ samples per leg. No speed threshold or CUDA/Triton comparison is promised.
 
 ## Evidence still required
 
-Kernel source/static checks, vendor compilation, complete native workload,
-bd qualification, small bounded model diagnostics, prefill/decode integration,
-public host-work audit, native BF16 storage checks and same-card measurements
-are pending. The branch is not ready for DONE or PR acceptance.
+Both typed entries passed static checks with0 errors and0 warnings and emitted
+pure-vector CCE. Lowered UB allocation is97KiB for FP32 and113KiB for BF16;
+the latter includes an explicit FP32 output stage before RNE narrowing.
+The44 canonical FP32 CPU reference cases and84 host tests passed.
+
+The first complete native B1/S16/H16/HV32 workload passed for both dtypes, with
+actual torch_npu baseline outputs also checked. FP32 output/state maximum
+relative L2 against A/B was1.5653452511426124e-7. BF16 state was within the
+FP32 budget, and BF16 output/state matched the same-input native FP32 output
+after RNE/state bytes respectively. BF16 output quality relative L2 was about
+0.0016592; this is not a FP32 arithmetic tolerance.
+
+The initial88-case bd1 grid had a foreign task observed during its window;
+its numerical results are retained separately. An isolated repeat passed all88
+cases, maximum budgeted relative L2=2.170130340355715e-7, with all44 BF16
+storage comparisons byte-identical. No foreign context was observed in that
+repeat. These results do not yet qualify the other candidate block dimensions.
+
+After the full hardware run, bounded FP32 B1/S2/H3/HV3 and BF16 B1/S2/H1/HV4
+with None state passed functional simulation and pipe simulation at bd1.
+The latter reported no event imbalance, hazard or deadlock. These are model
+diagnostics of repeated state reuse and cast footprints, not native evidence.
+
+Remaining: complete bd qualification and cross-bd byte checks, actual public
+prefill/decode integration, public host-work audit, same-card measurements and
+portable evidence closeout. The branch is not ready for DONE or PR acceptance.

@@ -1,0 +1,748 @@
+{
+  "schema": "ascriptor.kernel-unit/1",
+  "id": "a5.gdn_fused_recurrent",
+  "kind": "kernel",
+  "description": "A5 scalar-gated GDN decode, native token-major inputs, fresh FP32 K-major state. Canonical FP32 grid; BF16 is additionally verified natively.",
+  "inputs": {
+    "q": {
+      "dtype": "float32",
+      "shape": [
+        "B",
+        "S",
+        "H",
+        128
+      ]
+    },
+    "k": {
+      "dtype": "float32",
+      "shape": [
+        "B",
+        "S",
+        "H",
+        128
+      ]
+    },
+    "v": {
+      "dtype": "float32",
+      "shape": [
+        "B",
+        "S",
+        "HV",
+        128
+      ]
+    },
+    "g": {
+      "dtype": "float32",
+      "shape": [
+        "B",
+        "S",
+        "HV"
+      ]
+    },
+    "beta": {
+      "dtype": "float32",
+      "shape": [
+        "B",
+        "S",
+        "HV"
+      ]
+    },
+    "initial_state": {
+      "dtype": "float32",
+      "shape": [
+        "B",
+        "HV",
+        128,
+        128
+      ]
+    }
+  },
+  "outputs": {
+    "o": {
+      "dtype": "float32",
+      "shape": [
+        "B",
+        "S",
+        "HV",
+        128
+      ]
+    },
+    "final_state": {
+      "dtype": "float32",
+      "shape": [
+        "B",
+        "HV",
+        128,
+        128
+      ]
+    }
+  },
+  "domain": {
+    "S": "1..16",
+    "K": 128,
+    "V": 128,
+    "grouping": "HV positive multiple of H; contiguous value-head groups",
+    "state": "None or nonzero FP32; fresh final_state",
+    "normalization": "none; fixed scale128**-0.5",
+    "numeric": "finite g<=0, beta in[0,1]; avoid FP32 intermediate overflow",
+    "block_dim": [
+      1,
+      2,
+      4,
+      8,
+      16,
+      28
+    ],
+    "qualification": "Candidate block dimensions; native qualification pending"
+  },
+  "dependencies": {
+    "python": ">=3.10",
+    "ascriptor": "==0.1.0",
+    "host": [
+      "torch>=2.9",
+      "numpy",
+      "einops"
+    ]
+  },
+  "comparison": {
+    "default": {
+      "mode": "allclose",
+      "atol": 2e-05,
+      "rtol": 0.0002,
+      "max_relative_l2": 0.0001,
+      "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution."
+    }
+  },
+  "cases": [
+    {
+      "id": "full_float32",
+      "seed": 940000,
+      "parameters": {
+        "B": 1,
+        "S": 16,
+        "H": 16,
+        "HV": 32,
+        "state": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r1_s1_float32",
+      "seed": 940001,
+      "parameters": {
+        "B": 1,
+        "S": 1,
+        "H": 3,
+        "HV": 3,
+        "state": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r1_s2_float32",
+      "seed": 940002,
+      "parameters": {
+        "B": 1,
+        "S": 2,
+        "H": 3,
+        "HV": 3,
+        "state": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r1_s3_float32",
+      "seed": 940003,
+      "parameters": {
+        "B": 1,
+        "S": 3,
+        "H": 3,
+        "HV": 3,
+        "state": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r1_s7_float32",
+      "seed": 940004,
+      "parameters": {
+        "B": 1,
+        "S": 7,
+        "H": 3,
+        "HV": 3,
+        "state": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r1_s15_float32",
+      "seed": 940005,
+      "parameters": {
+        "B": 1,
+        "S": 15,
+        "H": 3,
+        "HV": 3,
+        "state": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r1_s16_float32",
+      "seed": 940006,
+      "parameters": {
+        "B": 1,
+        "S": 16,
+        "H": 3,
+        "HV": 3,
+        "state": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r2_s1_float32",
+      "seed": 940007,
+      "parameters": {
+        "B": 1,
+        "S": 1,
+        "H": 3,
+        "HV": 6,
+        "state": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r2_s2_float32",
+      "seed": 940008,
+      "parameters": {
+        "B": 1,
+        "S": 2,
+        "H": 3,
+        "HV": 6,
+        "state": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r2_s3_float32",
+      "seed": 940009,
+      "parameters": {
+        "B": 1,
+        "S": 3,
+        "H": 3,
+        "HV": 6,
+        "state": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r2_s7_float32",
+      "seed": 940010,
+      "parameters": {
+        "B": 1,
+        "S": 7,
+        "H": 3,
+        "HV": 6,
+        "state": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r2_s15_float32",
+      "seed": 940011,
+      "parameters": {
+        "B": 1,
+        "S": 15,
+        "H": 3,
+        "HV": 6,
+        "state": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r2_s16_float32",
+      "seed": 940012,
+      "parameters": {
+        "B": 1,
+        "S": 16,
+        "H": 3,
+        "HV": 6,
+        "state": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r4_s1_float32",
+      "seed": 940013,
+      "parameters": {
+        "B": 1,
+        "S": 1,
+        "H": 3,
+        "HV": 12,
+        "state": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r4_s2_float32",
+      "seed": 940014,
+      "parameters": {
+        "B": 1,
+        "S": 2,
+        "H": 3,
+        "HV": 12,
+        "state": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r4_s3_float32",
+      "seed": 940015,
+      "parameters": {
+        "B": 1,
+        "S": 3,
+        "H": 3,
+        "HV": 12,
+        "state": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r4_s7_float32",
+      "seed": 940016,
+      "parameters": {
+        "B": 1,
+        "S": 7,
+        "H": 3,
+        "HV": 12,
+        "state": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r4_s15_float32",
+      "seed": 940017,
+      "parameters": {
+        "B": 1,
+        "S": 15,
+        "H": 3,
+        "HV": 12,
+        "state": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r4_s16_float32",
+      "seed": 940018,
+      "parameters": {
+        "B": 1,
+        "S": 16,
+        "H": 3,
+        "HV": 12,
+        "state": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r8_s1_float32",
+      "seed": 940019,
+      "parameters": {
+        "B": 1,
+        "S": 1,
+        "H": 3,
+        "HV": 24,
+        "state": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r8_s2_float32",
+      "seed": 940020,
+      "parameters": {
+        "B": 1,
+        "S": 2,
+        "H": 3,
+        "HV": 24,
+        "state": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r8_s3_float32",
+      "seed": 940021,
+      "parameters": {
+        "B": 1,
+        "S": 3,
+        "H": 3,
+        "HV": 24,
+        "state": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r8_s7_float32",
+      "seed": 940022,
+      "parameters": {
+        "B": 1,
+        "S": 7,
+        "H": 3,
+        "HV": 24,
+        "state": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r8_s15_float32",
+      "seed": 940023,
+      "parameters": {
+        "B": 1,
+        "S": 15,
+        "H": 3,
+        "HV": 24,
+        "state": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r8_s16_float32",
+      "seed": 940024,
+      "parameters": {
+        "B": 1,
+        "S": 16,
+        "H": 3,
+        "HV": 24,
+        "state": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "zero_initial_float32",
+      "seed": 940025,
+      "parameters": {
+        "B": 2,
+        "S": 16,
+        "H": 2,
+        "HV": 8,
+        "state": "none",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "explicit_zero_float32",
+      "seed": 940026,
+      "parameters": {
+        "B": 2,
+        "S": 16,
+        "H": 2,
+        "HV": 8,
+        "state": "zero",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "batch2_s3_float32",
+      "seed": 940027,
+      "parameters": {
+        "B": 2,
+        "S": 3,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "batch2_s16_float32",
+      "seed": 940028,
+      "parameters": {
+        "B": 2,
+        "S": 16,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "many_heads_float32",
+      "seed": 940029,
+      "parameters": {
+        "B": 3,
+        "S": 3,
+        "H": 3,
+        "HV": 24,
+        "state": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "g_zero_float32",
+      "seed": 940030,
+      "parameters": {
+        "B": 2,
+        "S": 16,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "g": 0.0,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "g_small_float32",
+      "seed": 940031,
+      "parameters": {
+        "B": 2,
+        "S": 16,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "g": -0.001,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "g_large_float32",
+      "seed": 940032,
+      "parameters": {
+        "B": 2,
+        "S": 16,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "g": -30.0,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "g_underflow_float32",
+      "seed": 940033,
+      "parameters": {
+        "B": 2,
+        "S": 16,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "g": -1000.0,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "beta_zero_float32",
+      "seed": 940034,
+      "parameters": {
+        "B": 2,
+        "S": 16,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "beta": 0.0,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "beta_one_float32",
+      "seed": 940035,
+      "parameters": {
+        "B": 2,
+        "S": 16,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "beta": 1.0,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "zero_q_float32",
+      "seed": 940036,
+      "parameters": {
+        "B": 2,
+        "S": 16,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "zero_q": true,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "zero_k_float32",
+      "seed": 940037,
+      "parameters": {
+        "B": 2,
+        "S": 16,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "zero_k": true,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "all_zero_float32",
+      "seed": 940038,
+      "parameters": {
+        "B": 2,
+        "S": 16,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "all_zero": true,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "state_large_float32",
+      "seed": 940039,
+      "parameters": {
+        "B": 2,
+        "S": 16,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "state_scale": 16.0,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "state_small_float32",
+      "seed": 940040,
+      "parameters": {
+        "B": 2,
+        "S": 16,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "state_scale": 1e-06,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "key_norm_one_float32",
+      "seed": 940041,
+      "parameters": {
+        "B": 2,
+        "S": 16,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "key_norm": 1.0,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "key_norm_two_float32",
+      "seed": 940042,
+      "parameters": {
+        "B": 2,
+        "S": 16,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "key_norm": 2.0,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "signed_spikes_float32",
+      "seed": 940043,
+      "parameters": {
+        "B": 2,
+        "S": 16,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "spikes": true,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    }
+  ],
+  "support": [
+    {
+      "device": "a5",
+      "backend": "cce",
+      "stage": "reference",
+      "status": "untested"
+    },
+    {
+      "device": "a5",
+      "backend": "cce",
+      "stage": "emit",
+      "status": "untested"
+    },
+    {
+      "device": "a5",
+      "backend": "cce",
+      "stage": "compile",
+      "status": "untested"
+    },
+    {
+      "device": "a5",
+      "backend": "cce",
+      "stage": "sim",
+      "status": "untested"
+    },
+    {
+      "device": "a5",
+      "backend": "cce",
+      "stage": "pipesim",
+      "status": "untested"
+    },
+    {
+      "device": "a5",
+      "backend": "cce",
+      "stage": "board",
+      "status": "untested"
+    }
+  ],
+  "provenance": {
+    "algorithm": "FLA pin e52dbc0ea19d3a40d7ab7f9eed855d2b473994d2, naive_recurrent_gated_delta_rule; literal hash-verified A approved in issue94 comment5870217647",
+    "implementation": "From-zero pure vector GDN recurrence; no KDA or GDN chunk runtime dependency",
+    "library": "90cfcdc720bbcd66e8bd4361c4dd4fbc1a2a57b5",
+    "kernels": "b3b3f9c16df7c4626ed3c081032a1be5a753d0b1"
+  }
+}

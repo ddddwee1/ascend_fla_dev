@@ -4,6 +4,8 @@ from pathlib import Path
 import pytest
 import torch
 from ascend_fla.ops import gdn_fused_recurrent as api
+from kernels.projects.a5.gdn_fused_recurrent.ref import integration
+from kernels.projects.a5.gdn_fused_recurrent.ref.native_baseline import torch_npu_recurrent
 
 ROOT=Path(__file__).resolve().parents[1]/'kernels/projects/a5/gdn_fused_recurrent'
 _spec=importlib.util.spec_from_file_location('_gda04_reference_tests',ROOT/'ref/reference.py')
@@ -121,3 +123,57 @@ def test_comparator_zero_reference_and_nonfinite_rules():
     assert ref.metric(zero,zero)['relative_l2']==0.
     assert ref.metric(wrong,zero)['relative_l2']==float('inf')
     wrong[0,0]=float('nan');assert not ref.metric(wrong,zero)['finite']
+
+
+@pytest.mark.parametrize('dtype',['float32','bfloat16'])
+@pytest.mark.parametrize('width',[1,3,7])
+def test_state_chaining_matches_one_call_and_covers_short_tail(dtype,width):
+    data=ref.make_inputs(dict(B=2,S=16,H=2,HV=8,dtype=dtype,state='random',seed=9416))
+    whole=ref.reference(data)
+    split,calls=integration.chained_decode(data,ref.reference,width,output_dtype=torch.float32)
+    trace=integration.trace_metrics(split,whole)
+    assert all(trace['byte_identical'].values())
+    assert [t for row in calls for t in range(row['start'],row['stop'])]==list(range(16))
+    assert all(0<row['stop']-row['start']<=width for row in calls)
+    for previous,current in zip(calls,calls[1:]):
+        assert previous['returned_state_sha256']==current['initial_state_sha256']
+
+
+@pytest.mark.parametrize('fault',['missing','shape','dtype','nan','alias','mutation'])
+def test_integration_checks_reject_faulty_return_or_input_mutation(fault):
+    data=inputs()
+    def faulty_call(values):
+        result=ref.reference(values)
+        if fault=='missing':del result['final_state']
+        elif fault=='shape':result['o']=result['o'][:,:1].contiguous()
+        elif fault=='dtype':result['final_state']=result['final_state'].bfloat16()
+        elif fault=='nan':result['o'].reshape(-1)[0]=float('nan')
+        elif fault=='alias':result['final_state']=values['initial_state'].view_as(values['initial_state'])
+        else:values['initial_state'].add_(1.)
+        return result
+    with pytest.raises(ValueError):
+        integration.run_checked(data,faulty_call,output_dtype=torch.float32)
+
+
+def test_dropped_state_is_detected_at_first_token():
+    data=inputs();data['q'].zero_();data['q'][...,7]=1.
+    data['k'].zero_();data['beta'].zero_();data['g'].zero_()
+    data['initial_state'].zero_();data['initial_state'][:,:,7,:]=2.
+    expected=ref.reference(data)
+    dropped=ref.reference(dict(data,initial_state=None))
+    trace=integration.trace_metrics(dropped,expected,token_offset=128)
+    assert trace['tokens'][0]['token']==128
+    assert trace['tokens'][0]['relative_l2']==1.
+    assert not integration.trace_passed(trace)
+
+
+def test_trace_rejects_broadcastable_wrong_shape():
+    expected=ref.reference(inputs())
+    wrong=dict(expected,o=expected['o'][:,:1])
+    with pytest.raises(ValueError,match='shapes differ'):
+        integration.trace_metrics(wrong,expected)
+
+
+def test_native_baseline_rejects_cpu_fallback():
+    with pytest.raises(ValueError,match='no CPU fallback'):
+        torch_npu_recurrent(inputs())
