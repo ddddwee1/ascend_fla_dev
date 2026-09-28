@@ -201,6 +201,28 @@ The exact analysis source, raw stdout, results and hashes of its retained native
 tensor inputs are recorded. Tensor archives stay in private scratch and can be
 regenerated with the published full-chain diagnostic below.
 
+`slice-precision/` further localizes the saved bd=1 gradients by head and
+64-token chunk. It uses 0.05 only as a diagnostic marker per slice; the assigned
+whole-tensor acceptance rule is unchanged.
+
+| Target span | Worst native dg slice | Worst CPU FP32-gc replay dg slice | CPU replay slices over 0.05 / 64 |
+|---:|---:|---:|---:|
+| 24 | 0.043291 | 0.018648 | 0 |
+| 28 | 0.074723 | 0.021057 | 0 |
+| 32 | 0.081040 | 0.021917 | 0 |
+| 64 | 0.160728 | 0.038550 | 0 |
+| 96 | 0.219073 | 0.055960 | 2 |
+| 128 | 0.357063 | 0.085526 | 5 |
+
+At span128 all 64 native dg slices exceed the marker. The FP32-gc CPU experiment
+improves them substantially but still has localized residual error; its passing
+whole-tensor result cannot establish a universal safe domain. The raw summary
+stdout reports worst slices and counts for all six gradients. Full per-slice
+metrics remain in private scratch with their hash and reproducible source.
+`prospective-fp32-gc/` records the proposed ABI, storage and lifetime preflight;
+it is a read-only design pending kernel-owner scope, with no implementation,
+new compilation or repaired-device acceptance claim.
+
 ## Reproduction
 
 Use the accepted Docker/Python/CANN environment and pins above, with private
@@ -244,6 +266,10 @@ checkout on `PYTHONPATH`; it does not need a device. Spans64/96/128 are reproduc
 by the same full-chain diagnostic with those `--spans` and a fresh output path.
 The diagnostic's successful exit means the measurement completed, not that all
 gradient/checkpoint comparisons passed; the JSON keeps each failed comparison.
+To reproduce slice localization, also generate spans64/96/128 into
+`$A213_OUT/native/precision-v2-bd1/receipts`, copy
+`slice-precision/analyze_slice_precision.py` beside the other analysis script and
+run it in the same CPU environment. It reads both sets of saved native tensors.
 
 ## Torch NPU format notification
 

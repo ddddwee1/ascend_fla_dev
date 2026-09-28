@@ -1,0 +1,1100 @@
+{
+  "stage": "static source accounting, not emitted/compiled allocation or runtime measurement",
+  "kernel_files_modified": false,
+  "rows": [
+    {
+      "kernel": "scan_fused",
+      "source_sha256": "99de3182650d2c6b9c27cedfb4a6cc717db4c4418f3e7488da902078907f8a37",
+      "declared_UB_bytes": 135552,
+      "candidate_design_delta_bytes": -128,
+      "candidate_design_UB_bytes": 135424,
+      "b3_UB_capacity_bytes": 196608,
+      "remaining_before_compiler_temporaries": 61184,
+      "buffers": [
+        {
+          "name": "dstate_ub",
+          "line": 98,
+          "dtype": "DT.float",
+          "shape": [
+            64,
+            128
+          ],
+          "bytes": 32768
+        },
+        {
+          "name": "state_h_ub",
+          "line": 99,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            64,
+            128
+          ],
+          "bytes": 16384
+        },
+        {
+          "name": "seed_ub",
+          "line": 100,
+          "dtype": "DT.float",
+          "shape": [
+            64,
+            128
+          ],
+          "bytes": 32768
+        },
+        {
+          "name": "dv_sum_ub",
+          "line": 101,
+          "dtype": "DT.float",
+          "shape": [
+            32,
+            128
+          ],
+          "bytes": 16384
+        },
+        {
+          "name": "dv_delta_ub",
+          "line": 102,
+          "dtype": "DT.float",
+          "shape": [
+            32,
+            128
+          ],
+          "bytes": 16384
+        },
+        {
+          "name": "dv_b_ub",
+          "line": 103,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            32,
+            128
+          ],
+          "bytes": 8192
+        },
+        {
+          "name": "daqk_f_ub",
+          "line": 104,
+          "dtype": "DT.float",
+          "shape": [
+            32,
+            64
+          ],
+          "bytes": 8192
+        },
+        {
+          "name": "daqk_b_ub",
+          "line": 105,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            32,
+            64
+          ],
+          "bytes": 4096
+        },
+        {
+          "name": "glast_b_ub",
+          "line": 106,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            1,
+            64
+          ],
+          "bytes": 128
+        },
+        {
+          "name": "expg_ub",
+          "line": 107,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            64
+          ],
+          "bytes": 256
+        }
+      ]
+    },
+    {
+      "kernel": "inverse_epilogue",
+      "source_sha256": "b96c3f3ba347772c7fb97bcc88f6797e7fc44af7c18f638c898034e22921aacd",
+      "declared_UB_bytes": 168192,
+      "candidate_design_delta_bytes": 7424,
+      "candidate_design_UB_bytes": 175616,
+      "b3_UB_capacity_bytes": 196608,
+      "remaining_before_compiler_temporaries": 20992,
+      "buffers": [
+        {
+          "name": "g_b_ub",
+          "line": 63,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            32,
+            128
+          ],
+          "bytes": 8192
+        },
+        {
+          "name": "q_b_ub",
+          "line": 64,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            32,
+            128
+          ],
+          "bytes": 8192
+        },
+        {
+          "name": "k_b_ub",
+          "line": 65,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            32,
+            128
+          ],
+          "bytes": 8192
+        },
+        {
+          "name": "v_b_ub",
+          "line": 66,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            32,
+            128
+          ],
+          "bytes": 8192
+        },
+        {
+          "name": "dqg_b_ub",
+          "line": 67,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            32,
+            128
+          ],
+          "bytes": 8192
+        },
+        {
+          "name": "dkg_b_ub",
+          "line": 68,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            32,
+            128
+          ],
+          "bytes": 8192
+        },
+        {
+          "name": "dvb_b_ub",
+          "line": 69,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            32,
+            128
+          ],
+          "bytes": 8192
+        },
+        {
+          "name": "dkbg_b_ub",
+          "line": 70,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            32,
+            128
+          ],
+          "bytes": 8192
+        },
+        {
+          "name": "dq_out_ub",
+          "line": 71,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            32,
+            128
+          ],
+          "bytes": 8192
+        },
+        {
+          "name": "dk_out_ub",
+          "line": 72,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            32,
+            128
+          ],
+          "bytes": 8192
+        },
+        {
+          "name": "dv_out_ub",
+          "line": 73,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            32,
+            128
+          ],
+          "bytes": 8192
+        },
+        {
+          "name": "kexp_out_ub",
+          "line": 74,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            32,
+            128
+          ],
+          "bytes": 8192
+        },
+        {
+          "name": "dg_f_ub",
+          "line": 75,
+          "dtype": "DT.float",
+          "shape": [
+            64,
+            128
+          ],
+          "bytes": 32768
+        },
+        {
+          "name": "dg_b_ub",
+          "line": 76,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            64,
+            128
+          ],
+          "bytes": 16384
+        },
+        {
+          "name": "dbeta_f_ub",
+          "line": 77,
+          "dtype": "DT.float",
+          "shape": [
+            64,
+            8
+          ],
+          "bytes": 2048
+        },
+        {
+          "name": "beta_b_ub",
+          "line": 81,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            64,
+            16
+          ],
+          "bytes": 2048
+        },
+        {
+          "name": "beta_f_ub",
+          "line": 82,
+          "dtype": "DT.float",
+          "shape": [
+            64,
+            16
+          ],
+          "bytes": 4096
+        },
+        {
+          "name": "glast_b_ub",
+          "line": 83,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 256
+        },
+        {
+          "name": "glast_ub",
+          "line": 84,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 512
+        },
+        {
+          "name": "hrow_b_ub",
+          "line": 85,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 256
+        },
+        {
+          "name": "dhrow_b_ub",
+          "line": 86,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 256
+        },
+        {
+          "name": "hrow_ub",
+          "line": 87,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 512
+        },
+        {
+          "name": "dhrow_ub",
+          "line": 88,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 512
+        },
+        {
+          "name": "grow_ub",
+          "line": 89,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 512
+        },
+        {
+          "name": "qrow_ub",
+          "line": 90,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 512
+        },
+        {
+          "name": "krow_ub",
+          "line": 91,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 512
+        },
+        {
+          "name": "vrow_ub",
+          "line": 92,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 512
+        },
+        {
+          "name": "dqgrow_ub",
+          "line": 93,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 512
+        },
+        {
+          "name": "dkgrow_ub",
+          "line": 94,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 512
+        },
+        {
+          "name": "dvbrow_ub",
+          "line": 95,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 512
+        },
+        {
+          "name": "dkbgrow_ub",
+          "line": 96,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 512
+        },
+        {
+          "name": "dqrow_ub",
+          "line": 97,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 512
+        },
+        {
+          "name": "kexprow_ub",
+          "line": 98,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 512
+        },
+        {
+          "name": "expg_ub",
+          "line": 99,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 512
+        },
+        {
+          "name": "explmg_ub",
+          "line": 100,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 512
+        },
+        {
+          "name": "expgl_ub",
+          "line": 101,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 512
+        },
+        {
+          "name": "sh_ub",
+          "line": 102,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 512
+        },
+        {
+          "name": "dkkg_ub",
+          "line": 103,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 512
+        },
+        {
+          "name": "acc_ub",
+          "line": 104,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 512
+        },
+        {
+          "name": "term2_ub",
+          "line": 105,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 512
+        },
+        {
+          "name": "dglast_ub",
+          "line": 106,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 512
+        },
+        {
+          "name": "tmp_ub",
+          "line": 107,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 512
+        },
+        {
+          "name": "dot_ub",
+          "line": 108,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            64
+          ],
+          "bytes": 256
+        },
+        {
+          "name": "dot2_ub",
+          "line": 109,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            64
+          ],
+          "bytes": 256
+        }
+      ]
+    },
+    {
+      "kernel": "finalize_pre",
+      "source_sha256": "a8ae0e1101885017a9f0d58d1f2eea945f4e83e08072782e59a8cfbc1f6b27c9",
+      "declared_UB_bytes": 109856,
+      "candidate_design_delta_bytes": -256,
+      "candidate_design_UB_bytes": 109600,
+      "b3_UB_capacity_bytes": 196608,
+      "remaining_before_compiler_temporaries": 87008,
+      "buffers": [
+        {
+          "name": "stage_ub",
+          "line": 56,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            32,
+            128
+          ],
+          "bytes": 8192
+        },
+        {
+          "name": "out_ub",
+          "line": 57,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            32,
+            128
+          ],
+          "bytes": 8192
+        },
+        {
+          "name": "q_f_ub",
+          "line": 58,
+          "dtype": "DT.float",
+          "shape": [
+            32,
+            128
+          ],
+          "bytes": 16384
+        },
+        {
+          "name": "k_f_ub",
+          "line": 59,
+          "dtype": "DT.float",
+          "shape": [
+            32,
+            128
+          ],
+          "bytes": 16384
+        },
+        {
+          "name": "rs_ub",
+          "line": 60,
+          "dtype": "DT.float",
+          "shape": [
+            32,
+            128
+          ],
+          "bytes": 16384
+        },
+        {
+          "name": "cs_ub",
+          "line": 61,
+          "dtype": "DT.float",
+          "shape": [
+            32,
+            128
+          ],
+          "bytes": 16384
+        },
+        {
+          "name": "glast_ub",
+          "line": 62,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 256
+        },
+        {
+          "name": "gmid_ub",
+          "line": 63,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 512
+        },
+        {
+          "name": "stage_l_ub",
+          "line": 64,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            32,
+            64
+          ],
+          "bytes": 4096
+        },
+        {
+          "name": "a_f_ub",
+          "line": 65,
+          "dtype": "DT.float",
+          "shape": [
+            32,
+            64
+          ],
+          "bytes": 8192
+        },
+        {
+          "name": "m_f_ub",
+          "line": 66,
+          "dtype": "DT.float",
+          "shape": [
+            32,
+            64
+          ],
+          "bytes": 8192
+        },
+        {
+          "name": "beta_b_ub",
+          "line": 70,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            64,
+            16
+          ],
+          "bytes": 2048
+        },
+        {
+          "name": "beta_f_ub",
+          "line": 71,
+          "dtype": "DT.float",
+          "shape": [
+            64,
+            16
+          ],
+          "bytes": 4096
+        },
+        {
+          "name": "col_ub",
+          "line": 72,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            64
+          ],
+          "bytes": 256
+        },
+        {
+          "name": "zero_ub",
+          "line": 73,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            64
+          ],
+          "bytes": 256
+        },
+        {
+          "name": "pred_ub",
+          "line": 74,
+          "dtype": "DT.uint8",
+          "shape": [
+            1,
+            32
+          ],
+          "bytes": 32
+        }
+      ]
+    },
+    {
+      "kernel": "finalize_post",
+      "source_sha256": "979d1f30380a07fbe7ad5dd1e81a9a9ab833dc15b2bac9ed9f10cd5f55997fac",
+      "declared_UB_bytes": 159488,
+      "candidate_design_delta_bytes": 7936,
+      "candidate_design_UB_bytes": 167424,
+      "b3_UB_capacity_bytes": 196608,
+      "remaining_before_compiler_temporaries": 29184,
+      "buffers": [
+        {
+          "name": "g_b_ub",
+          "line": 63,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            32,
+            128
+          ],
+          "bytes": 8192
+        },
+        {
+          "name": "qkl_b_ub",
+          "line": 64,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            32,
+            128
+          ],
+          "bytes": 8192
+        },
+        {
+          "name": "qkr_b_ub",
+          "line": 65,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            32,
+            128
+          ],
+          "bytes": 8192
+        },
+        {
+          "name": "sbase_b_ub",
+          "line": 66,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            32,
+            128
+          ],
+          "bytes": 8192
+        },
+        {
+          "name": "tbeta_b_ub",
+          "line": 67,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            32,
+            128
+          ],
+          "bytes": 8192
+        },
+        {
+          "name": "qhv_b_ub",
+          "line": 68,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            32,
+            128
+          ],
+          "bytes": 8192
+        },
+        {
+          "name": "khv_b_ub",
+          "line": 69,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            32,
+            128
+          ],
+          "bytes": 8192
+        },
+        {
+          "name": "dq_in_b_ub",
+          "line": 70,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            32,
+            128
+          ],
+          "bytes": 8192
+        },
+        {
+          "name": "dk_in_b_ub",
+          "line": 71,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            32,
+            128
+          ],
+          "bytes": 8192
+        },
+        {
+          "name": "dgc_in_b_ub",
+          "line": 72,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            32,
+            128
+          ],
+          "bytes": 8192
+        },
+        {
+          "name": "dq_out_ub",
+          "line": 73,
+          "dtype": "DT.float",
+          "shape": [
+            32,
+            128
+          ],
+          "bytes": 16384
+        },
+        {
+          "name": "dk_out_ub",
+          "line": 74,
+          "dtype": "DT.float",
+          "shape": [
+            32,
+            128
+          ],
+          "bytes": 16384
+        },
+        {
+          "name": "dg_f_ub",
+          "line": 75,
+          "dtype": "DT.float",
+          "shape": [
+            32,
+            128
+          ],
+          "bytes": 16384
+        },
+        {
+          "name": "dg_b_ub",
+          "line": 76,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            32,
+            128
+          ],
+          "bytes": 8192
+        },
+        {
+          "name": "glast_b_ub",
+          "line": 77,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 256
+        },
+        {
+          "name": "gmid_ub",
+          "line": 78,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 512
+        },
+        {
+          "name": "rs_ub",
+          "line": 79,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 512
+        },
+        {
+          "name": "cs_ub",
+          "line": 80,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 512
+        },
+        {
+          "name": "sh_ub",
+          "line": 81,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 512
+        },
+        {
+          "name": "dqp_ub",
+          "line": 82,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 512
+        },
+        {
+          "name": "dkp_ub",
+          "line": 83,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 512
+        },
+        {
+          "name": "rowc_ub",
+          "line": 84,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 512
+        },
+        {
+          "name": "colc_ub",
+          "line": 85,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 512
+        },
+        {
+          "name": "qrow_ub",
+          "line": 86,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 512
+        },
+        {
+          "name": "krow_ub",
+          "line": 87,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 512
+        },
+        {
+          "name": "tmp_ub",
+          "line": 88,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 512
+        },
+        {
+          "name": "tmp2_ub",
+          "line": 89,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 512
+        },
+        {
+          "name": "acc_ub",
+          "line": 90,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 512
+        },
+        {
+          "name": "run_ub",
+          "line": 91,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            128
+          ],
+          "bytes": 512
+        },
+        {
+          "name": "dot_ub",
+          "line": 92,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            64
+          ],
+          "bytes": 256
+        },
+        {
+          "name": "dot2_ub",
+          "line": 93,
+          "dtype": "DT.float",
+          "shape": [
+            1,
+            64
+          ],
+          "bytes": 256
+        },
+        {
+          "name": "beta_b_ub",
+          "line": 97,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            64,
+            16
+          ],
+          "bytes": 2048
+        },
+        {
+          "name": "beta_f_ub",
+          "line": 98,
+          "dtype": "DT.float",
+          "shape": [
+            64,
+            16
+          ],
+          "bytes": 4096
+        },
+        {
+          "name": "dbeta_f_ub",
+          "line": 99,
+          "dtype": "DT.float",
+          "shape": [
+            64,
+            16
+          ],
+          "bytes": 4096
+        },
+        {
+          "name": "dbeta_b_ub",
+          "line": 100,
+          "dtype": "DT.bfloat16",
+          "shape": [
+            64,
+            16
+          ],
+          "bytes": 2048
+        }
+      ]
+    }
+  ]
+}
