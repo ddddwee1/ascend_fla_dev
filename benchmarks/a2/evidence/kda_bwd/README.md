@@ -175,6 +175,33 @@ all existing budgets, and repeat full hardware qualification. Such a repair
 requires the kernel owner's assigned scope; these qualification changes do not
 silently alter those frozen sources.
 
+`precision-seeds-v1/` additionally executes **12 fresh full native chains**:
+seeds1/2/3, uniform H32/T128 gates at target spans106.5/128, both block dimensions.
+All 12 retain the original gradient failure; all CPU-only FP32-gc replays satisfy
+the six whole-gradient budgets. This extends the repair hypothesis beyond seed0,
+without claiming that a modified device kernel has passed.
+
+| Seed | Target span | Native dg relative L2 | CPU-only FP32-gc dg relative L2 |
+|---:|---:|---:|---:|
+| 1 | 106.5 | 0.158323 | 0.029287 |
+| 1 | 128 | 0.251085 | 0.032172 |
+| 2 | 106.5 | 0.151497 | 0.029257 |
+| 2 | 128 | 0.259012 | 0.031614 |
+| 3 | 106.5 | 0.149237 | 0.028286 |
+| 3 | 128 | 0.229074 | 0.030384 |
+
+All six cross-bd case pairs match in **36 gradient, 36 raw-cache and 54
+assembled-cache byte comparisons**. `seed-npu-reference/` separately recomputes
+the six full FP32 autograd references with Torch NPU: maximum relative L2 against
+CPU FP32 is **2.341916e-7**. The same previously investigated allocation-format
+warning is retained in the raw log, with only the project path redacted.
+
+Additional checkpoint failures remain explicit: seed1/span106.5 fails s_base's
+allclose check, and seed1/span128 fails k_scaled and s_base allclose checks, at
+both bd values. Their relative L2 errors are tiny (1.02e-8, 3.66e-9, 1.87e-11),
+but **allclose and relative L2 are conjunctive**; a small normwise error does
+not waive those failures. The other four case pairs pass all 33 stage checks.
+
 ## Pair-matmul replay diagnosis
 
 `pair-replay/` analyzes the retained bd=1 native tensors from `precision-v1/`.
@@ -223,6 +250,18 @@ metrics remain in private scratch with their hash and reproducible source.
 it is a read-only design pending kernel-owner scope, with no implementation,
 new compilation or repaired-device acceptance claim.
 
+`pair-npu/` then runs fresh Torch NPU FP32 and BF16 matmuls on the retained
+actual finalize_pre inputs at spans24/28/32, with HF32 disabled. All **12 BF16
+products are byte-identical to the retained custom-kernel products**. The separate
+Torch NPU FP32 products also differ from CPU FP32 in the sensitive cases: e.g.
+span32/t_beta relative L2 9.293657e-5 after BF16 materialization. The run completed
+24 Torch matmuls, zero custom launches, with healthy pre/post device checks.
+These comparisons support an accumulation/rounding explanation for the located
+pair-stage discrepancy, rather than uniquely attributing it to custom code.
+They do not change CPU FP32 acceptance or resolve the end-to-end BF16-gc error.
+The complete raw stream, source, identity and receipt are retained without line
+filtering.
+
 ## Reproduction
 
 Use the accepted Docker/Python/CANN environment and pins above, with private
@@ -270,6 +309,19 @@ To reproduce slice localization, also generate spans64/96/128 into
 `$A213_OUT/native/precision-v2-bd1/receipts`, copy
 `slice-precision/analyze_slice_precision.py` beside the other analysis script and
 run it in the same CPU environment. It reads both sets of saved native tensors.
+For the Torch NPU comparison, copy `pair-npu/pair_npu_diagnostic.py` beside the
+analysis scripts and run it in the accepted native environment with a fresh
+health check and lock, `--bd 1 --out "$A213_OUT/pair-npu"`. The bd argument
+identifies the retained custom run; this diagnostic launches no custom kernel.
+For the three-new-seed experiment use
+`precision-seeds-v1/precision_seed_diagnostic.py --bd 1 --seeds 1 2 3
+--spans 106.5 128 --out "$A213_OUT/native/precision-seeds-v1-bd1/receipts"`,
+then repeat in a separate bd2 process with a distinct output/cache directory.
+Copy `seed-npu-reference/seed_npu_reference.py` beside the other scratch scripts;
+after the full native run completes, invoke it in the accepted native environment
+under a health check and lock with `--bd 1 --out "$A213_OUT/seed-npu-reference"`.
+It reads the retained bd1 inputs and CPU golden tensors and executes the full
+Torch NPU FP32 reference, with no custom kernel launch.
 
 ## Torch NPU format notification
 
