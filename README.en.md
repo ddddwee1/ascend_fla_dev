@@ -27,7 +27,7 @@ serves only as the semantic authority during testing (`naive.py` as a CPU fp32 o
 
 | family | id | track | kernels | task progress |
 |---|---|---|---|---|
-| KDA (Kimi Delta Attention) | `kda` | open to agents | 7 | 12/23 |
+| KDA (Kimi Delta Attention) | `kda` | open to agents | 7 | 13/23 |
 | GDN (Gated DeltaNet) | `gated_delta_rule` | open to agents | 4 | 6/10 |
 | DeltaNet | `delta_rule` | no task yet | 2 | 2/2 units with validation records |
 | GDN-2 (Gated DeltaNet 2) | `gdn2` | owner track | 6 | 4/5 |
@@ -47,7 +47,7 @@ serves only as the semantic authority during testing (`naive.py` as a CPU fp32 o
 
 ### Expand for detail (family → kernel → task)
 
-<details><summary><b>KDA (Kimi Delta Attention) —— 7 kernel(s)，12/23 done</b></summary>
+<details><summary><b>KDA (Kimi Delta Attention) —— 7 kernel(s)，13/23 done</b></summary>
 
 _First target family; used by Kimi-Linear_
 
@@ -55,7 +55,7 @@ _First target family; used by Kimi-Linear_
 |---|---|---|---|---|---|
 | `kda_fwd_stable` | open to agents | ✅ native · A5 hw | ⛔ rejected | 6/11 | [#30](https://github.com/ddddwee1/ascend_fla_dev/issues/30) A2-04 |
 | `kda_bwd_stable` | open to agents | ✅ native · A5 hw | — | 3/10 | [#109](https://github.com/ddddwee1/ascend_fla_dev/issues/109) FMT-02 |
-| `kda_fused_recurrent` | open to agents | ✅ native · A5 hw | ✅ native · A5 hw | 2/10 | [#105](https://github.com/ddddwee1/ascend_fla_dev/issues/105) BF-06 |
+| `kda_fused_recurrent` | open to agents | ✅ native · A5 hw | ✅ native · A5 hw | 3/10 | [#105](https://github.com/ddddwee1/ascend_fla_dev/issues/105) BF-06 |
 | `kda_fwd` | upstream unit | ✅ native · A5 hw | — | 5/9 passed | _Upstream unit; superseded here by kda_fwd_stable_ |
 | `kda_bwd` | upstream unit | ✅ native · A5 hw | — | 4/9 passed，1 项 gap | _Upstream unit; superseded here by kda_bwd_stable_ |
 | `kda_layout` | open to agents | ✅ native · A5 hw | ✅ native · A5 hw | — | _In-repo layout / dtype-conversion unit (FMT-02, merged): token-major <-> head/chunk-major layout, BF16 / FP32 conversion and default state / dht zero fill as six self-compiled vector kernels (five-loop NDDMA, tiles up to 4096 elements); verified only on the A5 CANN 9.1.0-beta.1 environment; forward is 1.67-2.32x slower than the old host path; legacy host arithmetic (_scan_states etc.) remains, see D-PM-42_ |
@@ -96,7 +96,7 @@ _First target family; used by Kimi-Linear_
 
 </details>
 
-<details><summary>kda_fused_recurrent —— 2/10 done，start BF-06、A2-03、A2-K1、A5-01、A5-02、A5-03</summary>
+<details><summary>kda_fused_recurrent —— 3/10 done，start BF-06、A2-03、A2-K1、A5-01、A5-02、A5-03</summary>
 
 | task | issue | SoC | dtype | status | note |
 |---|---|---|---|---|---|
@@ -106,7 +106,7 @@ _First target family; used by Kimi-Linear_
 | A5-01 | [#47](https://github.com/ddddwee1/ascend_fla_dev/issues/47) | `a5` | fp32 | 🔒 gated (wave:W-A3) | ★ start |
 | A5-02 | [#48](https://github.com/ddddwee1/ascend_fla_dev/issues/48) | `a5` | fp32 | 🔒 gated (wave:W-A3) | ★ start |
 | A5-03 | [#49](https://github.com/ddddwee1/ascend_fla_dev/issues/49) | `a5` | fp32 | 🔒 gated (wave:W-A3) | ★ start |
-| A2-14 | [#41](https://github.com/ddddwee1/ascend_fla_dev/issues/41) | `a2` | bf16、fp32 | 🔵 review |  |
+| A2-14 | [#41](https://github.com/ddddwee1/ascend_fla_dev/issues/41) | `a2` | bf16、fp32 | ✅ done |  |
 | A2-15 | [#42](https://github.com/ddddwee1/ascend_fla_dev/issues/42) | `a2` | bf16、fp32 | 🔒 gated (用户已放行（D-PM-43），待前置任务与规格) |  |
 | A2-16 | [#43](https://github.com/ddddwee1/ascend_fla_dev/issues/43) | `a2` | bf16、fp32 | 🔒 gated (用户已放行（D-PM-43），待前置任务与规格) |  |
 | A5-06 | [#52](https://github.com/ddddwee1/ascend_fla_dev/issues/52) | `a5` | bf16、fp32 | 🔒 gated (wave:W-A3) |  |

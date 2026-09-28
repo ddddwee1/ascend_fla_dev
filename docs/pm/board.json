@@ -2919,7 +2919,7 @@
       "wave": "W-A2",
       "soc": "a2",
       "priority": "P1",
-      "status": "review",
+      "status": "done",
       "model": [
         "kimi-linear-48b-a3b"
       ],
@@ -3021,9 +3021,25 @@
         {
           "at": "2026-09-28T07:10",
           "summary": "PM 独立复核完成（PR #135，worktree 内核查）。**写集边界**：36 个改动文件全部落在批准写集内（28 个是 `benchmarks/a2/evidence/decode/**` 证据、8 个是源码/测试/文档）；`git diff` 对 `kernels/projects/a2/kda_fused_recurrent/{kernels,unit.py,run.py,reference.py}` 为空——冻结的kernel/单元/参考代码完全未改。**两处一行断言批准**：`test_platform.py` 与 `test_kda_fwd_a2.py` 的 diff 确认各自就是一行，没有夹带别的改动。**`CAPABILITIES[\"a2\"]`**：只改 `supported_block_dim` 加 `\"decode\": (1, 2)`，`qualified` 仍 `False`，其余字段/函数逻辑未动。**FP32 金标准裁定落地核实**：既有单元 `reference.py` 的 `independent_reference`（FP64 内部/FP32 输出）逐字未改；新的 CPU FP32 主金标准 `a2_fp32_oracle()` 在 `benchmarks/verify_decode.py` 里独立写就（`.float()` 全程，代数结构与 `independent_reference` 不同——beta 先并入 delta 再做外积，不是同一份代码换皮），旧 FP64 参考保留作单独标注的诊断项，未被当验收金标准用——完全符合此前的裁定。**splitK/matmul 豁免**：`grep matmul` 在 `kernels/step.py` 零命中，AST 审计（`ast-audit.json`）与新增回归测试都确认零 matmul 调用，contract.json board note 逐项点名 A2-11 四项前提。**contract.json**：只有 `board` 这一条 stage 改了（untested→passed），`reference`/`sim`/`pipesim` 三条不变仍标注是 A2-03 的旧证据，不冒充新证据；`board` 的新 `scope`/`note` 明确区分'这是 A2-14 自己的独立重跑'。**复算**：32 个精度 case 独立复算 max rel_l2——o=1.7245406052097678e-3（case `zero_state`）、final_state=1.0151343587949668e-07（case `real_h16_t8`）——与声称完全一致；19 组跨 bd 一致性**不信汇总字段**，直接从原始 sha256 digest 逐 case 比对，19/19 一致、0 mismatch，独立复现。**host 测试**：目标三个文件（test_kda_decode.py/test_platform.py/test_kda_fwd_a2.py）43 passed/2 skipped/0 failure；全套14 failed/1336 passed/25 skipped，14 个失败全部是这台复核机器缺 `ascriptor` 包（与本 PR 无关，6 个失败文件都不引用 `CAPABILITIES[\"a2\"]`/`supported_block_dim`，grep 确认过），且都不在本 PR 目标文件里。跟 PR 自己声称的 1369 passed/6 skipped 总数对得上（1375=1369+6=1336+14+25），差异来自复核环境缺 ascriptor，不是本 PR 的问题。**仓库卫生**：36 个文件 grep 主机名/IP/账号/密钥模式零命中。**结论：无红旗，满足 D-PM-33 三条合入授权，按 A2-14 复核后合入。**"
+        },
+        {
+          "at": "2026-09-28T06:57",
+          "summary": "合入（PM，按 D-PM-33）。PR #135 merge commit acf817fd（`GH_TOKEN=$(gh auth token -u ascend-fla-pm-bot) gh pr merge --match-head-commit 7745847`，同 PK-05/A2-02 先例，`limjiunnbin` 账号无 MergePullRequest 权限）。main 全量回归（排除 torch_npu）1336 passed/25 skipped/14 failed，14 个失败全部是本机缺 ascriptor 包的既有环境缺口，与本任务无关，本任务自身 0 failure。docs/handoff.md 已补写这次的两个方法论要点（FP32 参考精确性纠正、精确字典断言全套搜索的教训）。review -> done。"
         }
       ],
-      "result": null
+      "result": {
+        "commits": [
+          "acf817fd"
+        ],
+        "evidence": [
+          "PR #135",
+          "benchmarks/a2/evidence/decode/",
+          "docs/research/a2_decode.md",
+          "kernels/projects/a2/kda_fused_recurrent/contract.json#support-board",
+          "ascend_fla/platform.py#CAPABILITIES-a2-supported_block_dim-decode"
+        ],
+        "numbers": "A2 Ascend910B3/CANN9.0.0：真实 Kimi H=HV=32 与 H16/HV32（GQA），K=V=128，T∈{1,4,8,16}，bd∈{1,2}，加原有 8 例，共 32/32 通过；o 最大相对 L2 1.7245406052097678e-3（case zero_state），final_state 1.0151343587949668e-7（case real_h16_t8），均在预算内。prefix128+64 单 token 续接全部 128 步满足原 1e-5 预算（最大 1.79e-7）；T16 分段 vs 一次性调用逐位相同。19 组跨 bd 输出/state 对逐位相同（PM 从原始 sha256 digest 独立复算，0 mismatch）。decode kernel（kernels/step.py）AST 扫描零 matmul 调用，splitK/手写 MMAD 链不适用；`CAPABILITIES[\"a2\"][\"supported_block_dim\"][\"decode\"]=(1,2)`，`qualified` 仍 False（公共路由不在本任务范围）。冻结的 kernel/unit/run/reference 源码全程未改（PM 核实 git diff 为空）；新增的 CPU FP32 主金标准（`a2_fp32_oracle`）是独立写就的算术实现，非既有 FP64 内部参考换皮。合入后 main 全量（本机排除 torch_npu、无 ascriptor 包）1336 passed/25 skipped/14 failed——14 个失败全部是本机缺 ascriptor 包的既有环境缺口，与本任务无关，本任务自身测试 0 failure。"
+      }
     },
     {
       "id": "A2-15",
