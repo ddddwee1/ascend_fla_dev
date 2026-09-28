@@ -175,6 +175,76 @@ all existing budgets, and repeat full hardware qualification. Such a repair
 requires the kernel owner's assigned scope; these qualification changes do not
 silently alter those frozen sources.
 
+## Pair-matmul replay diagnosis
+
+`pair-replay/` analyzes the retained bd=1 native tensors from `precision-v1/`.
+It separately recomputes each finalize_pair product from its **actual native
+finalize_pre inputs**, removing predecessor differences from that comparison.
+All computation in this follow-up is on CPU; it launches no custom kernel.
+
+| Target span / product | Native vs actual-input CPU FP32 | Native vs actual-input CPU FP64 diagnostic |
+|---|---:|---:|
+| 24 / qk_right | 4.768162e-5 | 0 (identical BF16 values) |
+| 28 / t_beta | 1.435331e-5 | 8.967541e-7 |
+| 32 / t_beta | 9.293656e-5 | 2.836270e-9 |
+
+Numbers are relative L2 after the product's declared BF16 materialization.
+The full CPU replay also differs from native finalize_pre in M_qk/M_base/M_beta
+by respectively 9/107/98 elements at span24, 1/42/40 at span28 and 6/52/49 at
+span32. This separates propagated predecessor rounding from sensitivity to
+FP32 matrix accumulation/cancellation. The higher-precision diagnostic is
+consistent with accumulation sensitivity contributing to these discrepancies;
+it does not prove the absence of a hardware defect or waive the original 1e-5
+checkpoint failures. **CPU FP32 remains the acceptance golden.**
+
+The exact analysis source, raw stdout, results and hashes of its retained native
+tensor inputs are recorded. Tensor archives stay in private scratch and can be
+regenerated with the published full-chain diagnostic below.
+
+## Reproduction
+
+Use the accepted Docker/Python/CANN environment and pins above, with private
+machine configuration, fresh health checks, the required device lock and isolated
+cache/output directories. Set `PYTHONPATH` to this checkout and the accepted
+library checkout; source the machine's CANN environment. Machine paths and device
+selection are intentionally external. Run every block dimension in a separate
+process; the worker precompiles/registers all 14 vendors before a custom launch.
+
+From the repository root, with `A213_OUT` set to an ignored scratch directory:
+
+```bash
+python benchmarks/probe_bwd_span.py --soc a2 --block-dim 1 \
+  --a2-suite fixture --a2-out "$A213_OUT/fixture-bd1"
+python benchmarks/probe_bwd_span.py --soc a2 --block-dim 1 \
+  --a2-suite actual --a2-out "$A213_OUT/actual-bd1"
+python benchmarks/probe_bwd_span.py --soc a2 --block-dim 1 \
+  --a2-suite span --a2-lengths 128 --a2-seeds 0 \
+  --a2-gates uniform fla_initialization \
+  --a2-spans 1 8 16 32 64 96 128 160 192 --a2-out "$A213_OUT/span-bd1"
+```
+
+Repeat with `--block-dim 2` and distinct `*-bd2` output/cache directories. The
+span suite is expected to return nonzero because the recorded accuracy and
+finite-cache failures are real. Inspect every receipt row, not only the exit code.
+For the located failing case, use `--a2-gates uniform --a2-spans 32`.
+
+After the full workload, reproduce the precision diagnosis and retained tensors:
+
+```bash
+python benchmarks/a2/evidence/kda_bwd/precision-v1/precision_diagnostic.py \
+  --bd 1 --spans 24 28 32 \
+  --out "$A213_OUT/native/precision-v1-bd1/receipts"
+cp benchmarks/a2/evidence/kda_bwd/pair-replay/analyze_pair_replay.py "$A213_OUT/"
+python "$A213_OUT/analyze_pair_replay.py"
+```
+
+The last command reads only those saved tensors and writes CPU diagnosis results
+beside the copied script. Run it with the accepted CPU Torch environment and
+checkout on `PYTHONPATH`; it does not need a device. Spans64/96/128 are reproduced
+by the same full-chain diagnostic with those `--spans` and a fresh output path.
+The diagnostic's successful exit means the measurement completed, not that all
+gradient/checkpoint comparisons passed; the JSON keeps each failed comparison.
+
 ## Torch NPU format notification
 
 Actual-cache/range raw logs include a Torch NPU notification from `zeros_like`

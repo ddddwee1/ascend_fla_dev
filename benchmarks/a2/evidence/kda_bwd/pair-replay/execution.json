@@ -1,0 +1,25 @@
+{
+  "stage": "CPU-only analysis of retained native checkpoint tensors",
+  "returncode": 0,
+  "hardware_launches": 0,
+  "source_commit": "69cab01870b7641b683bff860a66ebc62c3c5559",
+  "input_native_evidence": "../precision-v1/bd1",
+  "private_tensor_archives": {
+    "range_uniform_t128_seed0_span24.pt": {
+      "sha256": "766a84a2eb45d63cc5d89e89ad113e94d66fdd081a6fb03aae71a7ee48b47f9a",
+      "bytes": 78725232
+    },
+    "range_uniform_t128_seed0_span28.pt": {
+      "sha256": "574990166174061d6ccdc953a9a6a71ab8c4a6a8c0f621ac18746b83f8ae1d3a",
+      "bytes": 78725232
+    },
+    "range_uniform_t128_seed0_span32.pt": {
+      "sha256": "b2d79d16f5652d18894baaa2b5e6745a4756479057b4e7219e8a799929eec429",
+      "bytes": 78725232
+    }
+  },
+  "tensor_archives_published": false,
+  "reproduction": "Regenerate with precision-v1/precision_diagnostic.py; preserve its .pt files. See parent README.",
+  "golden": "CPU FP32 unchanged; FP64 is diagnosis only, not acceptance",
+  "all_original_checkpoint_failures_retained": true
+}
