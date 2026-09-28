@@ -2956,6 +2956,10 @@
         {
           "at": "2026-09-28T19:04",
           "summary": "STATUS（PR #137 评论 5876604634，commit 38c83cf，draft）。补充 pair-replay 只读 CPU 分析：用实际 native finalize_pre 输入重算，span24/qk_right、28/t_beta、32/t_beta 相对 CPU FP32 矩阵乘分别 4.77e-5/1.44e-5/9.29e-5；FP64 诊断分别 0/8.97e-7/2.84e-9（提示 FP32 累加/前级舍入敏感，但明确不替代 golden、原 1e-5 失败保留、不声称硬件已修好）。主机回归不变，104 个新增文件均为文档/证据追加。下一步继续读四个 gc 消费者的存储/载入/同步契约，准备可评审的修复 preflight；kernel 批次/写集裁定仍待定，未改冻结 kernel、未填能力值。"
+        },
+        {
+          "at": "2026-09-28T19:20",
+          "summary": "STATUS（issue #40 评论 5876851036，PR #137 commit 4c7383b，draft）。收到 NOTE，确认 kernel 保持只读，等裁定。补充三个新种子（seed1/2/3，H32/T128，目标 span106.5/128，两 bd 各独立进程）验证 gc 精度假设不是 seed0 偶然：原生 dg 全部失败（0.149~0.259），只替换 g_cumsum 的 CPU 对照六梯度全部回到 0.05 内（0.028~0.032）——三个新种子与之前一致，根因定位进一步加强。另做了额外交叉核实：Torch NPU BF16 对真实 native finalize_pre 输入算的 12 个矩阵积与自定义 kernel 逐位一致（排除 Torch/kernel BF16 舍入不一致这个可能性）；Torch NPU FP32 自动微分对 CPU 参考最大相对 L2=2.34e-7（额外交叉 oracle）；跨 bd 36/36 梯度、54/54 组装缓存逐位一致。如实记录两处细节不过度声称：seed1 在 span106.5/128 有 allclose 失败（明确说'相对 L2 小不能替代 allclose'）；seed0/span128 的逐 head/chunk 切片里，即便 gc 替换后仍有 5/64 片超 0.05（明确说不能把整张量通过解释成普遍安全）。已准备四个 kernel 的 GM/UB/末读者 preflight 设计，明确标注'待批准设计，未实现未编译'。主机1454 passed/6 skipped 不变，写集/AST/隐私扫描仍过。**没有新决策点**——PM 已转给用户的问题（批准新建派生 kernel / 还是先以负资格化收尾）仍待用户答复，这条 STATUS 是对同一根因的进一步交叉验证证据，不改变已上报的裁定请求。"
         }
       ],
       "result": null
