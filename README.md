@@ -167,7 +167,7 @@ _Qwen3-Next 用它，六项 ABI 缺口待补（第四期，与本条无关）。
 | 任务 | issue | SoC | dtype | 状态 | 说明 |
 |---|---|---|---|---|---|
 | A2-20 | [#45](https://github.com/ddddwee1/ascend_fla_dev/issues/45) | `a2` | bf16、fp32 | 🔒 gated (kernel-batch-approval) | ★ 起点 |
-| GDA-04 | [#94](https://github.com/ddddwee1/ascend_fla_dev/issues/94) | `a5` | bf16、fp32 | 🔵 assigned | ★ 起点 |
+| GDA-04 | [#94](https://github.com/ddddwee1/ascend_fla_dev/issues/94) | `a5` | bf16、fp32 | 🔵 in_progress | ★ 起点 |
 
 </details>
 
