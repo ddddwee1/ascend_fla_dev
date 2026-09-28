@@ -1,7 +1,8 @@
 # a2.kda_fused_recurrent：A2（c220）上的 KDA decode
 
 > 结论范围：Ascend 910B3 / CANN 9.0.0 / ascriptor library `90cfcdc`。
-> 按 `AGENTS.md` §2，A2-11 之前 A2 真机数字**只作观测**，契约的 board stage 因此标 `untested`。
+> A2-14 在 A2-11 之后独立重测通过：bd1/2、真实 Kimi/GQA 形状与状态续接。
+> [报告](../../../../docs/research/a2_decode.md)与[原始证据](../../../../benchmarks/a2/evidence/decode/)记录本次源码与环境；公共 dispatch 仍未接线。
 
 ## 这是什么
 
@@ -57,4 +58,22 @@ ASCEND_RT_VISIBLE_DEVICES=<card> PYTHONPATH=<ascriptor>/library python run.py ch
 ## 没有确立的
 
 - `block_dim` 只跑过 1 与 2。
-- 性能没有测。这个版本逐行发指令，是正确性优先的写法。
+- A2-14 已测 T=1/16 的三轮同步 Torch NPU 对照，逐轮样本和测量边界见报告；不代表已优化的 decode 性能。
+
+## A2-14 资格化
+
+本次每个 bd 独立进程先编完 decode 与 chunk 共六个 vendor，再执行完整真机 workload。
+CPU FP32 递推是主 golden，Torch NPU FP32 是第二 oracle；原有 `reference.py` 内部 FP64
+算术作为额外诊断保留。输出与状态预算未变。实际单元入口与续接 launcher 逐位一致，
+两种 bd 的 19 组输出/状态逐位一致，128-token prefill 后连续解码 64 步逐 token 验收。
+
+AST 扫描 `kernels/step.py` 中所有 Call 节点，`matmul` 调用数为 0。因此 A2 的 BF16/FP16
+split-K 与手写 FP32 MMAD 累加链均不在此 kernel 的执行路径上；全量
+`tests/test_a2_accumulate_barriers.py` 仍覆盖它与其它 A2 单元，没有跳过守卫。
+
+```bash
+python benchmarks/verify_decode.py --soc a2 --shapes kimi --a2-out <fresh-ignored-directory> --a2-performance
+```
+
+该命令从仓库根目录运行；CANN、固定修订的 ascriptor workspace、设备可见性和缓存目录
+由外部私有配置提供。decode 不受 chunk 门控跨度字段约束。

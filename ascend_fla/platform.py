@@ -57,7 +57,7 @@ CAPABILITIES: dict[str, dict[str, Any]] = {
     "a5": _A5_CAPABILITY,
     "a2": {
         "qualified": False,
-        "supported_block_dim": {"chunk": (1, 2)},
+        "supported_block_dim": {"chunk": (1, 2), "decode": (1, 2)},
         "max_gate_span": {"stable": {"forward": 158.0}},
         "unit_root": "kernels/projects/a2",
         "evidence": (

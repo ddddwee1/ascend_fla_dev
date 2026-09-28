@@ -125,3 +125,150 @@ def test_contract_declares_no_gate_span_limit():
     contract = json.loads((UNIT / "contract.json").read_text(encoding="utf-8"))
     span = contract["domain"]["gate_span"]
     assert "无上限" in span and "exp(g_i)" in span
+
+
+# A2-14: verifier regression tests. All remain CPU-only, with no kernel compilation.
+def _a2_verifier():
+    import importlib.util
+    path = ROOT / "benchmarks/verify_decode.py"
+    spec = importlib.util.spec_from_file_location("_test_decode_verifier", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_a2_fp32_oracle_preserves_gqa_decay_and_nonzero_state():
+    """Analytic one-hot case distinguishes K-axis decay, GQA mapping and state reuse."""
+    import torch
+    verifier = _a2_verifier()
+    q = torch.zeros(1, 2, 2, 128, dtype=torch.bfloat16)
+    q[:, :, 0, 0] = 1
+    q[:, :, 1, 1] = 1
+    x = dict(q=q, k=q.clone(), v=torch.zeros(1, 2, 4, 128, dtype=torch.bfloat16),
+             g=torch.zeros(1, 2, 4, 128), beta=torch.full((1, 2, 4), .5),
+             initial_state=torch.zeros(1, 4, 128, 128))
+    x["initial_state"][0, :, 0, 3] = 2
+    x["initial_state"][0, :, 1, 4] = 4
+    result = verifier.a2_fp32_oracle(x)
+    assert all(t.dtype == torch.float32 and t.device.type == "cpu" for t in result.values())
+    expected_state = x["initial_state"].clone()
+    expected_state[:, :2, 0, :] *= .25
+    expected_state[:, 2:, 1, :] *= .25
+    torch.testing.assert_close(result["final_state"], expected_state, rtol=0, atol=0)
+    expected_o = torch.zeros(1, 2, 4, 128)
+    expected_o[0, 0, :2, 3] = 128 ** -.5
+    expected_o[0, 1, :2, 3] = .5 * 128 ** -.5
+    expected_o[0, 0, 2:, 4] = 2 * 128 ** -.5
+    expected_o[0, 1, 2:, 4] = 128 ** -.5
+    torch.testing.assert_close(result["o"], expected_o, rtol=0, atol=0)
+    # A gate on one K row must not decay all rows or a V column.
+    x["g"][:, :, :, 0] = -1
+    decayed = verifier.a2_fp32_oracle(x)
+    torch.testing.assert_close(decayed["final_state"][:, :2, 0, 3],
+                               expected_state[:, :2, 0, 3] * torch.exp(torch.tensor(-2.)))
+    torch.testing.assert_close(decayed["final_state"][:, :, 1, :], expected_state[:, :, 1, :])
+
+
+def test_a2_metrics_reject_nan_and_small_l2_with_bad_element():
+    import torch
+    verifier = _a2_verifier()
+    contract = json.loads((ROOT / "kernels/projects/a2/kda_fused_recurrent/contract.json").read_text())
+    rule = verifier._a2_rules(contract)["final_state"]
+    expected = torch.ones(10000)
+    actual = expected.clone()
+    actual[0] += 1e-4
+    metrics = verifier.a2_metrics(actual, expected, rule)
+    assert metrics["rel_l2"] < rule["max_relative_l2"]
+    assert not metrics["allclose"] and not metrics["passed"]
+    actual[0] = float("nan")
+    assert not verifier.a2_metrics(actual, expected, rule)["passed"]
+
+
+def test_a2_metrics_also_enforce_l2_and_exact_shape():
+    import pytest
+    import torch
+    verifier = _a2_verifier()
+    rule = dict(rtol=1., atol=1., max_relative_l2=1e-5)
+    metric = verifier.a2_metrics(torch.ones(2) * 1.01, torch.ones(2), rule)
+    assert metric["allclose"] and not metric["passed"]
+    with pytest.raises(ValueError, match="shape mismatch"):
+        verifier.a2_metrics(torch.ones(1, 2), torch.ones(2), rule)
+
+
+def test_a2_reference_loaders_do_not_share_bare_reference_module():
+    import sys
+    verifier = _a2_verifier()
+    before = sys.modules.get("reference")
+    decode, ref_decode = verifier._a2_unit("kda_fused_recurrent")
+    chunk, ref_chunk = verifier._a2_unit("kda_fwd_stable")
+    assert decode.independent_reference is ref_decode.independent_reference
+    assert chunk.independent_reference is ref_chunk.independent_reference
+    assert decode.independent_reference is not chunk.independent_reference
+    assert sys.modules.get("reference") is before
+
+
+def test_a2_cross_bd_rejects_mismatch_missing_case_and_identity():
+    import copy
+    import pytest
+    import torch
+    verifier = _a2_verifier()
+    outputs = {f"real_h{h}_t{t}": {"o": verifier._a2_digest(torch.zeros(1, t, 32, 128, dtype=torch.bfloat16)),
+                                 "final_state": verifier._a2_digest(torch.zeros(1, 32, 128, 128))}
+               for h in (32, 16) for t in (1, 4, 8, 16)}
+    left = dict(block_dim=1, identity={"source": "same"}, passed=True, outputs=outputs,
+                inputs={name: {"digest": "same_input"} for name in outputs})
+    right = copy.deepcopy(left)
+    right["block_dim"] = 2
+    assert verifier.a2_compare_block_dims(left, right)["passed"]
+    right["outputs"]["real_h16_t16"]["o"]["sha256"] = "different"
+    assert not verifier.a2_compare_block_dims(left, right)["passed"]
+    del right["outputs"]["real_h16_t16"]
+    with pytest.raises(ValueError, match="cases missing"):
+        verifier.a2_compare_block_dims(left, right)
+    right["identity"] = {"source": "other"}
+    with pytest.raises(ValueError, match="identities differ"):
+        verifier.a2_compare_block_dims(left, right)
+    right = copy.deepcopy(left)
+    right["block_dim"] = 2
+    right["inputs"]["real_h32_t1"]["digest"] = "different_input"
+    with pytest.raises(ValueError, match="input identities"):
+        verifier.a2_compare_block_dims(left, right)
+    right["inputs"] = copy.deepcopy(left["inputs"])
+    right["outputs"]["real_h32_t1"] = {}
+    with pytest.raises(ValueError, match="both outputs"):
+        verifier.a2_compare_block_dims(left, right)
+
+
+def test_a2_precompiles_all_six_vendors_before_launch(monkeypatch):
+    from types import SimpleNamespace
+    import ascend_fla.runtime.compile as compiler
+    verifier = _a2_verifier()
+    decode = SimpleNamespace(HERE=ROOT / "kernels/projects/a2/kda_fused_recurrent", _kernel=lambda: "decode")
+    chunk = SimpleNamespace(HERE=ROOT / "kernels/projects/a2/kda_fwd_stable",
+                            _kernels=lambda: {name: name for name in ("gate", "intra", "triangular_inverse", "wy", "recurrent")})
+    monkeypatch.setattr(verifier, "_a2_unit", lambda name: (decode if name == "kda_fused_recurrent" else chunk, None))
+    built = []
+    def compile_stub(kernel, **kwargs):
+        assert kwargs == dict(device="a2", block_dim=2, backend="cce")
+        built.append(kernel)
+        return SimpleNamespace(signature=kernel, scalar_names=[])
+    monkeypatch.setattr(compiler, "compile_kernel", compile_stub)
+    events = []
+    native = verifier._A2Native(2, events.append)
+    assert len(set(built)) == 6 and len(native.compiled) == 6
+    assert not native.trace
+    assert events[-1] == dict(stage="precompile_complete", count=6, custom_launches=0)
+
+
+def test_a2_decode_has_no_matmul_and_keeps_declared_launch_domain():
+    """No matmul means neither split-K nor handwritten MMAD accumulation is exercised."""
+    unit = ROOT / "kernels/projects/a2/kda_fused_recurrent"
+    tree = ast.parse((unit / "kernels/step.py").read_text())
+    calls = {node.func.attr if isinstance(node.func, ast.Attribute) else node.func.id
+             for node in ast.walk(tree) if isinstance(node, ast.Call)
+             and isinstance(node.func, (ast.Name, ast.Attribute))}
+    assert "matmul" not in calls
+    contract = json.loads((unit / "contract.json").read_text())
+    assert contract["domain"]["block_dim"] == [1, 2]
+    assert "no chunk-span limit" in contract["domain"]["gate_span"]
+    assert _module_consts(unit / "kernels/step.py")["T_MAX"] == 16

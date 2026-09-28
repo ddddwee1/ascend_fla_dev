@@ -1,0 +1,420 @@
+{
+  "backend": "cce",
+  "cases": [
+    {
+      "block_dim": 1,
+      "id": "single_token",
+      "parameters": {
+        "B": 1,
+        "H": 1,
+        "HV": 1,
+        "T": 1
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 1e-06,
+            "max_relative_l2": 1e-05,
+            "mode": "allclose",
+            "reason": "final_state is FP32 end to end; the A5 decode budget is kept (A2 kernel measured 4e-8..1e-7 on device).",
+            "rtol": 1e-05
+          },
+          "dtype": "float32",
+          "sha256": "c2b37e624976a32cf8c94630a44f15e101c006ea9bc47c74362a0d2b0bfbfbd5",
+          "shape": [
+            1,
+            1,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 0.0001,
+            "max_relative_l2": 0.005,
+            "mode": "allclose",
+            "reason": "o is written in BF16 (D-PM-35); its floor is the BF16 rounding of the FP32 result, measured 1.63e-3..1.71e-3 relative L2. The budget is about 3x that floor, fixed before the unit runs.",
+            "reference_dtype": "float32",
+            "rtol": 0.01
+          },
+          "dtype": "float32",
+          "sha256": "a3c1769b3986639664ab376ab0da60432d301323d03de0758ae90cfa4c7cd225",
+          "shape": [
+            1,
+            1,
+            1,
+            128
+          ]
+        }
+      },
+      "seed": 2026
+    },
+    {
+      "block_dim": 1,
+      "id": "single_token_gva",
+      "parameters": {
+        "B": 1,
+        "H": 1,
+        "HV": 2,
+        "T": 1
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 1e-06,
+            "max_relative_l2": 1e-05,
+            "mode": "allclose",
+            "reason": "final_state is FP32 end to end; the A5 decode budget is kept (A2 kernel measured 4e-8..1e-7 on device).",
+            "rtol": 1e-05
+          },
+          "dtype": "float32",
+          "sha256": "def58092a3f9737e1b9cf7b3101a1f4da7b3881bed68c1cf7a29608d252739b7",
+          "shape": [
+            1,
+            2,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 0.0001,
+            "max_relative_l2": 0.005,
+            "mode": "allclose",
+            "reason": "o is written in BF16 (D-PM-35); its floor is the BF16 rounding of the FP32 result, measured 1.63e-3..1.71e-3 relative L2. The budget is about 3x that floor, fixed before the unit runs.",
+            "reference_dtype": "float32",
+            "rtol": 0.01
+          },
+          "dtype": "float32",
+          "sha256": "d9fc12c88d3620e1587e810bae7c025e7524b9bd1f1b1c061698fc0b680abf1d",
+          "shape": [
+            1,
+            1,
+            2,
+            128
+          ]
+        }
+      },
+      "seed": 2026
+    },
+    {
+      "block_dim": 1,
+      "id": "speculative_4",
+      "parameters": {
+        "B": 1,
+        "H": 1,
+        "HV": 1,
+        "T": 4
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 1e-06,
+            "max_relative_l2": 1e-05,
+            "mode": "allclose",
+            "reason": "final_state is FP32 end to end; the A5 decode budget is kept (A2 kernel measured 4e-8..1e-7 on device).",
+            "rtol": 1e-05
+          },
+          "dtype": "float32",
+          "sha256": "6f51a53b5c41b32905bc051cd7797704ed47135a2091d4f464304fa7329f5ca3",
+          "shape": [
+            1,
+            1,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 0.0001,
+            "max_relative_l2": 0.005,
+            "mode": "allclose",
+            "reason": "o is written in BF16 (D-PM-35); its floor is the BF16 rounding of the FP32 result, measured 1.63e-3..1.71e-3 relative L2. The budget is about 3x that floor, fixed before the unit runs.",
+            "reference_dtype": "float32",
+            "rtol": 0.01
+          },
+          "dtype": "float32",
+          "sha256": "fab82b6efe7594557ae4c140959cb5a9c00f7bf14bdd8e9f2f998e70695dc728",
+          "shape": [
+            1,
+            4,
+            1,
+            128
+          ]
+        }
+      },
+      "seed": 2026
+    },
+    {
+      "block_dim": 1,
+      "id": "t_max",
+      "parameters": {
+        "B": 1,
+        "H": 1,
+        "HV": 1,
+        "T": 16
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 1e-06,
+            "max_relative_l2": 1e-05,
+            "mode": "allclose",
+            "reason": "final_state is FP32 end to end; the A5 decode budget is kept (A2 kernel measured 4e-8..1e-7 on device).",
+            "rtol": 1e-05
+          },
+          "dtype": "float32",
+          "sha256": "73ff1faf61eb73d63e2649e2220725b95f7b2839e5fe0619d60f4eab27e35f77",
+          "shape": [
+            1,
+            1,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 0.0001,
+            "max_relative_l2": 0.005,
+            "mode": "allclose",
+            "reason": "o is written in BF16 (D-PM-35); its floor is the BF16 rounding of the FP32 result, measured 1.63e-3..1.71e-3 relative L2. The budget is about 3x that floor, fixed before the unit runs.",
+            "reference_dtype": "float32",
+            "rtol": 0.01
+          },
+          "dtype": "float32",
+          "sha256": "9a1466c23fb0f796ba6464f95b3a4d34a16c342ea1aa5c578001887581965a25",
+          "shape": [
+            1,
+            16,
+            1,
+            128
+          ]
+        }
+      },
+      "seed": 2026
+    },
+    {
+      "block_dim": 2,
+      "id": "kimi_decode",
+      "parameters": {
+        "B": 1,
+        "H": 32,
+        "HV": 32,
+        "T": 1
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 1e-06,
+            "max_relative_l2": 1e-05,
+            "mode": "allclose",
+            "reason": "final_state is FP32 end to end; the A5 decode budget is kept (A2 kernel measured 4e-8..1e-7 on device).",
+            "rtol": 1e-05
+          },
+          "dtype": "float32",
+          "sha256": "278097ef95a5805bb0fedcc07c608364c336333bd3832a209dd8aaeaeb58f138",
+          "shape": [
+            1,
+            32,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 0.0001,
+            "max_relative_l2": 0.005,
+            "mode": "allclose",
+            "reason": "o is written in BF16 (D-PM-35); its floor is the BF16 rounding of the FP32 result, measured 1.63e-3..1.71e-3 relative L2. The budget is about 3x that floor, fixed before the unit runs.",
+            "reference_dtype": "float32",
+            "rtol": 0.01
+          },
+          "dtype": "float32",
+          "sha256": "cd3ebeba4dcd5ccef83904d3bd6ab3f87cce69149a762c545c4181688bbf9c52",
+          "shape": [
+            1,
+            1,
+            32,
+            128
+          ]
+        }
+      },
+      "seed": 7
+    },
+    {
+      "block_dim": 2,
+      "id": "kimi_decode_gqa",
+      "parameters": {
+        "B": 1,
+        "H": 16,
+        "HV": 32,
+        "T": 1
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 1e-06,
+            "max_relative_l2": 1e-05,
+            "mode": "allclose",
+            "reason": "final_state is FP32 end to end; the A5 decode budget is kept (A2 kernel measured 4e-8..1e-7 on device).",
+            "rtol": 1e-05
+          },
+          "dtype": "float32",
+          "sha256": "dff7cf830bb7bdb311fa6a8f2e7b501f601219d506472693327c5c2e463ab33c",
+          "shape": [
+            1,
+            32,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 0.0001,
+            "max_relative_l2": 0.005,
+            "mode": "allclose",
+            "reason": "o is written in BF16 (D-PM-35); its floor is the BF16 rounding of the FP32 result, measured 1.63e-3..1.71e-3 relative L2. The budget is about 3x that floor, fixed before the unit runs.",
+            "reference_dtype": "float32",
+            "rtol": 0.01
+          },
+          "dtype": "float32",
+          "sha256": "68eb568b9a69badc030b026b94549461f5d32e28f91314759d59c1b42f685f34",
+          "shape": [
+            1,
+            1,
+            32,
+            128
+          ]
+        }
+      },
+      "seed": 2026
+    },
+    {
+      "block_dim": 1,
+      "id": "batch2_spec8_gqa",
+      "parameters": {
+        "B": 2,
+        "H": 4,
+        "HV": 8,
+        "T": 8
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 1e-06,
+            "max_relative_l2": 1e-05,
+            "mode": "allclose",
+            "reason": "final_state is FP32 end to end; the A5 decode budget is kept (A2 kernel measured 4e-8..1e-7 on device).",
+            "rtol": 1e-05
+          },
+          "dtype": "float32",
+          "sha256": "3c618d063b3e12d0fa932a2149d7dfcd6f4da20de7b0321bca464226a435b494",
+          "shape": [
+            2,
+            8,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 0.0001,
+            "max_relative_l2": 0.005,
+            "mode": "allclose",
+            "reason": "o is written in BF16 (D-PM-35); its floor is the BF16 rounding of the FP32 result, measured 1.63e-3..1.71e-3 relative L2. The budget is about 3x that floor, fixed before the unit runs.",
+            "reference_dtype": "float32",
+            "rtol": 0.01
+          },
+          "dtype": "float32",
+          "sha256": "a533e688bfe7106327da898cbf2ad077f193f0db7709d1165925afcdadcfc561",
+          "shape": [
+            2,
+            8,
+            8,
+            128
+          ]
+        }
+      },
+      "seed": 11
+    },
+    {
+      "block_dim": 2,
+      "id": "zero_state",
+      "parameters": {
+        "B": 1,
+        "H": 2,
+        "HV": 4,
+        "T": 2,
+        "initial_state": "zero"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 1e-06,
+            "max_relative_l2": 1e-05,
+            "mode": "allclose",
+            "reason": "final_state is FP32 end to end; the A5 decode budget is kept (A2 kernel measured 4e-8..1e-7 on device).",
+            "rtol": 1e-05
+          },
+          "dtype": "float32",
+          "sha256": "41a83cd29050c8ca7cfadd534b98b64b83f35177d57a7dadaee2be79b3c761cd",
+          "shape": [
+            1,
+            4,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 0.0001,
+            "max_relative_l2": 0.005,
+            "mode": "allclose",
+            "reason": "o is written in BF16 (D-PM-35); its floor is the BF16 rounding of the FP32 result, measured 1.63e-3..1.71e-3 relative L2. The budget is about 3x that floor, fixed before the unit runs.",
+            "reference_dtype": "float32",
+            "rtol": 0.01
+          },
+          "dtype": "float32",
+          "sha256": "a628a52cd1680cfdfb224d007e74ae8095a5b30e00cb1ba283f78b885f16be96",
+          "shape": [
+            1,
+            2,
+            4,
+            128
+          ]
+        }
+      },
+      "seed": 5
+    }
+  ],
+  "command": "reference",
+  "contract_sha256": "1f982117445b65c94f07099bd3626298ca45792e1c63ca0dfa488bb25de852b4",
+  "device": "a2",
+  "dsl_imported": false,
+  "imports": {
+    "unit": "<private-path>/unit.py"
+  },
+  "kernel_imported": false,
+  "launcher": null,
+  "passed": true,
+  "runner_sha256": "8e91d95ed0294ddbfc204957b8bf77606a79123655fc096963b94658b633566b",
+  "schema": "ascriptor.unit-result/1",
+  "simulator_imported": false,
+  "stage": "reference",
+  "started_at": "2026-09-28T02:21:14.782929+00:00",
+  "unit": "a2.kda_fused_recurrent",
+  "versions": {
+    "ascriptor": null,
+    "numpy": "1.26.4",
+    "python": "3.11.15",
+    "torch": "2.10.0+cpu"
+  }
+}
