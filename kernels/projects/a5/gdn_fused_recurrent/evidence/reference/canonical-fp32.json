@@ -1,0 +1,2242 @@
+{
+  "backend": "cce",
+  "cases": [
+    {
+      "block_dim": 1,
+      "id": "full_float32",
+      "parameters": {
+        "B": 1,
+        "H": 16,
+        "HV": 32,
+        "S": 16,
+        "dtype": "float32",
+        "state": "random"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "a59eae76287fb4c98293301e5fe8293ff9ccb323d4f5f91200b11dbf5e10a3c0",
+          "shape": [
+            1,
+            32,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "5caf4771cf99c256a78850df4d4a920a769bcfaf6a1b51658f7f43ff7d52e222",
+          "shape": [
+            1,
+            16,
+            32,
+            128
+          ]
+        }
+      },
+      "seed": 940000
+    },
+    {
+      "block_dim": 1,
+      "id": "r1_s1_float32",
+      "parameters": {
+        "B": 1,
+        "H": 3,
+        "HV": 3,
+        "S": 1,
+        "dtype": "float32",
+        "state": "random"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "e957dc12fb432bdb7af98b7be15e4b27e5cb36a00f8e7d39b3496961d423f980",
+          "shape": [
+            1,
+            3,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "cb32bb20238b639c5144c3fd4c221950e8440d125aa0c52c86237e0c305f749d",
+          "shape": [
+            1,
+            1,
+            3,
+            128
+          ]
+        }
+      },
+      "seed": 940001
+    },
+    {
+      "block_dim": 1,
+      "id": "r1_s2_float32",
+      "parameters": {
+        "B": 1,
+        "H": 3,
+        "HV": 3,
+        "S": 2,
+        "dtype": "float32",
+        "state": "random"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "cad6c45f9bd8629e6ef085c1d0e81c55b6bdf5f3e058d56a9d1ff022ef3bea15",
+          "shape": [
+            1,
+            3,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "09db6128905e2dc74e6a834eda30110ab238e0da116d91bcff32bdb5dd7b64c5",
+          "shape": [
+            1,
+            2,
+            3,
+            128
+          ]
+        }
+      },
+      "seed": 940002
+    },
+    {
+      "block_dim": 1,
+      "id": "r1_s3_float32",
+      "parameters": {
+        "B": 1,
+        "H": 3,
+        "HV": 3,
+        "S": 3,
+        "dtype": "float32",
+        "state": "random"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "ccee37e3a25f8d9b92eabdfb48dc4c2f858e5320d13051474e8ee210e1df2f9e",
+          "shape": [
+            1,
+            3,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "e0c31d7be74df9625406e5f7266512e833baa5983e49ed990e6efb87cb87acf9",
+          "shape": [
+            1,
+            3,
+            3,
+            128
+          ]
+        }
+      },
+      "seed": 940003
+    },
+    {
+      "block_dim": 1,
+      "id": "r1_s7_float32",
+      "parameters": {
+        "B": 1,
+        "H": 3,
+        "HV": 3,
+        "S": 7,
+        "dtype": "float32",
+        "state": "random"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "8cc7d676842fd830b158f21fbf625af126c4aa91c1d11bd650fc6b637bc16f26",
+          "shape": [
+            1,
+            3,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "1046b1876f7f9205baf41021a6f0d3805b1f2558233d53248953c9538be9c9da",
+          "shape": [
+            1,
+            7,
+            3,
+            128
+          ]
+        }
+      },
+      "seed": 940004
+    },
+    {
+      "block_dim": 1,
+      "id": "r1_s15_float32",
+      "parameters": {
+        "B": 1,
+        "H": 3,
+        "HV": 3,
+        "S": 15,
+        "dtype": "float32",
+        "state": "random"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "5e31dcd3916b761a8372f3509e1add7aed867e33cf500441e998447a103872d7",
+          "shape": [
+            1,
+            3,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "e2befca6219a18da4656f8cf5a1c1a9e66f7947cf4fc8b172aab0aa8f085752b",
+          "shape": [
+            1,
+            15,
+            3,
+            128
+          ]
+        }
+      },
+      "seed": 940005
+    },
+    {
+      "block_dim": 1,
+      "id": "r1_s16_float32",
+      "parameters": {
+        "B": 1,
+        "H": 3,
+        "HV": 3,
+        "S": 16,
+        "dtype": "float32",
+        "state": "random"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "3cf68ae6f1f602d95ef055560465685105f4feb8e1e43b41d896948195244813",
+          "shape": [
+            1,
+            3,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "2a59985ae44be3ad194d3e677ff1e333cb0c145ee6d3be49f2fbb443aa0098f2",
+          "shape": [
+            1,
+            16,
+            3,
+            128
+          ]
+        }
+      },
+      "seed": 940006
+    },
+    {
+      "block_dim": 1,
+      "id": "r2_s1_float32",
+      "parameters": {
+        "B": 1,
+        "H": 3,
+        "HV": 6,
+        "S": 1,
+        "dtype": "float32",
+        "state": "random"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "e474af3dee0fa0795acc7f573287b75fa1e616cc5e5d4221336d6bd58ffb759c",
+          "shape": [
+            1,
+            6,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "47eeebdc8450975f3e3ce3f01b65bf371c680b43ed99dc25c377174445f4c827",
+          "shape": [
+            1,
+            1,
+            6,
+            128
+          ]
+        }
+      },
+      "seed": 940007
+    },
+    {
+      "block_dim": 1,
+      "id": "r2_s2_float32",
+      "parameters": {
+        "B": 1,
+        "H": 3,
+        "HV": 6,
+        "S": 2,
+        "dtype": "float32",
+        "state": "random"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "d24db25022dea1c4a6162917856625aa1914abb40a7ca432aa39afddf888980e",
+          "shape": [
+            1,
+            6,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "6caaa074a7fa9a6cf70c9f21af7c2b7ded27e6db9a2f0272517379fcfa3e61bb",
+          "shape": [
+            1,
+            2,
+            6,
+            128
+          ]
+        }
+      },
+      "seed": 940008
+    },
+    {
+      "block_dim": 1,
+      "id": "r2_s3_float32",
+      "parameters": {
+        "B": 1,
+        "H": 3,
+        "HV": 6,
+        "S": 3,
+        "dtype": "float32",
+        "state": "random"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "a3238781f046a2c8868a45b6d173b1ce54f5615e8d22e945663d03fc43c65ca6",
+          "shape": [
+            1,
+            6,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "ba910503ab3e58ae65f6b85c81f51b137e749b243460f3e0d37e77c21dd8e906",
+          "shape": [
+            1,
+            3,
+            6,
+            128
+          ]
+        }
+      },
+      "seed": 940009
+    },
+    {
+      "block_dim": 1,
+      "id": "r2_s7_float32",
+      "parameters": {
+        "B": 1,
+        "H": 3,
+        "HV": 6,
+        "S": 7,
+        "dtype": "float32",
+        "state": "random"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "7417f26ac444fc02dba6804dc6c44ffb25115209d942c5033f9ca3f112b134a1",
+          "shape": [
+            1,
+            6,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "2198a9fc60d787deeb7380bad7066dc1ff75c68c0bddb3417e244c506596a88d",
+          "shape": [
+            1,
+            7,
+            6,
+            128
+          ]
+        }
+      },
+      "seed": 940010
+    },
+    {
+      "block_dim": 1,
+      "id": "r2_s15_float32",
+      "parameters": {
+        "B": 1,
+        "H": 3,
+        "HV": 6,
+        "S": 15,
+        "dtype": "float32",
+        "state": "random"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "4d8db9b1ca7ccf41ed0c88015ff30bba2240af96f9e4ec8c5cdc7dcdb6da2f75",
+          "shape": [
+            1,
+            6,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "91c8cc158ca2d82391586f83e46752ce94ca66c01fe977eebbbb083ca06f24d4",
+          "shape": [
+            1,
+            15,
+            6,
+            128
+          ]
+        }
+      },
+      "seed": 940011
+    },
+    {
+      "block_dim": 1,
+      "id": "r2_s16_float32",
+      "parameters": {
+        "B": 1,
+        "H": 3,
+        "HV": 6,
+        "S": 16,
+        "dtype": "float32",
+        "state": "random"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "f35823ec7d020a6097458d5512f2340696b140b87ddb5f91ed50e0aa1400a4dd",
+          "shape": [
+            1,
+            6,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "f30a62d1b94c3e92b4e298ec473967404a7dd27b5c63b65dc41b455b0e1e4d96",
+          "shape": [
+            1,
+            16,
+            6,
+            128
+          ]
+        }
+      },
+      "seed": 940012
+    },
+    {
+      "block_dim": 1,
+      "id": "r4_s1_float32",
+      "parameters": {
+        "B": 1,
+        "H": 3,
+        "HV": 12,
+        "S": 1,
+        "dtype": "float32",
+        "state": "random"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "3554864d21091646f70f1d3b91cced7dbd55ad993c1d63714be9754220587164",
+          "shape": [
+            1,
+            12,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "142ee9240909c49a3f22a0d7122b80049188b03249902c80ad34511b1e8f693c",
+          "shape": [
+            1,
+            1,
+            12,
+            128
+          ]
+        }
+      },
+      "seed": 940013
+    },
+    {
+      "block_dim": 1,
+      "id": "r4_s2_float32",
+      "parameters": {
+        "B": 1,
+        "H": 3,
+        "HV": 12,
+        "S": 2,
+        "dtype": "float32",
+        "state": "random"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "bc264cd38109b56c173628c3628ab82f05709999c0dea197e348f054949e1995",
+          "shape": [
+            1,
+            12,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "b47d54013bc1803ac7b0706f9ef029f710a700ae9ee9f1a978ed5dc4c59ff5c3",
+          "shape": [
+            1,
+            2,
+            12,
+            128
+          ]
+        }
+      },
+      "seed": 940014
+    },
+    {
+      "block_dim": 1,
+      "id": "r4_s3_float32",
+      "parameters": {
+        "B": 1,
+        "H": 3,
+        "HV": 12,
+        "S": 3,
+        "dtype": "float32",
+        "state": "random"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "93683e5a2b940f72980a90c1c8b144653b875df358d5970056ef3b073f7a2d23",
+          "shape": [
+            1,
+            12,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "1dda3c3833e6f69c995d33da24e052e2e7dcf4cbb04398f1e8d95eb62212c8d7",
+          "shape": [
+            1,
+            3,
+            12,
+            128
+          ]
+        }
+      },
+      "seed": 940015
+    },
+    {
+      "block_dim": 1,
+      "id": "r4_s7_float32",
+      "parameters": {
+        "B": 1,
+        "H": 3,
+        "HV": 12,
+        "S": 7,
+        "dtype": "float32",
+        "state": "random"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "303a6e99a72cbd1d8840d5eedff45e0eb22f4062275dfea69b0c6f1925ce53e1",
+          "shape": [
+            1,
+            12,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "99e60dba96e117805f680b06a96ea427091966b5f4f06aced9ed3cde5d30453f",
+          "shape": [
+            1,
+            7,
+            12,
+            128
+          ]
+        }
+      },
+      "seed": 940016
+    },
+    {
+      "block_dim": 1,
+      "id": "r4_s15_float32",
+      "parameters": {
+        "B": 1,
+        "H": 3,
+        "HV": 12,
+        "S": 15,
+        "dtype": "float32",
+        "state": "random"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "91ee39f51de4880308587ad86906618f4d56f9d9a0ecbd9413b56575c782b6bc",
+          "shape": [
+            1,
+            12,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "cab6d0055b513697bdd427853a680bbdfcc3c71c416e16648a714063ab232386",
+          "shape": [
+            1,
+            15,
+            12,
+            128
+          ]
+        }
+      },
+      "seed": 940017
+    },
+    {
+      "block_dim": 1,
+      "id": "r4_s16_float32",
+      "parameters": {
+        "B": 1,
+        "H": 3,
+        "HV": 12,
+        "S": 16,
+        "dtype": "float32",
+        "state": "random"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "93065b796eaa2bdb113ea8e0765d487a548ef302b4e7d01b8874f495bac883e8",
+          "shape": [
+            1,
+            12,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "ef5b031a8ceaecd77d448a5f0c4e09b564b533927deda85925ce876ae686568e",
+          "shape": [
+            1,
+            16,
+            12,
+            128
+          ]
+        }
+      },
+      "seed": 940018
+    },
+    {
+      "block_dim": 1,
+      "id": "r8_s1_float32",
+      "parameters": {
+        "B": 1,
+        "H": 3,
+        "HV": 24,
+        "S": 1,
+        "dtype": "float32",
+        "state": "random"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "f527e40d16d7c3d902f6d97376f42fd45f2904ff10ccbbe3c0f5ea6bfb870956",
+          "shape": [
+            1,
+            24,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "357e40f6c162d23a4d8a568c59a5cde4d11d8b959526ddd71dc3cbab56d231a5",
+          "shape": [
+            1,
+            1,
+            24,
+            128
+          ]
+        }
+      },
+      "seed": 940019
+    },
+    {
+      "block_dim": 1,
+      "id": "r8_s2_float32",
+      "parameters": {
+        "B": 1,
+        "H": 3,
+        "HV": 24,
+        "S": 2,
+        "dtype": "float32",
+        "state": "random"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "cf130b9b6933186cb367e7d88aaf5ad74d0c5e603e134e219c5c5379dac6653d",
+          "shape": [
+            1,
+            24,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "b02bd578bd725a9afd2228cfd551d3fccf9bc275c2802d8db12236b09a908293",
+          "shape": [
+            1,
+            2,
+            24,
+            128
+          ]
+        }
+      },
+      "seed": 940020
+    },
+    {
+      "block_dim": 1,
+      "id": "r8_s3_float32",
+      "parameters": {
+        "B": 1,
+        "H": 3,
+        "HV": 24,
+        "S": 3,
+        "dtype": "float32",
+        "state": "random"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "8719a18b43dee66ceccb5d807c97eb7af0d9d7a123f0962b76d22359f9b86ef7",
+          "shape": [
+            1,
+            24,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "1438f5a8e231108e4c6c9c2f3f948add56151b450215b6770258a29318e45ef3",
+          "shape": [
+            1,
+            3,
+            24,
+            128
+          ]
+        }
+      },
+      "seed": 940021
+    },
+    {
+      "block_dim": 1,
+      "id": "r8_s7_float32",
+      "parameters": {
+        "B": 1,
+        "H": 3,
+        "HV": 24,
+        "S": 7,
+        "dtype": "float32",
+        "state": "random"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "c422a9729383d1601133ab412439cc2be813f7a88a0ac745ad939ca17a51285c",
+          "shape": [
+            1,
+            24,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "81404a57c89652c936402c3226c61b538948422f8691650d797994ca94a3c431",
+          "shape": [
+            1,
+            7,
+            24,
+            128
+          ]
+        }
+      },
+      "seed": 940022
+    },
+    {
+      "block_dim": 1,
+      "id": "r8_s15_float32",
+      "parameters": {
+        "B": 1,
+        "H": 3,
+        "HV": 24,
+        "S": 15,
+        "dtype": "float32",
+        "state": "random"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "11d9ef005c14c8cdc0769c25574e929df479368544ef0226f5c82c2c06a1a03e",
+          "shape": [
+            1,
+            24,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "11e2eadcbf17f34e37c19e33dc9e4fe70190ed3f3b49ebbde11618c3c4f06120",
+          "shape": [
+            1,
+            15,
+            24,
+            128
+          ]
+        }
+      },
+      "seed": 940023
+    },
+    {
+      "block_dim": 1,
+      "id": "r8_s16_float32",
+      "parameters": {
+        "B": 1,
+        "H": 3,
+        "HV": 24,
+        "S": 16,
+        "dtype": "float32",
+        "state": "random"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "372ea812e1a56b6bf28c6d49221d77b8b3a141f0f73ee945e9b9cf0ca10a6a90",
+          "shape": [
+            1,
+            24,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "f4776ecb61291bd98bab5f4411d32bf796c50b614563638a50a1a03b8ccc51cf",
+          "shape": [
+            1,
+            16,
+            24,
+            128
+          ]
+        }
+      },
+      "seed": 940024
+    },
+    {
+      "block_dim": 1,
+      "id": "zero_initial_float32",
+      "parameters": {
+        "B": 2,
+        "H": 2,
+        "HV": 8,
+        "S": 16,
+        "dtype": "float32",
+        "state": "none"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "e225a95b0146fdaceab73d5570e3f34098a435da38041ac78ff0c038cbdd12f3",
+          "shape": [
+            2,
+            8,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "7136fed5261b63a014fd4edb4babc17110ea4f1c96f1d5ed5c73e3c4854d8c89",
+          "shape": [
+            2,
+            16,
+            8,
+            128
+          ]
+        }
+      },
+      "seed": 940025
+    },
+    {
+      "block_dim": 1,
+      "id": "explicit_zero_float32",
+      "parameters": {
+        "B": 2,
+        "H": 2,
+        "HV": 8,
+        "S": 16,
+        "dtype": "float32",
+        "state": "zero"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "af554f20692a20dcb76a2136ee5326d2e56525b1c71fe2e5c274f418455346ba",
+          "shape": [
+            2,
+            8,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "245923f0f53630c744c4002805b57925dc7fad22053854a896779f96f95f7425",
+          "shape": [
+            2,
+            16,
+            8,
+            128
+          ]
+        }
+      },
+      "seed": 940026
+    },
+    {
+      "block_dim": 1,
+      "id": "batch2_s3_float32",
+      "parameters": {
+        "B": 2,
+        "H": 2,
+        "HV": 8,
+        "S": 3,
+        "dtype": "float32",
+        "state": "random"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "85e493616fb478e5a826e354a95c74e5113127b4334b5a88a96121c3669c21db",
+          "shape": [
+            2,
+            8,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "93c8cc50d6e2336bd86f4a8ecd368b711d3e12d9c9dbb894f919c5ccb18059c7",
+          "shape": [
+            2,
+            3,
+            8,
+            128
+          ]
+        }
+      },
+      "seed": 940027
+    },
+    {
+      "block_dim": 1,
+      "id": "batch2_s16_float32",
+      "parameters": {
+        "B": 2,
+        "H": 2,
+        "HV": 8,
+        "S": 16,
+        "dtype": "float32",
+        "state": "random"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "36b183264217a00ac10d708d24cf0d16d4327925bdf489db9b9dab7d097aaeb5",
+          "shape": [
+            2,
+            8,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "2fee7ace34c15968c3d10771bc857b3da485e7321fd93b2d87f23ed0052a7bf5",
+          "shape": [
+            2,
+            16,
+            8,
+            128
+          ]
+        }
+      },
+      "seed": 940028
+    },
+    {
+      "block_dim": 1,
+      "id": "many_heads_float32",
+      "parameters": {
+        "B": 3,
+        "H": 3,
+        "HV": 24,
+        "S": 3,
+        "dtype": "float32",
+        "state": "random"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "3eb94f28ff358d3aa97266e74ddb07d452774c3e5faea3d47353b97810547e0b",
+          "shape": [
+            3,
+            24,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "2df888d37ab81441ff200e05b11a87ed1e6bc268348cc07e1d9d226583a1d492",
+          "shape": [
+            3,
+            3,
+            24,
+            128
+          ]
+        }
+      },
+      "seed": 940029
+    },
+    {
+      "block_dim": 1,
+      "id": "g_zero_float32",
+      "parameters": {
+        "B": 2,
+        "H": 2,
+        "HV": 8,
+        "S": 16,
+        "dtype": "float32",
+        "g": 0.0,
+        "state": "random"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "72dc6f875cc44e461989bde064fbe64e07841b6af23aae89b5532b3db0b5d9ec",
+          "shape": [
+            2,
+            8,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "da89bdac3cba52835d320f55f558cc0ad08d56b28113c8d3ef34c24d24bec78a",
+          "shape": [
+            2,
+            16,
+            8,
+            128
+          ]
+        }
+      },
+      "seed": 940030
+    },
+    {
+      "block_dim": 1,
+      "id": "g_small_float32",
+      "parameters": {
+        "B": 2,
+        "H": 2,
+        "HV": 8,
+        "S": 16,
+        "dtype": "float32",
+        "g": -0.001,
+        "state": "random"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "df0874d26c2795bcf81158a9a6b10775aae1a282dadac92ffb3a4305fb5affd2",
+          "shape": [
+            2,
+            8,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "c19f8dac94e2195d942f2adc19beccefce66dcd7a5c53a69bb720a4929343711",
+          "shape": [
+            2,
+            16,
+            8,
+            128
+          ]
+        }
+      },
+      "seed": 940031
+    },
+    {
+      "block_dim": 1,
+      "id": "g_large_float32",
+      "parameters": {
+        "B": 2,
+        "H": 2,
+        "HV": 8,
+        "S": 16,
+        "dtype": "float32",
+        "g": -30.0,
+        "state": "random"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "f1a8037bc6eeac42902ab9c5a8d8fdb2e19d37711654d955e30f4e3104234167",
+          "shape": [
+            2,
+            8,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "f97408e6e52e4cef9f5a8ba5b80a1a404ceb69b40ac2c9658c7f6be31c2a1c1f",
+          "shape": [
+            2,
+            16,
+            8,
+            128
+          ]
+        }
+      },
+      "seed": 940032
+    },
+    {
+      "block_dim": 1,
+      "id": "g_underflow_float32",
+      "parameters": {
+        "B": 2,
+        "H": 2,
+        "HV": 8,
+        "S": 16,
+        "dtype": "float32",
+        "g": -1000.0,
+        "state": "random"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "bdaaa27f1bd9d071dab20d4d35d39132ab8663c304fcda96d5315352639af418",
+          "shape": [
+            2,
+            8,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "c5ab1d1cf276013fd0dde79c1bc64ee941658583daa4d83b0286b6915952d36b",
+          "shape": [
+            2,
+            16,
+            8,
+            128
+          ]
+        }
+      },
+      "seed": 940033
+    },
+    {
+      "block_dim": 1,
+      "id": "beta_zero_float32",
+      "parameters": {
+        "B": 2,
+        "H": 2,
+        "HV": 8,
+        "S": 16,
+        "beta": 0.0,
+        "dtype": "float32",
+        "state": "random"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "800298354ac5f2c3ec32038114cf58d1d1777ae68e6b19e2ba82800fb2215fe8",
+          "shape": [
+            2,
+            8,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "a41b4bb00989c65c15f8adfbd194dfb68cc94ee375c6931b460eddbb397aae86",
+          "shape": [
+            2,
+            16,
+            8,
+            128
+          ]
+        }
+      },
+      "seed": 940034
+    },
+    {
+      "block_dim": 1,
+      "id": "beta_one_float32",
+      "parameters": {
+        "B": 2,
+        "H": 2,
+        "HV": 8,
+        "S": 16,
+        "beta": 1.0,
+        "dtype": "float32",
+        "state": "random"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "ab6dc22a1bafec0f77903be3e47a32a16d7c1c5bb1fd747ce67b16ad2853915e",
+          "shape": [
+            2,
+            8,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "171d0b83017a4cbc52f2dc673c0ff78de8cecd83ef60413991f586b710fd8851",
+          "shape": [
+            2,
+            16,
+            8,
+            128
+          ]
+        }
+      },
+      "seed": 940035
+    },
+    {
+      "block_dim": 1,
+      "id": "zero_q_float32",
+      "parameters": {
+        "B": 2,
+        "H": 2,
+        "HV": 8,
+        "S": 16,
+        "dtype": "float32",
+        "state": "random",
+        "zero_q": true
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "4999c66f718ce52c16bfbf06ddab46e8fca730b85345996d0000aaffc83df482",
+          "shape": [
+            2,
+            8,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "fa43239bcee7b97ca62f007cc68487560a39e19f74f3dde7486db3f98df8e471",
+          "shape": [
+            2,
+            16,
+            8,
+            128
+          ]
+        }
+      },
+      "seed": 940036
+    },
+    {
+      "block_dim": 1,
+      "id": "zero_k_float32",
+      "parameters": {
+        "B": 2,
+        "H": 2,
+        "HV": 8,
+        "S": 16,
+        "dtype": "float32",
+        "state": "random",
+        "zero_k": true
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "8f7d27f915e081d250810701aa9bc8a67567dbdb2a494aac84b6f59910fd15c0",
+          "shape": [
+            2,
+            8,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "f01d4a839b8521af16429935090c5b04e7957b638b7e8023ff67785a451e41a5",
+          "shape": [
+            2,
+            16,
+            8,
+            128
+          ]
+        }
+      },
+      "seed": 940037
+    },
+    {
+      "block_dim": 1,
+      "id": "all_zero_float32",
+      "parameters": {
+        "B": 2,
+        "H": 2,
+        "HV": 8,
+        "S": 16,
+        "all_zero": true,
+        "dtype": "float32",
+        "state": "random"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58",
+          "shape": [
+            2,
+            8,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "fa43239bcee7b97ca62f007cc68487560a39e19f74f3dde7486db3f98df8e471",
+          "shape": [
+            2,
+            16,
+            8,
+            128
+          ]
+        }
+      },
+      "seed": 940038
+    },
+    {
+      "block_dim": 1,
+      "id": "state_large_float32",
+      "parameters": {
+        "B": 2,
+        "H": 2,
+        "HV": 8,
+        "S": 16,
+        "dtype": "float32",
+        "state": "random",
+        "state_scale": 16.0
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "141d4e5c5396ed0a2d3e21cc4e94f6fc483599ab80fc1d17d2d88aee3dd2747d",
+          "shape": [
+            2,
+            8,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "5632507fd383f9279f68fc99f18d2082d01c12f05229da02ac39ee0efbbea785",
+          "shape": [
+            2,
+            16,
+            8,
+            128
+          ]
+        }
+      },
+      "seed": 940039
+    },
+    {
+      "block_dim": 1,
+      "id": "state_small_float32",
+      "parameters": {
+        "B": 2,
+        "H": 2,
+        "HV": 8,
+        "S": 16,
+        "dtype": "float32",
+        "state": "random",
+        "state_scale": 1e-06
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "649e3cd03c7a94a7755e1d24e29851347deb18d8f560dc99bb6da8e5390c89a4",
+          "shape": [
+            2,
+            8,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "572ef2eba3ec26c402b73b239cba7021ed0f6afd8dc5bab6d1cb28fc20652231",
+          "shape": [
+            2,
+            16,
+            8,
+            128
+          ]
+        }
+      },
+      "seed": 940040
+    },
+    {
+      "block_dim": 1,
+      "id": "key_norm_one_float32",
+      "parameters": {
+        "B": 2,
+        "H": 2,
+        "HV": 8,
+        "S": 16,
+        "dtype": "float32",
+        "key_norm": 1.0,
+        "state": "random"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "c779dfcb8863c49e3d2c1e7667e2405d318b39d4c0bcf48295e8a38dd0024600",
+          "shape": [
+            2,
+            8,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "4e1df0e19852da835a31b082783d6eb65a3fcbfff92c7eb4374a01fbeb5bee98",
+          "shape": [
+            2,
+            16,
+            8,
+            128
+          ]
+        }
+      },
+      "seed": 940041
+    },
+    {
+      "block_dim": 1,
+      "id": "key_norm_two_float32",
+      "parameters": {
+        "B": 2,
+        "H": 2,
+        "HV": 8,
+        "S": 16,
+        "dtype": "float32",
+        "key_norm": 2.0,
+        "state": "random"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "5369c56fa36767e769b625410bb2b7f4c7621ea509fa368edfe08931d73867de",
+          "shape": [
+            2,
+            8,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "8fc5498b3f956f2783691351e364d6521b9fb8b550dba741f1320a6dc4981acc",
+          "shape": [
+            2,
+            16,
+            8,
+            128
+          ]
+        }
+      },
+      "seed": 940042
+    },
+    {
+      "block_dim": 1,
+      "id": "signed_spikes_float32",
+      "parameters": {
+        "B": 2,
+        "H": 2,
+        "HV": 8,
+        "S": 16,
+        "dtype": "float32",
+        "spikes": true,
+        "state": "random"
+      },
+      "passed": true,
+      "reference": {
+        "final_state": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "6be930527274c7b703d732a3408a6927dfa86118d231f3185e6fae48a7286cd9",
+          "shape": [
+            2,
+            8,
+            128,
+            128
+          ]
+        },
+        "o": {
+          "comparison": {
+            "atol": 2e-05,
+            "max_relative_l2": 0.0001,
+            "mode": "allclose",
+            "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+            "rtol": 0.0002
+          },
+          "dtype": "float32",
+          "sha256": "5960f1578c836b9220c7e7a3417173deff3657843e4d8f844dd990621de8cbc1",
+          "shape": [
+            2,
+            16,
+            8,
+            128
+          ]
+        }
+      },
+      "seed": 940043
+    }
+  ],
+  "command": "reference",
+  "contract_sha256": "af494a30707e88f23bbc9146ef86597817d2c55c4ea879179884184a89588eb6",
+  "device": "a5",
+  "dsl_imported": false,
+  "imports": {
+    "ref": "None",
+    "unit": "<repo>/kernels/projects/a5/gdn_fused_recurrent/unit.py"
+  },
+  "kernel_imported": false,
+  "launcher": null,
+  "passed": true,
+  "runner_sha256": "8e91d95ed0294ddbfc204957b8bf77606a79123655fc096963b94658b633566b",
+  "schema": "ascriptor.unit-result/1",
+  "simulator_imported": false,
+  "stage": "reference",
+  "started_at": "2026-09-28T13:05:28.084355+00:00",
+  "unit": "a5.gdn_fused_recurrent",
+  "versions": {
+    "ascriptor": null,
+    "numpy": "1.26.4",
+    "python": "3.11.15",
+    "torch": "2.10.0+cpu"
+  }
+}

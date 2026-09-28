@@ -1,0 +1,96 @@
+{
+  "task": "GDA-04",
+  "implementation_commit": "1de6f78",
+  "branch_with_PM_spec": "922caf0",
+  "PM_oracle_acceptance": "https://github.com/ddddwee1/ascend_fla_dev/issues/94#issuecomment-5870217647",
+  "stages": [
+    {
+      "label": "full-bd1-v1",
+      "passed": true,
+      "clean_observed_window": true,
+      "stage": "native_inprocess",
+      "block_dim": 1
+    },
+    {
+      "label": "grid-bd1-v1",
+      "passed": true,
+      "clean_observed_window": false,
+      "stage": "native_inprocess",
+      "block_dim": 1
+    },
+    {
+      "label": "grid-bd1-isolated-v1",
+      "passed": true,
+      "clean_observed_window": true,
+      "stage": "native_inprocess",
+      "block_dim": 1
+    },
+    {
+      "label": "grid-bd2-isolated-v1",
+      "passed": true,
+      "clean_observed_window": true,
+      "stage": "native_inprocess",
+      "block_dim": 2
+    },
+    {
+      "label": "grid-bd4-isolated-v1",
+      "passed": true,
+      "clean_observed_window": true,
+      "stage": "native_inprocess",
+      "block_dim": 4
+    },
+    {
+      "label": "grid-bd8-isolated-v1",
+      "passed": true,
+      "clean_observed_window": true,
+      "stage": "native_inprocess",
+      "block_dim": 8
+    },
+    {
+      "label": "grid-bd16-isolated-v1",
+      "passed": true,
+      "clean_observed_window": true,
+      "stage": "native_inprocess",
+      "block_dim": 16
+    },
+    {
+      "label": "grid-bd28-isolated-v1",
+      "passed": true,
+      "clean_observed_window": true,
+      "stage": "native_inprocess",
+      "block_dim": 28
+    },
+    {
+      "label": "integration-bd4-v1",
+      "passed": true,
+      "clean_observed_window": false,
+      "stage": "native_state_continuation",
+      "block_dim": 4
+    },
+    {
+      "label": "integration-bd4-isolated-v2",
+      "passed": true,
+      "clean_observed_window": true,
+      "stage": "native_state_continuation",
+      "block_dim": 4
+    },
+    {
+      "label": "timing-bd4-v1",
+      "passed": true,
+      "clean_observed_window": true,
+      "stage": "same_card_public_call_timing",
+      "block_dim": 4
+    },
+    {
+      "label": "host-audit-bd4-v2",
+      "passed": true,
+      "clean_observed_window": true,
+      "stage": "native_public_host_work_audit",
+      "block_dim": 4
+    }
+  ],
+  "cuda_triton_executed": false,
+  "weight_validation_executed": false,
+  "source_manifests": "Each native receipt binds exact executed source and compiled-artifact hashes.",
+  "historical_wording": "Original CPU calibration reports say proposed / RISK pending: they predate the linked PM acceptance, which accepted these exact results without rerunning."
+}
