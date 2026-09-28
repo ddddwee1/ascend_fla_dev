@@ -2871,7 +2871,7 @@
       "wave": "W-A2",
       "soc": "a2",
       "priority": "P1",
-      "status": "assigned",
+      "status": "in_progress",
       "model": [
         "kimi-linear-48b-a3b"
       ],
@@ -2932,6 +2932,10 @@
         {
           "at": "2026-09-28T17:30",
           "summary": "PM 写完规格（docs/pm/tasks/A2-13.md 全文新写，格式参照 A2-12）并裁定路由问题（issue #28 评论 5870823831/5875099907 提出的\"既有单元资格化 vs 真实带缓存前向/公开 autograd 接线\"）：**保持单元级资格化范围，不升级为公开接线**——A5 的 chunk_kda_fwd_with_caches/chunk_kda_bwd 虽已 SoC 泛化（resolve_soc/device= 参数），但两者入口都调 require_qualified(device)，a2 的 qualified 仍是 False 且这次不翻；写集也没有 ops/kda/*.py，不能靠改这些文件绕开。但资格化的方法论要改：不能只用 reference.py 独立算的 FP32 fixture 校验反向单元（PM 核实这些 fixture 确实不与真实前向的 BF16 舍入接缝逐位相同）——正确做法是直接对 kernels/projects/a2/kda_fwd_stable 发起 ascriptor 调用拿真实九检查点（同 A2-03/A2-12 的绕开门控包装、直调单元的技术），再喂给 kda_bwd_stable，对 CPU FP32 端到端参考（不是孤立fixture 期望值）报相对 L2；独立 fixture 检查保留但单独报数字，不与端到端结果合并陈述。qg 缩放陷阱、门控跨度重测方法论、CAPABILITIES 填数范围（max_gate_span.stable.backward，qualified 仍留 False）都写进规格。写集补 3 项（platform.py/test_platform.py/证据目录，对齐 A2-12 先例，提前批好不必另发 write-set-expansion）。gated -> assigned（deps A2-09/A2-12 均已完成，D-PM-43 已放行用户批准这一层）：指派给 issue #28 标准 APPLY（limjiunnbin / session 01a0b7ce-3daf-7550-a7bf-31c67eb91ca3，范围声明含 KDA/PKDA，A2-14 已合入后空闲）。ASSIGN 协议消息随后发到 issue #40。"
+        },
+        {
+          "at": "2026-09-28T17:54",
+          "summary": "ACK（issue #40 评论 5875551167，session 01a0b7ce-...）。计划：①从最新 main 建 task/A2-13 独立 checkout，先跑主机基线、核验 pin/导入路径/设备健康；②写测试侧 a2 直调辅助，记录六项真机前向直出量与三项 host 补算缓存的来源/精度，kernel 预编译、每个 bd 独立进程；③真实 H=HV=32、T∈{64,128,512,4096} 及边界，对 CPU FP32 自动微分六个梯度逐项报 0.05 预算，独立 fixture 数字单独留；④真机扫 backward gate span 与≥8 seed 下界，qualified 保持 False、公开 ops 不改；⑤全量回归+脱敏证据+PR/DONE。eta_h=20，与 timebox 一致。note 明确接受单元级范围边界，不把 fixture/补算缓存/构建结果冒充公开 autograd 资格——与规格裁定一致，无异议。另指出一处源码细节（供后续核实，非争议）：stable 分支的 g_cumsum 实际是直接换底算的，不是先算 log2(eg) 再转——会在测试里如实记录实际来源。assigned -> in_progress。"
         }
       ],
       "result": null
