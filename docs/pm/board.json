@@ -2940,7 +2940,8 @@
         "kernels/projects/a2/kda_fused_recurrent/README.md",
         "ascend_fla/platform.py",
         "docs/research/a2_decode.md",
-        "benchmarks/a2/evidence/decode/**"
+        "benchmarks/a2/evidence/decode/**",
+        "tests/test_platform.py"
       ],
       "needs": {
         "npu": true,
@@ -2979,6 +2980,18 @@
         {
           "at": "2026-09-28T02:05",
           "summary": "ACK（issue #41 评论 5862008621，session 01a0b7ce-3daf-7550-a7bf-31c67eb91ca3；ASSIGN 于 2026-09-26T01:47:01Z，ACK 迟到约 48h，因指派方会话中间不活跃，非申领人责任，同 BF-09 先例不收回）。同时提了三条 RISK，PM 逐条裁定：\n① timebox-slip：接受不追责，timebox_h=10 从本次 resume（02:05Z）重新起算。\n② contradicts-handoff：核实属实——`kda_fused_recurrent/reference.py` 的 `independent_reference` 实际是 FP64 内部算术、FP32 输出，不是规格原文字面说的'CPU FP32 参考'，是 PM 用词不精确。裁定按申领人方案：验证器新增显式逐元素 FP32 算术的独立 CPU 递推作主金标准，既有 FP64 内部参考保留作补充诊断，第二 oracle 用 Torch NPU FP32 递推；不改现有单元 reference.py/kernel。规格已更正措辞。\n③ write-set-expansion：批准 `docs/research/a2_decode.md`（新建）+ `benchmarks/a2/evidence/decode/**`（新建），已核对与 A2-13 写集无冲突，只放脱敏文本/JSON。\nassigned -> in_progress。计划：验证 pinned 源码与环境→precompile 六个 decode/chunk vendor→真实 Kimi T=1/4/8/16 与 GQA case、CPU FP32/Torch NPU 双 oracle、跨 bd 逐位对比→prefix128+续接64 vs 整 chunk192、分段解码 vs T16→ETA 10h。"
+        },
+        {
+          "at": "2026-09-28T02:16",
+          "summary": "STATUS（issue #41 评论 5862105276，session 01a0b7ce-...）。bd1 完整真机 workload 通过（Ascend910B3/CANN9.0.0，六个 vendor 全部 precompile）：16 个精度 case（8 原有 + H32/HV32、H16/HV32 在 T1/4/8/16），CPU FP32 最大相对 L2 o=0.00172/state=1.02e-7；分段 T16 vs 一次性调用逐位相同；真实 prefix128+64 单 token 续接 decode vs 整 chunk192 对照；Torch NPU 第二 oracle 与三轮同卡计时完成。CPU 定向测试+A2 累加守卫 19 passed。next：bd2 编译中，随后跨 bd 逐位比较。"
+        },
+        {
+          "at": "2026-09-28T02:24",
+          "summary": "STATUS（issue #41 评论 5862171271，同 session）。bd1+bd2 均完整真机通过：32 个精度 case（每 bd 16 个），CPU FP32 最大相对 L2 o=1.72e-3/state=1.02e-7（冻结预算内）；19 组跨 bd 输出/state 对逐位相同（含两个 GQA 形状、分段 T16、chunk128+64 续接）；每 token 续接 state 相对 L2 最大 1.79e-7（1e-5 预算内）。sim/pipesim 定点诊断通过、无 hazard/deadlock。host 全套 1369 passed/6 skipped（设置 hash 核验过的 既有 FLA oracle 文件后）。**同时发现一个新的写集外冲突**（见下一条 RISK）。尚无 DONE。"
+        },
+        {
+          "at": "2026-09-28T02:24",
+          "summary": "RISK write-set-expansion（issue #41 评论 5862171382）：`tests/test_platform.py:56` 硬编码断言 `cap[\"supported_block_dim\"] == {\"chunk\": (1, 2)}`，本任务要求新增的 `\"decode\": (1, 2)` 键会让这条断言失败。PM 核实属实（已读该文件该行确认）。**批准**：只改这一行断言为 `{\"chunk\": (1, 2), \"decode\": (1, 2)}`，该文件其余断言（`qualified is False`、报错检查等）不动；`tests/test_platform.py` 已并入写集，范围限定这一行。"
         }
       ],
       "result": null
