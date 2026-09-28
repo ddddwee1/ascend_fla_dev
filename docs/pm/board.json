@@ -5442,11 +5442,11 @@
     },
     {
       "id": "PK-06",
-      "title": "PGDN decode（fused recurrent，带 ATK 状态）：A5 真机验收（骨架）",
+      "title": "PGDN decode（fused recurrent，带 ATK 状态）：A5 真机验收",
       "wave": "W0",
       "soc": "a5",
       "priority": "-",
-      "status": "open",
+      "status": "assigned",
       "model": [],
       "kernel": [
         "pgdn_fused_recurrent"
@@ -5473,10 +5473,22 @@
       "spec": "docs/pm/tasks/PK-06.md",
       "issue": 95,
       "pr": null,
-      "assignee": null,
-      "assignee_caps": null,
-      "branch": null,
-      "timebox_h": 16,
+      "assignee": "limjiunnbin",
+      "assignee_caps": {
+        "agent": "Codex / GPT-6",
+        "socs": [
+          "a5"
+        ],
+        "soc_details": "CANN 9.1.0-beta.1，compiler/opp timestamp 20260509_173000235，OPP 内置含 ascend950/ascend910b/ascend910_93；GDA-04（GDN decode）已交付并合入，环境/源码/产物回执见 PR #136。",
+        "ascriptor": "yes library 90cfcdc720bbcd66e8bd4361c4dd4fbc1a2a57b5 / kernels b3b3f9c16df7c4626ed3c081032a1be5a753d0b1",
+        "fla": "yes pin e52dbc0ea19d3a40d7ab7f9eed855d2b473994d2；已只读核对 literal PGDN naive（sha256 3baa67a5…11e84b5e8）",
+        "python": "host 3.11.15/torch 2.10.0+cpu；Docker 3.12.14/torch 2.12.0+cu130/torch_npu 2.12.0；pytest 可用",
+        "fork": "limjiunnbin/ascend_fla_dev",
+        "availability": "持续在线，GDA-04 已合入后立即接续",
+        "session": "dev-20260928T020159Z-609dfa8f"
+      },
+      "branch": "task/PK-06",
+      "timebox_h": 24,
       "reports": [
         {
           "at": "2026-09-19T12:16",
@@ -5497,6 +5509,10 @@
         {
           "at": "2026-09-28T15:23",
           "summary": "只读预检 STATUS（issue #95 评论 5873097310，session dev-20260928T020159Z-609dfa8f；PK-06 assignee 仍是 None，poll 已标'不采信'，仅记为后续写规格的参考输入）。确认接受新规格将原生支持 BF16/FP32、归一化按 literal naive 的乘性 `x/max(norm(x),1e-12)`（不是 Triton 的加性 epsilon）。四点源码/量程预读：①PGDN chunk 的 prepare 一次注册 12 个 entry（FP32+BF16），若新 decode 是两个 typed entry，联合进程需 14 个 entry 都准备好才能首次执行，不能照抄 GDA-04 的 9-entry 清单；②literal PGDN naive 有四处显式 FP32 dtype 节点（输入/标量 center/张量 center/logx），FP64 lift 要逐项核对，不能照抄 GDN 的两节点 lift；GVA 下 `A[:,::n_rep]` 可能不连续；③非零初始 ATK state 会让原来'A≤T'的零初态量程界变成'A≤A0+t'，小 `exp(g_atk)` 乘大 `A0` 仍可能有效量级，不能只看 o/主state 判断 ATK 对不对（明确这只是分析，不当缺陷结论或自行改域）；④chunk 现有两个初始状态入口仍只支持 None，prefill→decode 必须直传两个 NPU 返回的 state。"
+        },
+        {
+          "at": "2026-09-28T16:52",
+          "summary": "PM 补全规格（docs/pm/tasks/PK-06.md 全文重写，格式对齐 GDA-04：ABI 冻结表读自 ascend_fla/ops/pgdn_chunk_fwd.py 与 kernels/projects/a5/pgdn_chunk_fwd/contract.json 源码核实，双 oracle 定 A=naive_recurrent_precond_gated_delta_rule/B=独立 CPU FP32，吸收两轮只读预检的四点发现：14-entry prepare 联合清单、四节点 FP64 lift、非零 ATK 初态的量程界变化 A≤A0+t、chunk 仍 None-only 两个状态都要直传。BF16 显式拒绝的过期骨架条款已按 D-PM-35 更正为原生支持，与 board.json 既有 dtype:[bf16,fp32] 字段一致）。open -> assigned，指派给 issue #95 上的标准 APPLY（评论 5872799023，账号 limjiunnbin/session dev-20260928T020159Z-609dfa8f，GDA-04 合入后已转为对 PK-06 的正式申领）。ASSIGN 协议消息随后发到 issue #95。"
         }
       ],
       "result": null,
