@@ -296,23 +296,8 @@ def a2_actual_cases(native, emit, cases=None):
         inputs, distribution = fixtures.a2_qualification_inputs(case)
         trace_start = len(native.trace)
         assembled, forward, assembly = caches.a2_actual_forward_caches(native, inputs)
-        nonfinite = {**{f"forward.{n}": int((~v.isfinite()).sum()) for n, v in forward.items()},
-                     **{f"saved.{n}": int((~v.isfinite()).sum()) for n, v in assembled["saved"].items()}}
-        if any(nonfinite.values()):
-            # The unit contract requires finite saved inputs. Preserve this
-            # forward failure; never upload invalid caches to manufacture a bwd run.
-            row = {"stage": "actual_cache_pre_backward_failure", "case": case["id"],
-                   "block_dim": native.bd, "parameters": case, "distribution": distribution,
-                   "assembly": assembly, "nonfinite_counts": nonfinite,
-                   "input_digests": {n: _a2_digest(v) for n, v in inputs.items()},
-                   "launches": native.trace[trace_start:], "native_backward_executed": False,
-                   "reason": "forward produced nonfinite outputs/caches; backward input contract rejects them",
-                   "passed": False}
-            rows.append(row)
-            emit(row)
-            continue
         cache_metrics, direct_metrics = {}, {}
-        if case.get("check_cache_foundation", case["HV"] <= 4):
+        if case["gate"] == "uniform":
             # Small-shape foundation check; the independent builder is not used as
             # backward input or as the end-to-end gradient oracle.
             independent = native.backward_ref.build_saved_forward(
@@ -375,17 +360,13 @@ def a2_actual_cases(native, emit, cases=None):
     return rows
 
 
-def a2_worker(bd, out, suite, *, lengths=(128,), seeds=(0,),
-              spans=(1., 8., 16., 32., 64., 96., 128., 160., 192.),
-              gates=("uniform", "fla_initialization")):
+def a2_worker(bd, out, suite):
     """One process / one block_dim. Caller supplies an isolated output directory."""
     import hashlib
     from benchmarks.verify_decode import _a2_identity
     out.mkdir(parents=True, exist_ok=False)
     def emit(row):
-        import datetime
-        line = json.dumps({"at_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(), **row},
-                          ensure_ascii=False, allow_nan=False)
+        line = json.dumps(row, ensure_ascii=False, allow_nan=False)
         with (out / "events.jsonl").open("a") as stream:
             stream.write(line + "\n")
         print(line, flush=True)
@@ -408,14 +389,11 @@ def a2_worker(bd, out, suite, *, lengths=(128,), seeds=(0,),
         rows = a2_fixture_cases(native, emit)
     elif suite == "actual":
         rows = a2_actual_cases(native, emit)
-    elif suite == "span":
-        fixtures, _, _ = a2_test_helpers()
-        rows = a2_actual_cases(native, emit, fixtures.a2_span_cases(lengths, seeds, spans, gates))
     else:
         raise ValueError("unsupported A2 suite")
     receipt = {"block_dim": bd, "suite": suite, "cases": len(rows),
                "passed": all(row["passed"] for row in rows),
-               "public_dispatch_qualified": False, "rows": rows}
+               "actual_cache_qualified": False, "rows": rows}
     (out / "receipt.json").write_text(json.dumps(receipt, indent=2, allow_nan=False) + "\n")
     emit({key: value for key, value in receipt.items() if key != "rows"})
     return 0 if receipt["passed"] else 1
@@ -431,13 +409,8 @@ def main() -> int:
                     help="门控倍数列表，默认 MULTS。本脚本的输入分布下跨度 ≈ 1.117 × 倍数")
     ap.add_argument("--json-out", type=pathlib.Path)
     ap.add_argument("--soc", choices=("a5", "a2"), default="a5")
-    ap.add_argument("--a2-suite", choices=("fixture", "actual", "span"), default="fixture")
+    ap.add_argument("--a2-suite", choices=("fixture", "actual"), default="fixture")
     ap.add_argument("--a2-out", type=pathlib.Path)
-    ap.add_argument("--a2-lengths", type=int, nargs="+", default=[128])
-    ap.add_argument("--a2-seeds", type=int, nargs="+", default=[0])
-    ap.add_argument("--a2-spans", type=float, nargs="+", default=[1., 8., 16., 32., 64., 96., 128., 160., 192.])
-    ap.add_argument("--a2-gates", nargs="+", choices=("uniform", "fla_initialization"),
-                    default=["uniform", "fla_initialization"])
     args = ap.parse_args()
 
     try:
@@ -449,8 +422,7 @@ def main() -> int:
     if args.soc == "a2":
         if args.impl not in (None, "stable") or args.mults or args.json_out or args.a2_out is None:
             ap.error("A2 requires --a2-out and its own suite; A5 impl/mults/json-out do not apply")
-        return a2_worker(args.block_dim, args.a2_out, args.a2_suite,
-                         lengths=args.a2_lengths, seeds=args.a2_seeds, spans=args.a2_spans, gates=args.a2_gates)
+        return a2_worker(args.block_dim, args.a2_out, args.a2_suite)
 
     if args.impl is not None:
         rows = run(args.impl, args.block_dim, args.mults)

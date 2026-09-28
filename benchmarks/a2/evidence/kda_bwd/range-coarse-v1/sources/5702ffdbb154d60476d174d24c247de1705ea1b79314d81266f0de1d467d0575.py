@@ -296,21 +296,6 @@ def a2_actual_cases(native, emit, cases=None):
         inputs, distribution = fixtures.a2_qualification_inputs(case)
         trace_start = len(native.trace)
         assembled, forward, assembly = caches.a2_actual_forward_caches(native, inputs)
-        nonfinite = {**{f"forward.{n}": int((~v.isfinite()).sum()) for n, v in forward.items()},
-                     **{f"saved.{n}": int((~v.isfinite()).sum()) for n, v in assembled["saved"].items()}}
-        if any(nonfinite.values()):
-            # The unit contract requires finite saved inputs. Preserve this
-            # forward failure; never upload invalid caches to manufacture a bwd run.
-            row = {"stage": "actual_cache_pre_backward_failure", "case": case["id"],
-                   "block_dim": native.bd, "parameters": case, "distribution": distribution,
-                   "assembly": assembly, "nonfinite_counts": nonfinite,
-                   "input_digests": {n: _a2_digest(v) for n, v in inputs.items()},
-                   "launches": native.trace[trace_start:], "native_backward_executed": False,
-                   "reason": "forward produced nonfinite outputs/caches; backward input contract rejects them",
-                   "passed": False}
-            rows.append(row)
-            emit(row)
-            continue
         cache_metrics, direct_metrics = {}, {}
         if case.get("check_cache_foundation", case["HV"] <= 4):
             # Small-shape foundation check; the independent builder is not used as

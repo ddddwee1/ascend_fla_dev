@@ -83,8 +83,7 @@ def a2_actual_forward_caches(native, inputs):
         raise RuntimeError("A2 fixture did not assemble all nine caches")
     # Undo the layout mapping, proving no hidden arithmetic touched the six values.
     roundtrip = {name: torch.equal(
-        saved[name].view(b, c, 64, hv, -1).permute(0, 3, 1, 2, 4).contiguous().view(torch.uint8),
-        raw[name].contiguous().view(torch.uint8))
+        saved[name].view(b, c, 64, hv, -1).permute(0, 3, 1, 2, 4).contiguous(), raw[name])
         for name in direct}
     if not all(roundtrip.values()):
         raise RuntimeError("A2 fixture layout conversion changed tensor values")

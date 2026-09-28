@@ -215,19 +215,6 @@ def a2_qualification_inputs(case):
     return {n: v.contiguous() for n, v in result.items()}, metadata
 
 
-def a2_span_cases(lengths, seeds, spans, gates):
-    """Two gate distributions prevent quiet heads from masking deep-decay errors."""
-    if any(t < 64 or t % 64 for t in lengths) or not seeds or not spans:
-        raise ValueError("span cases require positive T divisible by 64, seeds and spans")
-    if any(not (0 < span < float("inf")) for span in spans):
-        raise ValueError("span targets must be positive and finite")
-    if set(gates) - {"uniform", "fla_initialization"}:
-        raise ValueError("unknown gate distribution")
-    return [dict(id=f"range_{gate}_t{t}_seed{seed}_span{span:g}", B=1, T=t, H=32, HV=32,
-                 seed=seed, span=span, gate=gate, check_cache_foundation=False)
-            for t in lengths for seed in seeds for gate in gates for span in spans]
-
-
 if __name__ == "__main__":
     # worker 模式：python tests/test_kda_bwd_npu.py <case_id>
     if len(sys.argv) != 2 or sys.argv[1] not in CASES:
