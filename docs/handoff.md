@@ -11,6 +11,12 @@
 
 ### 正在飞的任务（现在没有；A5K-02、PK-02、PK-03 都已于 2026-09-19 合入）
 
+> **2026-09-28T15:08Z 更新：GDA-04（A5 GDN decode/fused recurrent：从零建 kernel，PR #136）审查 accept 并按 D-PM-33 合入（merge commit `ebdf55eb`）；main 全量（排除 torch_npu）1421 passed / 25 skipped / 14 failed。GDA-04 done。**
+> - **从 ASSIGN 到 DONE 只用了不到两小时**——GDN decode 之前完全没有可移植的 ascriptor 资产（不像 A2-14 是资格化既有单元），是这轮里真正从零建 kernel 却最快交付的一次。规格里唯一的技术错误是 PM 自己写的：oracle A 原文写"fla 的 `fused_recurrent_gated_delta_rule` CPU FP32 自动实现"——申领人读源码指出这个函数是纯 Triton kernel，没有 CPU 分支；真正对应的是同目录 `naive.py::naive_recurrent_gated_delta_rule`，与 GDA-03（GDN 反向）已经用的是同一个函数。PM 核实属实、当场改规格，不是申领人的错误。
+> - **528 个真机 case（6 个 block_dim × 88 例）全部通过**，对 A/B 最大相对 L2=2.170130340355715e-7（1e-4 预算内近 3 个数量级余量）；264 组 BF16 与同输入 FP32 RNE 输出逐位一致；prefill→decode 的 14 组/56 条链、132 次分段对照逐位一致；跨 6 个 block_dim 的输出/state 哈希全部一致。PM 独立复核全部重新计算过，包括从原始 sha256 digest 字段（不是汇总的 `passed` 字段）逐 case 复核跨 bd 一致性。
+> - **PM 复核过程中发现一个"自述但证据不够独立核实"的缺口，并自己动手解决了**：申领人自述"最终交付的 `ascend_fla/ops/gdn_fused_recurrent.py` 字节（sha256 `b5534d63`）与真机证据收集时实际执行的字节（`216dbef7`）不同，但 AST 相同（只改了资格化注释）"——证据里只有执行版本的哈希，没有源码文本，子 agent 复核时标成"无法独立复核"。**PM 直接在 PR 分支上 `git diff` 两个相关 commit，确认这个文件唯一的差异就是一行注释**（"Candidate set...pending native evidence" → "Qualified native inprocess grid..."），零可执行代码改动。**这是本轮学到的一课**：遇到"哈希对不上、只有自述解释"的情况，先看 PR 分支自己的提交历史能不能直接验证，不必假设"无法核实"就只能选择信或不信——很多时候证据其实就在那里，只是复核 agent 没往那个方向找。
+> - 真机基础设施细节：host 侧零 dtype/布局转换，静态 grep 之外还做了真实 ATen dispatch 审计（`TorchDispatchMode`）确认所有拦截调用只有内存分配，是比静态检查更强的验证方式，值得作为以后审 BF16/dtype 相关 DONE 的标准做法之一。
+>
 > **2026-09-28T06:57Z 更新：A2-14（A2 KDA decode 资格化，PR #135）审查 accept 并按 D-PM-33 合入（merge commit `acf817fd`）；main 全量（排除 torch_npu）1336 passed / 25 skipped / 14 failed。A2-14 done。**
 > - 这是"资格化既有单元"，不是新建 kernel：`kernels/projects/a2/kda_fused_recurrent/{kernels,unit.py,run.py,reference.py}` 全程未改，`git diff` 对这几个路径为空——PM 独立核实过。真机 32/32 精度 case（Kimi 真实 H=HV=32 与 H16/HV32，T=1/4/8/16，bd1/2）、19 组跨 bd 输出/state 字节比较全部一致（**不信汇总字段**，直接从原始 sha256 digest 逐 case 复算）；`o` 最大相对 L2 1.7245406052097678e-3、`final_state` 1.0151343587949668e-7，均在既有预算内。`CAPABILITIES["a2"]["supported_block_dim"]` 加了 `"decode": (1,2)`，`qualified` 仍 `False`（公共路由接线不在本任务范围）。
 > - **申领人的一条 contradicts-handoff RISK 纠正了 PM 自己规格里的一处不精确措辞**：规格原文说"CPU FP32 参考"，但既有单元的 `independent_reference` 实际是"FP64 内部算术、FP32 输出"。PM 核实属实，裁定按申领人方案办——在申领人自己的验证器（`benchmarks/verify_decode.py` 新增的 `a2_fp32_oracle()`）里另写一个全程 `.float()` 的显式独立递推作主金标准，旧的 FP64 内部参考保留做补充诊断、不作验收依据。PM 复核时确认这个新函数是真的独立实现（代数结构与旧参考不同——beta 先并入 delta 再做外积，不是换皮抄一份），符合裁定。

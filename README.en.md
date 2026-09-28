@@ -28,7 +28,7 @@ serves only as the semantic authority during testing (`naive.py` as a CPU fp32 o
 | family | id | track | kernels | task progress |
 |---|---|---|---|---|
 | KDA (Kimi Delta Attention) | `kda` | open to agents | 7 | 13/23 |
-| GDN (Gated DeltaNet) | `gated_delta_rule` | open to agents | 4 | 6/10 |
+| GDN (Gated DeltaNet) | `gated_delta_rule` | open to agents | 4 | 7/10 |
 | DeltaNet | `delta_rule` | no task yet | 2 | 2/2 units with validation records |
 | GDN-2 (Gated DeltaNet 2) | `gdn2` | owner track | 6 | 4/5 |
 | Whole-network fusion ops (module / layer) | `fusion` | open to agents | 4 | 1/4 |
@@ -125,7 +125,7 @@ _First target family; used by Kimi-Linear_
 
 </details>
 
-<details><summary><b>GDN (Gated DeltaNet) —— 4 kernel(s)，6/10 done</b></summary>
+<details><summary><b>GDN (Gated DeltaNet) —— 4 kernel(s)，7/10 done</b></summary>
 
 _Used by Qwen3-Next; six ABI gaps to close (phase 4, unrelated to this). **GDN/PGDN exception track** (D-PM-20/22): GDA-01 (non-GQA forward) and GDA-02 (GQA/GVA grouping) both merged; PK-03 (PGDN forward) unlocked; sequence continues to backward → decode → perf_
 
@@ -133,7 +133,7 @@ _Used by Qwen3-Next; six ABI gaps to close (phase 4, unrelated to this). **GDN/P
 |---|---|---|---|---|---|
 | `gdn_fwd` | open to agents | ✅ native · A5 hw | — | 4/7 | [#35](https://github.com/ddddwee1/ascend_fla_dev/issues/35) A2-07 |
 | `gdn_bwd` | open to agents | ✅ native · A5 hw | ✅ native · A5 hw | 3/6 | [#35](https://github.com/ddddwee1/ascend_fla_dev/issues/35) A2-07 |
-| `gdn_fused_recurrent` | open to agents | — | — | 0/2 | [#94](https://github.com/ddddwee1/ascend_fla_dev/issues/94) GDA-04 |
+| `gdn_fused_recurrent` | open to agents | — | — | 1/2 | [#94](https://github.com/ddddwee1/ascend_fla_dev/issues/94) GDA-04 |
 | `gdn_chunk_fwd_a5` | open to agents | ✅ native · A5 hw | ✅ native · A5 hw | — | _Narrow exception (D-PM-20/22): non-GQA forward and GQA/GVA grouping merged (GDA-01/02); native BF16 with in-kernel head indexing, and the FP32 public entry routed through the new unit (bitwise-identical output), in BF-01, merged_ |
 
 <details><summary>gdn_fwd —— 4/7 done，start A2-07、GDA-01</summary>
@@ -163,12 +163,12 @@ _Used by Qwen3-Next; six ABI gaps to close (phase 4, unrelated to this). **GDN/P
 
 </details>
 
-<details><summary>gdn_fused_recurrent —— 0/2 done，start GDA-04、A2-20</summary>
+<details><summary>gdn_fused_recurrent —— 1/2 done，start GDA-04、A2-20</summary>
 
 | task | issue | SoC | dtype | status | note |
 |---|---|---|---|---|---|
 | A2-20 | [#45](https://github.com/ddddwee1/ascend_fla_dev/issues/45) | `a2` | bf16、fp32 | 🔒 gated (kernel-batch-approval) | ★ start |
-| GDA-04 | [#94](https://github.com/ddddwee1/ascend_fla_dev/issues/94) | `a5` | bf16、fp32 | 🔵 review | ★ start |
+| GDA-04 | [#94](https://github.com/ddddwee1/ascend_fla_dev/issues/94) | `a5` | bf16、fp32 | ✅ done | ★ start |
 
 </details>
 

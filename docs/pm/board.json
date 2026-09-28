@@ -5309,7 +5309,7 @@
       "wave": "W0",
       "soc": "a5",
       "priority": "-",
-      "status": "review",
+      "status": "done",
       "model": [],
       "kernel": [
         "gdn_fused_recurrent"
@@ -5411,9 +5411,24 @@
         {
           "at": "2026-09-28T15:30",
           "summary": "PM 独立复核完成（PR #136，worktree 内核查）。**写集边界**：92 个文件全落在四路径写集内（71 个是证据），其余 5 个 GDN/GDN-2 单元（gdn_chunk_fwd/bwd、gdn2_chunk_fwd、gdn2_fused_decode/recurrent、gdn2_short_conv_decode）零改动。**host 零转换**：静态 grep 零命中 + 真实 ATen dispatch 审计（TorchDispatchMode，4 组真机跑）确认所有拦截调用只有 `aten.empty.memory_format`（3 处输出/占位分配 + 1 处 workspace，复用不重复分配）——比静态检查更强的证据。**on-device 处理**核实：scale 乘法、BF16 widen/narrow（RNE 落盘）全在 kernel 内，state 是 [B,HV,128,128] FP32 K-major，结构上（索引方式）与 chunk 的 `final_state` 惯例一致，不只是同名。**oracle A**：PM 独立复算 `naive.py` sha256=`d1cf179...`，与代码里硬编码校验值、以及本地 fla 仓库文件的哈希三方一致；全仓 grep 确认从未 import 或引用 Triton 版 `fused_recurrent_gated_delta_rule`。**oracle B** 独立实现，不 import A。**零 try/except**，无静默兜底路径。**复算**：528 例（6 个 bd×88）最大相对 L2=2.170130340355715e-7 精确复现；264 组 BF16 vs 同输入 FP32 RNE 逐位检查（读原始 SHA256 digest 字段，非汇总字段）264/264 全一致；prefill→decode 14 组/56 链/132 次分段比较数字精确复现（token 6.80e-7/6.55e-7、state 5.53e-7/1.23e-7）；跨 bd 逐位一致性独立复算 6 对组合（bd1↔bd2、bd4↔bd8、bd1↔bd4、bd1↔bd28、bd2↔bd16、bd8↔bd28）共 3168 项比较，0 mismatch；同卡三轮计时数字精确复现。**host 测试**：目标文件 85 passed；全套在排除 torch_npu 后 14 failed/1421 passed/25 skipped，与已知环境基线完全吻合，0 个属于本 PR 目标文件。**仓库卫生**：92 个文件 grep 零命中，回执文件自带 redaction 字段脱敏。**复核过程中发现并由 PM 亲自解决的一个验证缺口**：申领人自述'交付文件与真机证据收集时实际执行的文件字节不同，但 AST 相同（只改了一行资格化注释）'，复核agent 因证据里只有执行版本的哈希、没有源码文本，标记为'无法独立复核，仅供 PM 关注'——**PM 直接在 PR 分支上 `git diff bf87a6d 47bfe12 -- ascend_fla/ops/gdn_fused_recurrent.py` 核实**：两个commit 间该文件唯一差异就是一行注释（'Candidate set...pending native evidence' 改成 'Qualified native inprocess grid...'），哈希变化（216dbef7→b5534d63）完全由这一行注释解释，无任何可执行代码改动——申领人的自述属实，此前唯一悬而未决的一点也已确认。另有一处文档措辞不够精确（final-state 相对 L2 的两个数字实际来自不同的 case 子集：token 数字限定 FP32 输入 case、state 数字是跨 dtype 池化的——因为 state 恒为 FP32 与输入 dtype 无关，池化本身合理，只是文档没说清楚是哪个子集），两个数字都真实可复现，不算问题，不需要改代码。**结论：无红旗，满足 D-PM-33 三条合入授权，按 GDA-04 复核后合入。**"
+        },
+        {
+          "at": "2026-09-28T15:08",
+          "summary": "合入（PM，按 D-PM-33）。PR #136 merge commit ebdf55eb（`GH_TOKEN=$(gh auth token -u ascend-fla-pm-bot) gh pr merge --match-head-commit 9bdb238`）。main 全量回归（排除 torch_npu）1421 passed/25 skipped/14 failed，14 个失败全部是本机缺 ascriptor 包的既有环境缺口，与本任务无关，本任务自身 0 failure。docs/handoff.md 已补写这次的快速交付、oracle A 更正先例的复用、以及 PM 亲自解决验证缺口（diff PR commit 核实字节差异只是注释）的教训。review -> done。PK-06（issue #95）的依赖已满足，下一轮 PM 补规格。"
         }
       ],
-      "result": null,
+      "result": {
+        "commits": [
+          "ebdf55eb"
+        ],
+        "evidence": [
+          "PR #136",
+          "kernels/projects/a5/gdn_fused_recurrent/evidence/",
+          "docs/research/gdn_fused_recurrent_gate_range.md",
+          "ascend_fla/ops/gdn_fused_recurrent.py"
+        ],
+        "numbers": "A5 Ascend950PR_9579V100/CANN 9.1.0-beta.1：从零建 GDN recurrent decode kernel（单 launch 纯向量，原生 FP32/BF16，scalar g/beta，S1..16，None/非零初态，[B,HV,128,128] FP32 K-major state，对齐 chunk 前向的 final_state 布局）。6 个 block_dim（1/2/4/8/16/28）各 88 例共 528 例全通过，对 A（pin 住的 fla naive_recurrent_gated_delta_rule，hash 核验）/B（独立 CPU FP32 推导）最大相对 L2=2.170130340355715e-7（1e-4 预算内）；264 组 BF16 与同输入 FP32 RNE 输出/state 逐位一致；跨 6 个 bd 的输入/输出/state 哈希全部一致（PM 独立复核 6 对组合共 3168 项比较，0 mismatch）；真实 prefill→decode（14 组/56 条链，直传 NPU state）132 次分段对照逐位一致（token 最大相对 L2 6.80e-7/6.55e-7、state 5.53e-7/1.23e-7）；同卡三轮基线，1800 个原始样本。host 端零 dtype/布局转换：静态 grep 零命中，另有真实 ATen dispatch 审计（TorchDispatchMode）确认所有拦截调用只是内存分配。92 个交付文件全在四路径写集内，其余 5 个 GDN/GDN-2 单元零改动。PM 复核发现并自行解决一处验证缺口：交付文件与真机执行版本字节不同，PM 直接 diff PR 分支两个commit 确认唯一差异是一行资格化注释，零可执行改动。合入后 main 全量（排除 torch_npu）1421 passed/25 skipped/14 failed，14 个失败全部是本机缺 ascriptor 包的既有环境缺口，与本任务无关，本任务自身 0 failure。从 ASSIGN 到 DONE 用时不到两小时。"
+      },
       "origin": {
         "kind": "request",
         "issue": 89,
