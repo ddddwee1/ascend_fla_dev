@@ -2867,12 +2867,11 @@
     },
     {
       "id": "A2-13",
-      "title": "A2 KDA 反向 + autograd：检查点、宽域精度曲线重测",
+      "title": "A2 KDA 反向：单元级资格化 + 九检查点真实缓存 + 宽域精度曲线重测",
       "wave": "W-A2",
       "soc": "a2",
       "priority": "P1",
-      "status": "gated",
-      "gate": "用户已放行（D-PM-43），待前置任务与规格",
+      "status": "assigned",
       "model": [
         "kimi-linear-48b-a3b"
       ],
@@ -2891,20 +2890,36 @@
         "tests/test_kda_bwd_npu.py",
         "tests/test_kda_bwd_deep_npu.py",
         "tests/test_kda_caches_npu.py",
-        "benchmarks/probe_bwd_span.py"
+        "benchmarks/probe_bwd_span.py",
+        "ascend_fla/platform.py",
+        "tests/test_platform.py",
+        "benchmarks/a2/evidence/kda_bwd/**"
       ],
       "needs": {
         "npu": true,
         "ascriptor": true,
         "fla": true
       },
-      "spec": null,
+      "spec": "docs/pm/tasks/A2-13.md",
       "issue": 40,
       "pr": null,
-      "assignee": null,
-      "assignee_caps": null,
-      "branch": null,
-      "timebox_h": 16,
+      "assignee": "limjiunnbin",
+      "assignee_caps": {
+        "agent": "Codex / GPT-6",
+        "socs": [
+          "a2",
+          "a5"
+        ],
+        "soc_details": "a2: Docker 内 Ascend910B3，CANN 9.0.0（V100R001C10SPC001B250），compiler/OPP timestamp 20260428_134817545，内置 OPP 含 ascend910b/ascend910_93（A2-14 实测，同 session 沿用）。",
+        "ascriptor": "yes 90cfcdc720bbcd66e8bd4361c4dd4fbc1a2a57b5 (kernels b3b3f9c16df7c4626ed3c081032a1be5a753d0b1)",
+        "fla": "yes pin e52dbc0ea19d3a40d7ab7f9eed855d2b473994d2；已只读核对 kda_bwd_stable reference.py/wy.py/recurrent.py 源码",
+        "python": "A2 Docker Python 3.11.15 / Torch 2.10.0+cpu / torch_npu 2.10.0",
+        "fork": "limjiunnbin/ascend_fla_dev",
+        "availability": "同步在线，A2-14 已合入，无在手任务",
+        "session": "01a0b7ce-3daf-7550-a7bf-31c67eb91ca3"
+      },
+      "branch": "task/A2-13",
+      "timebox_h": 20,
       "reports": [
         {
           "at": "2026-09-20T03:48",
@@ -2913,6 +2928,10 @@
         {
           "at": "2026-09-28T15:36",
           "summary": "只读预检信息（issue #28 评论 5870823831，session 01a0b7ce-...；A2-13 仍 gated/spec=null，仅记为后续写规格的参考输入，非正式验收或新真机声明）。source_update：`kda_bwd_stable` 的九个 cache 生产者需要精度契约（不只是形状）——`reference.py:69-114` 用 FP32 求逆/w/u/v_new/state 算术建 fixture 后存成 BF16 cache，后续 fixture 算术接着用 FP32 值；而实际 `kda_fwd_stable/kernels/wy.py:116-144` 在 matmul 前把 `Akk*beta` 与 `k*exp(gc)` 舍到 BF16，`recurrent.py:126-179` 在别的接缝处也舍 state 和 v_new——所以 fixture cache 不能假设与真实前向 cache 逐位相同（这是源码层面的区分，不是说现有梯度预算失败，未要求改预算）。另一处：`qg` 的导出语义有陷阱——反向需要未缩放的 `qg`（bwd reference.py:107，对应 forward wy.py:113-115,128），但 recurrent.py:133-142 存的是 `qg*scale`，如果直接把这个环导出当 `saved.qg` 会用错量。建议 在 chunk 入口持久化 `h`（decay/update 前）与发布时的 `v_new`（含完整历史）。这些边界要写进未来规格：区分'单元资格化'还是'真实带缓存前向/autograd 接线'。"
+        },
+        {
+          "at": "2026-09-28T17:30",
+          "summary": "PM 写完规格（docs/pm/tasks/A2-13.md 全文新写，格式参照 A2-12）并裁定路由问题（issue #28 评论 5870823831/5875099907 提出的\"既有单元资格化 vs 真实带缓存前向/公开 autograd 接线\"）：**保持单元级资格化范围，不升级为公开接线**——A5 的 chunk_kda_fwd_with_caches/chunk_kda_bwd 虽已 SoC 泛化（resolve_soc/device= 参数），但两者入口都调 require_qualified(device)，a2 的 qualified 仍是 False 且这次不翻；写集也没有 ops/kda/*.py，不能靠改这些文件绕开。但资格化的方法论要改：不能只用 reference.py 独立算的 FP32 fixture 校验反向单元（PM 核实这些 fixture 确实不与真实前向的 BF16 舍入接缝逐位相同）——正确做法是直接对 kernels/projects/a2/kda_fwd_stable 发起 ascriptor 调用拿真实九检查点（同 A2-03/A2-12 的绕开门控包装、直调单元的技术），再喂给 kda_bwd_stable，对 CPU FP32 端到端参考（不是孤立fixture 期望值）报相对 L2；独立 fixture 检查保留但单独报数字，不与端到端结果合并陈述。qg 缩放陷阱、门控跨度重测方法论、CAPABILITIES 填数范围（max_gate_span.stable.backward，qualified 仍留 False）都写进规格。写集补 3 项（platform.py/test_platform.py/证据目录，对齐 A2-12 先例，提前批好不必另发 write-set-expansion）。gated -> assigned（deps A2-09/A2-12 均已完成，D-PM-43 已放行用户批准这一层）：指派给 issue #28 标准 APPLY（limjiunnbin / session 01a0b7ce-3daf-7550-a7bf-31c67eb91ca3，范围声明含 KDA/PKDA，A2-14 已合入后空闲）。ASSIGN 协议消息随后发到 issue #40。"
         }
       ],
       "result": null
