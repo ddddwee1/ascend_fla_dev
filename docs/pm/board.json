@@ -2909,6 +2909,10 @@
         {
           "at": "2026-09-20T03:48",
           "summary": "用户 2026-09-20 放行（D-PM-43「其他的也放行」）：原 gate = machines:a2。规格未写、前置未完成，所以状态位仍是 gated、gate 文案改成「用户已放行，待前置任务与规格」；PM 在前置完成、规格写好时改 open，不再问用户。"
+        },
+        {
+          "at": "2026-09-28T15:36",
+          "summary": "只读预检信息（issue #28 评论 5870823831，session 01a0b7ce-...；A2-13 仍 gated/spec=null，仅记为后续写规格的参考输入，非正式验收或新真机声明）。source_update：`kda_bwd_stable` 的九个 cache 生产者需要精度契约（不只是形状）——`reference.py:69-114` 用 FP32 求逆/w/u/v_new/state 算术建 fixture 后存成 BF16 cache，后续 fixture 算术接着用 FP32 值；而实际 `kda_fwd_stable/kernels/wy.py:116-144` 在 matmul 前把 `Akk*beta` 与 `k*exp(gc)` 舍到 BF16，`recurrent.py:126-179` 在别的接缝处也舍 state 和 v_new——所以 fixture cache 不能假设与真实前向 cache 逐位相同（这是源码层面的区分，不是说现有梯度预算失败，未要求改预算）。另一处：`qg` 的导出语义有陷阱——反向需要未缩放的 `qg`（bwd reference.py:107，对应 forward wy.py:113-115,128），但 recurrent.py:133-142 存的是 `qg*scale`，如果直接把这个环导出当 `saved.qg` 会用错量。建议 在 chunk 入口持久化 `h`（decay/update 前）与发布时的 `v_new`（含完整历史）。这些边界要写进未来规格：区分'单元资格化'还是'真实带缓存前向/autograd 接线'。"
         }
       ],
       "result": null
@@ -5489,6 +5493,10 @@
         {
           "at": "2026-09-20T03:48",
           "summary": "用户 2026-09-20 放行（D-PM-43「其他的也放行」）：gated → open。来自外部需求 #89，用户批准；仍是骨架，PM 派单前先补全规格（GDA-04 / PK-06 / GDA-05 还要等各自的前置）。"
+        },
+        {
+          "at": "2026-09-28T15:23",
+          "summary": "只读预检 STATUS（issue #95 评论 5873097310，session dev-20260928T020159Z-609dfa8f；PK-06 assignee 仍是 None，poll 已标'不采信'，仅记为后续写规格的参考输入）。确认接受新规格将原生支持 BF16/FP32、归一化按 literal naive 的乘性 `x/max(norm(x),1e-12)`（不是 Triton 的加性 epsilon）。四点源码/量程预读：①PGDN chunk 的 prepare 一次注册 12 个 entry（FP32+BF16），若新 decode 是两个 typed entry，联合进程需 14 个 entry 都准备好才能首次执行，不能照抄 GDA-04 的 9-entry 清单；②literal PGDN naive 有四处显式 FP32 dtype 节点（输入/标量 center/张量 center/logx），FP64 lift 要逐项核对，不能照抄 GDN 的两节点 lift；GVA 下 `A[:,::n_rep]` 可能不连续；③非零初始 ATK state 会让原来'A≤T'的零初态量程界变成'A≤A0+t'，小 `exp(g_atk)` 乘大 `A0` 仍可能有效量级，不能只看 o/主state 判断 ATK 对不对（明确这只是分析，不当缺陷结论或自行改域）；④chunk 现有两个初始状态入口仍只支持 None，prefill→decode 必须直传两个 NPU 返回的 state。"
         }
       ],
       "result": null,
