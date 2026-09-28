@@ -68,6 +68,20 @@ def test_reject_sequence_bounds(s):
     with pytest.raises(ValueError,match='S=1..16'):public(data)
 
 
+def test_reject_state_index_overflow_before_allocation_or_kernel_loading(monkeypatch):
+    # Exactly2**31 state elements exceed the signed32 indexing ABI. Meta inputs
+    # exercise the boundary without allocating the corresponding8GiB state.
+    b,hv=2048,64
+    data=dict(q=torch.empty(b,1,1,128,device='meta'),
+              k=torch.empty(b,1,1,128,device='meta'),
+              v=torch.empty(b,1,hv,128,device='meta'),
+              g=torch.empty(b,1,hv,device='meta'),
+              beta=torch.empty(b,1,hv,device='meta'),initial_state=None)
+    monkeypatch.setattr(api,'_pipeline',lambda:pytest.fail('overflow reached kernel loading'))
+    with pytest.raises(ValueError,match='state exceeds signed32 indexing domain'):
+        public(data)
+
+
 def test_reject_zero_heads_and_nondivisible_groups():
     data=inputs();data['q']=data['q'][:,:,:0].contiguous()
     with pytest.raises(ValueError):public(data)
