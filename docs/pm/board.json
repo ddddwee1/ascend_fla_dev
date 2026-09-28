@@ -5309,7 +5309,7 @@
       "wave": "W0",
       "soc": "a5",
       "priority": "-",
-      "status": "in_progress",
+      "status": "review",
       "model": [],
       "kernel": [
         "gdn_fused_recurrent"
@@ -5334,7 +5334,7 @@
       },
       "spec": "docs/pm/tasks/GDA-04.md",
       "issue": 94,
-      "pr": null,
+      "pr": 136,
       "assignee": "limjiunnbin",
       "assignee_caps": {
         "agent": "Codex / GPT-6",
@@ -5399,6 +5399,10 @@
         {
           "at": "2026-09-28T13:26",
           "summary": "STATUS（issue #94 评论 5870802824，session dev-20260928T020159Z-609dfa8f，fork commit 922caf0）。**首个真机 kernel 里程碑**：按更正后的规格实现单 launch 纯向量 GDN recurrent，原生 FP32/BF16、scalar g/beta、连续分组、S1..16、None/非零初态、新 FP32 K-major state；host 只做校验/分配/dispatch，无归一化/扩头/dtype 转换/CPU 兜底。两个 typed entry 静态检查 0 error/0 warning，UB 97KiB/113KiB。**首次真机执行就是完整 B1/S16/H16/HV32 双 dtype workload**（没有先缩小形状），同时跑了对应的 torch_npu 组合参考；未跑 CUDA/Triton。中途遇到共享设备被别的任务占用，正确处理：记录后换到重新核实 Healthy/空闲的设备重做隔离网格，没碰别人的进程或卡（D-PM-28，不升级）。**bd1/2/4 各 88 例全部通过**，前后空闲、期间 0 外来 context；**bd1/2 的 88 组输入及全部返回 o/state 哈希逐位一致**（bd 之间逐位相同，硬判据初步满足）；44 组 BF16 各自与同输入 native FP32 的 RNE 输出/FP32 state 逐位一致。真机后的 sim/pipesim 定点检查通过，无 hazard/deadlock。数字：网格最大相对 L2=2.170130340355715e-7（FP32 预算 1e-4 内，留了近 3 个数量级余量）；BF16 输出质量相对 L2≈0.0016592（只作存储质量报告，不判 FP32 阈值）；44 个canonical FP32 case 通过，主机 84 tests passed。next：bd8/16/28 + 全网格跨 bd 审计；实际 chunk→decode 直传 NPU state 的 14 组/56 链逐 token 验证、132 次分段比较；S1/S16 × FP32/BF16 同卡三轮三明治；主机回归+证据/写集/隐私审计后提 PR。心跳正常，进展非常快。"
+        },
+        {
+          "at": "2026-09-28T13:56",
+          "summary": "DONE（issue #94 评论 5871363190，session dev-20260928T020159Z-609dfa8f；PR #136 ready，head 9bdb23807400b0bbf5f919463c53753aa87f50d4，92 文件/+290831/-0）。声称：ABI 冻结表/S_MAX/bd 合法值/state 布局/A↔B 一致性/量程复核完成（沿用 NOTE 5870217647 裁定的 A，未重新定义）；六个 bd 各 88 例共 528 例全通过，对 A/B 最大相对 L2=2.170130340355715e-7（1e-4 预算内），跨 bd 输入/output/state 哈希一致，264 组 BF16 与同输入 FP32 RNE 输出/state 逐位一致；真实 prefill→decode（14 组/56 条链，直传 NPU state）132 次分段对照逐位一致；同卡三轮 B/C/B（真实 torch_npu GDN 组合基线，1800 个原始样本）；入口显式拒绝域外组合；92 个交付文件全在四项写集内，GDN chunk/bwd、GDN-2、共享 runtime 均未改动；未声称 CUDA/Triton/权重验证/其它 SoC 结论。真机：SoC a5，CANN 9.1.0-beta.1，Ascend950PR_9579V100。host 全套 1449 passed/10 skipped。两次观测到外来任务占用后正确换设备重跑，未碰他人进程或复位卡。按 D-PM-33 走完整审查，不因自述免检——这是从零建 kernel（不是资格化），需要真正的代码质量审查，已派发独立复核（写集边界、生产代码/门控纪律、关键数字复算、bd 跨维度逐位一致性独立验证、host 测试重跑），结果另记。in_progress -> review。"
         }
       ],
       "result": null,
