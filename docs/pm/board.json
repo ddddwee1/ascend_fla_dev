@@ -2941,7 +2941,8 @@
         "ascend_fla/platform.py",
         "docs/research/a2_decode.md",
         "benchmarks/a2/evidence/decode/**",
-        "tests/test_platform.py"
+        "tests/test_platform.py",
+        "tests/test_kda_fwd_a2.py"
       ],
       "needs": {
         "npu": true,
@@ -2950,7 +2951,7 @@
       },
       "spec": "docs/pm/tasks/A2-14.md",
       "issue": 41,
-      "pr": null,
+      "pr": 135,
       "assignee": "limjiunnbin",
       "assignee_caps": {
         "agent": "Codex / GPT-6",
@@ -2992,6 +2993,18 @@
         {
           "at": "2026-09-28T02:24",
           "summary": "RISK write-set-expansion（issue #41 评论 5862171382）：`tests/test_platform.py:56` 硬编码断言 `cap[\"supported_block_dim\"] == {\"chunk\": (1, 2)}`，本任务要求新增的 `\"decode\": (1, 2)` 键会让这条断言失败。PM 核实属实（已读该文件该行确认）。**批准**：只改这一行断言为 `{\"chunk\": (1, 2), \"decode\": (1, 2)}`，该文件其余断言（`qualified is False`、报错检查等）不动；`tests/test_platform.py` 已并入写集，范围限定这一行。"
+        },
+        {
+          "at": "2026-09-28T02:35",
+          "summary": "RISK write-set-expansion（issue #41 评论 5862263134）：全套 host 回归发现第二处硬编码的过期能力字典断言——`tests/test_kda_fwd_a2.py:171` 同样断言 `supported_block_dim == {\"chunk\": (1, 2)}`（之前只搜到 test_platform.py 那处，全套跑才暴露这第二处）。PM 核实属实（已读该文件该行确认）。**批准**：同 test_platform.py 的处理方式，只改这一行为 `{\"chunk\": (1, 2), \"decode\": (1, 2)}`，`qualified=False`、门控跨度断言与其它前向证据检查均不动。`tests/test_kda_fwd_a2.py` 已并入写集，范围限定这一行。"
+        },
+        {
+          "at": "2026-09-28T02:37",
+          "summary": "STATUS（issue #41 评论 5862283464，PR #135 已开，commit c7e6d7e，draft）。draft PR 已含验证器、资格化元数据、完整 native/model/host 日志与报告；公开 54 个文件+私有 3163 个文件的哈希已核对，隐私与写集检查通过。真机验收已完成：32/32 精度 case、19 组跨 bd 字节比较。最终 host 套件 1368 passed/6 skipped/1 failed，唯一失败就是待批准的 test_kda_fwd_a2.py 过期字典（已批准，见上）。next：应用订正、重跑全套、更新报告/归档、转 ready 提交 DONE。尚无 DONE。"
+        },
+        {
+          "at": "2026-09-28T02:53",
+          "summary": "BLOCKED（issue #41 评论 5862421775）：等待上面那条 write-set-expansion 批准才能改那一行。PM 已在此轮批准并回复，解除阻塞。真机 32/32 精度 case、19 组跨 bd 逐位一致、全部 128 续接步满足严格 state 预算，双 oracle 均测过；private 3163 文件 + public 54 文件归档 SHA 核对完毕。未声称 DONE。"
         }
       ],
       "result": null
