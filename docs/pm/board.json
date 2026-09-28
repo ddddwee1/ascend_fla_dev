@@ -2940,6 +2940,14 @@
         {
           "at": "2026-09-28T18:05",
           "summary": "RISK contradicts-handoff（issue #40 评论 5875719287，session 01a0b7ce-...）。真实新发现，非争议：A2 前反向单元张量布局不兼容——kda_fwd_stable/unit.py:116-124 六项直接输出是连续 [B,HV,C,64,D]，kda_bwd_stable/unit.py:52-64 要求连续 [B,T,HV,D]，HV>1 时不是 view 能做的，需要一次真正的 permute+reshape。申领人正确指出不能复用 A5 的 _from_bhcld/_layout_runtime——PM 读源码确认 ascend_fla/ops/kda/chunk.py::_layout_runtime() 硬编码路径 kernels/projects/a5/kda_layout/runtime.py，不按 device 参数化，复用会在 a2 上悄悄跑 a5 布局 kernel。裁定（已写进 docs/pm/tasks/A2-13.md 新增一节）：允许测试夹具做这次布局转换，五条边界——①只在测试代码里，不碰 ops/kda/*.py；②不复用 _from_bhcld/_layout_runtime，为 a2 单独写；③NPU 原生 torch 或 D2H/CPU/H2D 由 assignee 定，如实报告选哪条；④转换前六项原始哈希、转换后九项哈希、每步来源分别报（申领人自己提的口径）；⑤明确标注'测试夹具组装成本'，不声称零拷贝或产品路径性能——D-PM-35/37 管的是公开入口与其 runtime，本任务写集本就没有那些文件，测试夹具桥接两个独立单元的布局转换如实报告就不违反纪律本意。另采纳两点非争议的源码核实（g_cumsum 实际是 stable 分支直接乘 1/ln2 窄化、不是按过时文档字符串 log2(eg) 反推；qg 真实位置是 kda_fwd_stable/kernels/recurrent.py 不是 decode 单元）。budget 未放宽：端到端六梯度 0.05 严格执行，独立 fixture 的 dk0.15/dg0.25 仅用于孤立 fixture 实验，两者分开报，不用后者放宽前者。NOTE 已回复 issue #40。仍 in_progress，无状态变化。"
+        },
+        {
+          "at": "2026-09-28T18:25",
+          "summary": "STATUS（issue #40 评论 5876029054）。已按裁定实现测试侧 D2H/CPU/H2D 布局转换，六项原始输出与九项组装缓存分别哈希；六项转换往返逐位、g_cumsum 直接换底、qg 取自 wy、h/v_new 标为 FP32 _scan_states 重构——与裁定一致。主机基线 1454 passed/6 skipped（不变）。两个 bd 独立进程全部 14 项 vendor 预编译完成。新真机独立 fixture 26/26 通过（按原契约156 梯度检查+858 中间检查，明确未当端到端 0.05 验收）。真实前向缓存→完整反向链：两个 bd 均过 4 个缓存基础 case 及 H=HV=32 的 T64/128/512，六梯度对 CPU FP32 完整自动微分逐项报数，另加 Torch NPU FP32 参考（比规格要求多一个交叉对照）。T4096 已跑完整设备链，长序列比较进行中，未宣称通过。8 seed 初始化跨度重测：FP32 最大 106.38469696044922、BF16 输入 ABI 后最大 106.3828125——明确标注这是输入分布下界，不是设备验收或已批准阈值。"
+        },
+        {
+          "at": "2026-09-28T18:35",
+          "summary": "RISK silent-wrong-result（issue #40 评论 5876157911，已转告用户）。真实缓存 18/18 case 通过（六梯度最坏相对 L2 0.00971，两 bd 逐位一致）；但 H=HV=32/T128/seed0/uniform 深衰减门控在目标 span32（BF16 输入实际 span32.0176）时，dg 相对 CPU FP32 完整自动微分 = 0.06317 > 0.05 预算（其余五梯度 dq0.0224/dk0.0478/dv0.0030/dbeta0.0033/dh00.0024 都在预算内）；全部 33 中间量与六梯度仍有限（不是 overflow），两 bd 逐位同错（dg sha256 1571683f...）。粗扫 uniform span：16 通过(0.0326)，64/96/128/160 依次 0.1228/0.1379/0.2446/0.2639，精度随跨度单调变差，不是只有溢出才失效。**关键张力**：8 seed 默认初始化跨度下界 max=106.38（FP32），若统一闸要覆盖这个下界，就会连带纳入已经失败的 span32.0176——\"覆盖默认初始化典型跨度\"与\"守住 0.05 预算\"可能不兼容，比 A5 当年更窄。申领人处理方式完全正确：不拿独立 fixture 的 dg0.25 预算去掩盖端到端 0.05 的失败、不填 backward 能力值、不翻 qualified、不报 DONE，继续定位根因（算术/缓存精度）与责任层，粗扫仍在跑。这是申领人主动、透明报出的潜在静默错误风险，不是已经发生的静默错误，也不是分歧——按标准流程记录，PM 未做任何裁决（无需要现在裁的东西），继续跟踪。"
         }
       ],
       "result": null
