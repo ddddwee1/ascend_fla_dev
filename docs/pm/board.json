@@ -5387,6 +5387,10 @@
         {
           "at": "2026-09-28T12:12",
           "summary": "STATUS（issue #94 评论 5869600700）。已完成不依赖 A 身份争议的部分：公共 ABI 校验、独立 B 参考、88 组固定网格（FP32/BF16 原生存储、ratio1/2/4/8、S∈{1,2,3,7,15,16}、72 个 value-head 工作项、None/非零 state、门控/量程边界）+ 比较器，先用申领人提议的 literal naive 做预校准（身份当时待裁定，现已裁定通过）。数字：主机 Python3.11.15/Torch2.10.0+cpu，88 组 A/B 最大相对 L2=1.8991640892534126e-7，3 组 FP64 lifted-A/独立-B 最大相对 L2=2.082554894892825e-16；Docker Python3.12.14/Torch2.12.0+cu130，同 88 组最大相对 L2=2.0076726144241469e-7，3 组 FP64 最大相对 L2=2.174836294858946e-16（两边各自独立生成输入，未跨环境混用随机数）。公共 ABI/拒绝路径/初始态不变/独立解析/比较器负控制：主机 69 passed。尚无 kernel 代码或设备数值运行。next：Docker 侧重跑 ABI 测试、完成 ABI/量程文档草案；收到 oracle 裁定（已给）后开始 CCE kernel。同卡基线拟用真实 torch_npu 组成的 GDN 逐 token 递推（会先验证该基线确实执行对应数学任务）。心跳正常。"
+        },
+        {
+          "at": "2026-09-28T12:59",
+          "summary": "STATUS（issue #94 评论 5870356414，session dev-20260928T020159Z-609dfa8f）。已确认 oracle A/B 裁定（NOTE 5870217647，PM 的更正回复），冻结 A=原样 hash 核验的 pinned `naive_recurrent_gated_delta_rule`、B=独立 FP32 bmm 递推；保留此前 88 组校准与 FP64 记录，不重跑。新增 prefill/分段验收脚本的 CPU 校准：14 组场景/56 条续接链（前缀 64/128/4032，suffix 64，width 1/3/7/16），逐 token 比较；44 组 S16 输入的 132 次分段比较逐位一致；故意漏传 state 在首 token 全部被检出（负控制有效）。主机/Docker 最大相对 L2=1.129173212695534e-6 / 1.1218276553216875e-6，CPU 测试两边各 83 passed。**明确声明**这是验收脚本自己的 CPU 校准，不冒充实际 chunk→decode 设备验证。next：已开始从零写 CCE 纯向量 kernel（原生 FP32/BF16、scalar g/beta、每 value head 独占 FP32 state），静态检查/源码发射完成后在持锁窗口跑完整 B1/S16/H16/HV32 workload。UB 预算细节在核实中（BF16 共享 FP32 递推 VF 后显式 RNE 落盘，额外 8KiB 输出 staging，合计 113KiB，原 105KiB 只是初步估计）。心跳正常。"
         }
       ],
       "result": null,
