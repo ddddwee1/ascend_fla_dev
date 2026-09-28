@@ -126,8 +126,10 @@ No speed threshold or CUDA/Triton comparison is used.
 Both typed entries passed static checks with0 errors and0 warnings and emitted
 pure-vector CCE. Lowered UB allocation is97KiB for FP32 and113KiB for BF16;
 the latter includes an explicit FP32 output stage before RNE narrowing.
-The44 canonical FP32 CPU reference cases and84 task tests passed on host and
-Docker. Full CPU host regression:1449 passed,10 skipped,5 warnings.
+The44 canonical FP32 CPU reference cases passed. Task tests:85 on host,84 on
+Docker; the extra final host test rejects the signed32 state-index limit using
+meta inputs before allocation or kernel loading. Full CPU host regression before
+that test-only addition:1449 passed,10 skipped,5 warnings.
 
 The first complete native B1/S16/H16/HV32 workload passed for both dtypes, with
 actual torch_npu baseline outputs also checked. FP32 output/state maximum
