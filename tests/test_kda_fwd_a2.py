@@ -168,7 +168,7 @@ def test_a2_guard_has_measured_upper_and_lower_bounds():
     assert sum(not all(m["ok"] for m in r["comparison"].values()) for r in coarse) == 3
     guard = _range_guard()
     assert CAPABILITIES["a2"]["qualified"] is False
-    assert CAPABILITIES["a2"]["supported_block_dim"] == {"chunk": (1, 2)}
+    assert CAPABILITIES["a2"]["supported_block_dim"] == {"chunk": (1, 2), "decode": (1, 2)}
     assert CAPABILITIES["a2"]["max_gate_span"] == {"stable": {"forward": float(guard)}}
     for bd in (1, 2):
         defaults = _records(f"defaults-bd{bd}")
