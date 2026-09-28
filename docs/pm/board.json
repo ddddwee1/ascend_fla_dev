@@ -2936,6 +2936,10 @@
         {
           "at": "2026-09-28T17:54",
           "summary": "ACK（issue #40 评论 5875551167，session 01a0b7ce-...）。计划：①从最新 main 建 task/A2-13 独立 checkout，先跑主机基线、核验 pin/导入路径/设备健康；②写测试侧 a2 直调辅助，记录六项真机前向直出量与三项 host 补算缓存的来源/精度，kernel 预编译、每个 bd 独立进程；③真实 H=HV=32、T∈{64,128,512,4096} 及边界，对 CPU FP32 自动微分六个梯度逐项报 0.05 预算，独立 fixture 数字单独留；④真机扫 backward gate span 与≥8 seed 下界，qualified 保持 False、公开 ops 不改；⑤全量回归+脱敏证据+PR/DONE。eta_h=20，与 timebox 一致。note 明确接受单元级范围边界，不把 fixture/补算缓存/构建结果冒充公开 autograd 资格——与规格裁定一致，无异议。另指出一处源码细节（供后续核实，非争议）：stable 分支的 g_cumsum 实际是直接换底算的，不是先算 log2(eg) 再转——会在测试里如实记录实际来源。assigned -> in_progress。"
+        },
+        {
+          "at": "2026-09-28T18:05",
+          "summary": "RISK contradicts-handoff（issue #40 评论 5875719287，session 01a0b7ce-...）。真实新发现，非争议：A2 前反向单元张量布局不兼容——kda_fwd_stable/unit.py:116-124 六项直接输出是连续 [B,HV,C,64,D]，kda_bwd_stable/unit.py:52-64 要求连续 [B,T,HV,D]，HV>1 时不是 view 能做的，需要一次真正的 permute+reshape。申领人正确指出不能复用 A5 的 _from_bhcld/_layout_runtime——PM 读源码确认 ascend_fla/ops/kda/chunk.py::_layout_runtime() 硬编码路径 kernels/projects/a5/kda_layout/runtime.py，不按 device 参数化，复用会在 a2 上悄悄跑 a5 布局 kernel。裁定（已写进 docs/pm/tasks/A2-13.md 新增一节）：允许测试夹具做这次布局转换，五条边界——①只在测试代码里，不碰 ops/kda/*.py；②不复用 _from_bhcld/_layout_runtime，为 a2 单独写；③NPU 原生 torch 或 D2H/CPU/H2D 由 assignee 定，如实报告选哪条；④转换前六项原始哈希、转换后九项哈希、每步来源分别报（申领人自己提的口径）；⑤明确标注'测试夹具组装成本'，不声称零拷贝或产品路径性能——D-PM-35/37 管的是公开入口与其 runtime，本任务写集本就没有那些文件，测试夹具桥接两个独立单元的布局转换如实报告就不违反纪律本意。另采纳两点非争议的源码核实（g_cumsum 实际是 stable 分支直接乘 1/ln2 窄化、不是按过时文档字符串 log2(eg) 反推；qg 真实位置是 kda_fwd_stable/kernels/recurrent.py 不是 decode 单元）。budget 未放宽：端到端六梯度 0.05 严格执行，独立 fixture 的 dk0.15/dg0.25 仅用于孤立 fixture 实验，两者分开报，不用后者放宽前者。NOTE 已回复 issue #40。仍 in_progress，无状态变化。"
         }
       ],
       "result": null
