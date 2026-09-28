@@ -9,7 +9,7 @@ import torch
 
 SCALE = 128**-0.5
 S_MAX = 16
-# Candidate set. Qualification and public release are pending native evidence.
+# Qualified native inprocess grid; scope and evidence are in the research ledger.
 BLOCK_DIMS = (1, 2, 4, 8, 16, 28)
 
 

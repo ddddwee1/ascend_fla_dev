@@ -1,0 +1,185 @@
+{
+  "stage": "source_emission",
+  "device_execution": false,
+  "files_sha256": {
+    "zero_state.h": "522de4964e93b381fb082e022de8bd3c7f0958610ef7b98c40658e8fddb88d8f",
+    "scale_query.h": "f8676802a00649d9f404e5996d72e13c0c0945092a16637ecdd2b23c01a3dc30",
+    "advance.h": "49a24237957e95654940ce428a7a13ae6705914beb0a460881a766e1daff3540",
+    "gdn_recurrent_fp32_vec.h": "b59b15fd1da3c8154a1122e8b0c07c4708c5a2f5a9f3b108648a80d83ae11e0d",
+    "gdn_recurrent_fp32.cpp": "9b622162e4fda7650782200c9a210944a8e55947faea1189e48e903897ec6e91",
+    "tensorutils_cce.h": "73965f4ed6c9afaf1eb96724a47b6a3cca2e15c9615afc4958b05831782d2bc9",
+    "scalar_math.h": "a49ae04e54ad1999222c1ca925a1f624f36df2551ae9fed73a8b0a1461081f7e",
+    "manifest.json": "a94bb8f55ff01a7563f8607cc1d82262825c8c90fc8ce5a65c2b9d6f1a742ff4",
+    "metadata.json": "c102931aa07dd564273b8c64f62c04c2aa942cad2be9128f3a9a53faa3f9d263"
+  },
+  "metadata": {
+    "backend": "cce",
+    "arch": "c310",
+    "kernel": "gdn_recurrent_fp32",
+    "ir_kernel": "gdn_recurrent_fp32",
+    "device": "950",
+    "mode": "vec",
+    "task_type": "KERNEL_TYPE_AIV_ONLY",
+    "block_dim": 1,
+    "params": [
+      {
+        "name": "q",
+        "ir_name": "q",
+        "kind": "tensor",
+        "dtype": "f32",
+        "dims": [
+          "B",
+          "S",
+          "H",
+          128
+        ],
+        "output": false
+      },
+      {
+        "name": "k",
+        "ir_name": "k",
+        "kind": "tensor",
+        "dtype": "f32",
+        "dims": [
+          "B",
+          "S",
+          "H",
+          128
+        ],
+        "output": false
+      },
+      {
+        "name": "v",
+        "ir_name": "v",
+        "kind": "tensor",
+        "dtype": "f32",
+        "dims": [
+          "B",
+          "S",
+          "HV",
+          128
+        ],
+        "output": false
+      },
+      {
+        "name": "g",
+        "ir_name": "g",
+        "kind": "tensor",
+        "dtype": "f32",
+        "dims": [
+          "B",
+          "S",
+          "HV"
+        ],
+        "output": false
+      },
+      {
+        "name": "beta",
+        "ir_name": "beta",
+        "kind": "tensor",
+        "dtype": "f32",
+        "dims": [
+          "B",
+          "S",
+          "HV"
+        ],
+        "output": false
+      },
+      {
+        "name": "initial_state",
+        "ir_name": "initial_state",
+        "kind": "tensor",
+        "dtype": "f32",
+        "dims": [
+          "B",
+          "HV",
+          128,
+          128
+        ],
+        "output": false
+      },
+      {
+        "name": "o",
+        "ir_name": "o",
+        "kind": "tensor",
+        "dtype": "f32",
+        "dims": [
+          "B",
+          "S",
+          "HV",
+          128
+        ],
+        "output": true
+      },
+      {
+        "name": "final_state",
+        "ir_name": "final_state",
+        "kind": "tensor",
+        "dtype": "f32",
+        "dims": [
+          "B",
+          "HV",
+          128,
+          128
+        ],
+        "output": true
+      },
+      {
+        "name": "B",
+        "ir_name": "B",
+        "kind": "scalar",
+        "dtype": "i32"
+      },
+      {
+        "name": "S",
+        "ir_name": "S",
+        "kind": "scalar",
+        "dtype": "i32"
+      },
+      {
+        "name": "H",
+        "ir_name": "H",
+        "kind": "scalar",
+        "dtype": "i32"
+      },
+      {
+        "name": "HV",
+        "ir_name": "HV",
+        "kind": "scalar",
+        "dtype": "i32"
+      },
+      {
+        "name": "HAS_INITIAL",
+        "ir_name": "HAS_INITIAL",
+        "kind": "scalar",
+        "dtype": "i32"
+      }
+    ],
+    "outputs": [
+      "o",
+      "final_state"
+    ],
+    "workspaces": [],
+    "sides": [
+      "vec"
+    ],
+    "vf": [
+      "zero_state",
+      "scale_query",
+      "advance"
+    ],
+    "simt": {},
+    "ops": 214,
+    "files": [
+      "advance.h",
+      "gdn_recurrent_fp32.cpp",
+      "gdn_recurrent_fp32_vec.h",
+      "scalar_math.h",
+      "scale_query.h",
+      "tensorutils_cce.h",
+      "zero_state.h"
+    ],
+    "entry": "gdn_recurrent_fp32.cpp"
+  },
+  "UB_bytes": 99328
+}

@@ -93,7 +93,7 @@
       16,
       28
     ],
-    "qualification": "Candidate block dimensions; native qualification pending"
+    "qualification": "Native inprocess at all listed block dimensions:88 fixed FP32/BF16 cases each; see measured and evidence. No arbitrary-magnitude accuracy claim."
   },
   "dependencies": {
     "python": ">=3.10",
@@ -706,37 +706,43 @@
       "device": "a5",
       "backend": "cce",
       "stage": "reference",
-      "status": "untested"
+      "status": "passed",
+      "reason": "44 canonical FP32 cases and88 literal A/independent B calibrations; not device execution."
     },
     {
       "device": "a5",
       "backend": "cce",
       "stage": "emit",
-      "status": "untested"
+      "status": "passed",
+      "reason": "Two typed pure-vector CCE entries; UB97KiB/113KiB."
     },
     {
       "device": "a5",
       "backend": "cce",
       "stage": "compile",
-      "status": "untested"
+      "status": "passed",
+      "reason": "Both typed entries vendor-compiled at bd1/2/4/8/16/28; exact source and artifact hashes in evidence/native."
     },
     {
       "device": "a5",
       "backend": "cce",
       "stage": "sim",
-      "status": "untested"
+      "status": "untested",
+      "reason": "Full-grid sim is untested. Focused FP32 B1/S2/H3/HV3 and BF16 None-state B1/S2/H1/HV4 at bd1 passed; see evidence/models."
     },
     {
       "device": "a5",
       "backend": "cce",
       "stage": "pipesim",
-      "status": "untested"
+      "status": "untested",
+      "reason": "Full-grid pipesim is untested. Focused FP32 B1/S2/H3/HV3 and BF16 None-state B1/S2/H1/HV4 at bd1 passed; see evidence/models."
     },
     {
       "device": "a5",
       "backend": "cce",
       "stage": "board",
-      "status": "untested"
+      "status": "untested",
+      "reason": "Standalone board/aclnn harness is unqualified; actual NPU inprocess acceptance is recorded in measured.native_inprocess."
     }
   ],
   "provenance": {
@@ -744,5 +750,47 @@
     "implementation": "From-zero pure vector GDN recurrence; no KDA or GDN chunk runtime dependency",
     "library": "90cfcdc720bbcd66e8bd4361c4dd4fbc1a2a57b5",
     "kernels": "b3b3f9c16df7c4626ed3c081032a1be5a753d0b1"
+  },
+  "measured": {
+    "native_inprocess": {
+      "status": "passed",
+      "block_dims": [
+        1,
+        2,
+        4,
+        8,
+        16,
+        28
+      ],
+      "cases_per_bd": 88,
+      "total_cases": 528,
+      "max_budgeted_relative_l2": 2.170130340355715e-07,
+      "cross_bd_byte_identical": true,
+      "bf16_RNE_and_state_checks": 264,
+      "evidence": "evidence/native/cross-bd.json"
+    },
+    "state_continuation": {
+      "status": "passed",
+      "prefill_cases": 14,
+      "chains": 56,
+      "split_comparisons": 132,
+      "all_splits_byte_identical": true,
+      "max_FP32_suffix_token_relative_l2_vs_chunk": 6.803415911187458e-07,
+      "max_state_relative_l2_vs_chunk": 5.530971869996005e-07,
+      "evidence": "evidence/native/integration-bd4-isolated-v2/results.json"
+    },
+    "same_card_timing": {
+      "status": "measured",
+      "rounds": "3 B/C/B per workload",
+      "warmups_per_leg": 10,
+      "samples_per_leg": 50,
+      "metric": "synchronized public-call wall microseconds, allocations included",
+      "evidence": "evidence/native/timing-bd4-v1/results.json"
+    },
+    "limitations": [
+      "No CUDA/Triton execution",
+      "No model-weight validation",
+      "No full sim/pipesim grid or diagnostic board/aclnn acceptance"
+    ]
   }
 }

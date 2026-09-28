@@ -1,0 +1,65 @@
+{
+  "stage": "pipesim",
+  "case": {
+    "B": 1,
+    "S": 2,
+    "H": 1,
+    "HV": 4,
+    "state": "none",
+    "dtype": "bfloat16",
+    "seed": 948202
+  },
+  "backend_executed": false,
+  "metrics": {
+    "A": {
+      "o": {
+        "relative_l2": 0.00160820731846748,
+        "max_abs": 0.00017558038234710693,
+        "finite": true,
+        "reference_norm": 0.8280113566827323,
+        "error_norm": 0.001331613923591357
+      },
+      "final_state": {
+        "relative_l2": 1.8744112251189614e-08,
+        "max_abs": 2.9802322387695312e-08,
+        "finite": true,
+        "reference_norm": 7.831551624460883,
+        "error_norm": 1.4679548274988117e-07
+      }
+    },
+    "B": {
+      "o": {
+        "relative_l2": 0.001608207532479063,
+        "max_abs": 0.00017558038234710693,
+        "finite": true,
+        "reference_norm": 0.8280113551444547,
+        "error_norm": 0.0013316140983215085
+      },
+      "final_state": {
+        "relative_l2": 1.0624591992028738e-08,
+        "max_abs": 1.4901161193847656e-08,
+        "finite": true,
+        "reference_norm": 7.831551627937361,
+        "error_norm": 8.320704071134291e-08
+      }
+    }
+  },
+  "execution": [
+    {
+      "kernel": "gdn_recurrent_bf16",
+      "device": "a5",
+      "requested_backend": "cce",
+      "stage": "pipesim",
+      "launcher": "pipesim",
+      "block_dim": 1,
+      "model": "lowered events and hazards",
+      "backend_executed": false,
+      "event_balance": [],
+      "hazards": [],
+      "deadlock": null,
+      "model_cycles": 22220,
+      "sim_processes": "threads"
+    }
+  ],
+  "passed": true
+}

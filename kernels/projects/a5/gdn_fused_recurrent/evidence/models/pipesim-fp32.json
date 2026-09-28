@@ -1,0 +1,129 @@
+{
+  "block_dim": 1,
+  "comparison": {
+    "final_state": {
+      "comparison": {
+        "atol": 2e-05,
+        "max_relative_l2": 0.0001,
+        "mode": "allclose",
+        "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+        "rtol": 0.0002
+      },
+      "max_abs_error": 2.9802322387695312e-08,
+      "passed": true,
+      "relative_l2_error": 2.3360622232764044e-08
+    },
+    "o": {
+      "comparison": {
+        "atol": 2e-05,
+        "max_relative_l2": 0.0001,
+        "mode": "allclose",
+        "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+        "rtol": 0.0002
+      },
+      "max_abs_error": 5.960464477539063e-08,
+      "passed": true,
+      "relative_l2_error": 1.3953654036939807e-07
+    }
+  },
+  "execution_evidence": [
+    {
+      "backend_executed": false,
+      "block_dim": 1,
+      "deadlock": null,
+      "device": "a5",
+      "event_balance": [],
+      "hazards": [],
+      "kernel": "gdn_recurrent_fp32",
+      "launcher": "pipesim",
+      "model": "lowered events and hazards",
+      "model_cycles": 26274,
+      "requested_backend": "cce",
+      "sim_processes": "threads",
+      "stage": "pipesim"
+    },
+    {
+      "dual_oracle": {
+        "A": {
+          "final_state": {
+            "error_norm": 5.555168958249757e-07,
+            "finite": true,
+            "max_abs": 2.9802322387695312e-08,
+            "reference_norm": 23.7800556119539,
+            "relative_l2": 2.3360622232764044e-08
+          },
+          "o": {
+            "error_norm": 2.7054185203302045e-07,
+            "finite": true,
+            "max_abs": 5.960464477539063e-08,
+            "reference_norm": 1.938860253499257,
+            "relative_l2": 1.3953654036939807e-07
+          }
+        },
+        "B": {
+          "final_state": {
+            "error_norm": 4.260056192994939e-07,
+            "finite": true,
+            "max_abs": 2.9802322387695312e-08,
+            "reference_norm": 23.780055611101925,
+            "relative_l2": 1.791440803446269e-08
+          },
+          "o": {
+            "error_norm": 2.720998545362316e-07,
+            "finite": true,
+            "max_abs": 5.960464477539063e-08,
+            "reference_norm": 1.9388602567599789,
+            "relative_l2": 1.403401063008721e-07
+          }
+        }
+      }
+    }
+  ],
+  "id": "r1_s2_float32",
+  "parameters": {
+    "B": 1,
+    "H": 3,
+    "HV": 3,
+    "S": 2,
+    "dtype": "float32",
+    "state": "random"
+  },
+  "passed": true,
+  "reference": {
+    "final_state": {
+      "comparison": {
+        "atol": 2e-05,
+        "max_relative_l2": 0.0001,
+        "mode": "allclose",
+        "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+        "rtol": 0.0002
+      },
+      "dtype": "float32",
+      "sha256": "cad6c45f9bd8629e6ef085c1d0e81c55b6bdf5f3e058d56a9d1ff022ef3bea15",
+      "shape": [
+        1,
+        3,
+        128,
+        128
+      ]
+    },
+    "o": {
+      "comparison": {
+        "atol": 2e-05,
+        "max_relative_l2": 0.0001,
+        "mode": "allclose",
+        "reason": "PM FP32 relative-L2 budget against literal A and independent B; additional elementwise guard matches existing GDN chunk convention, fixed before native execution.",
+        "rtol": 0.0002
+      },
+      "dtype": "float32",
+      "sha256": "09db6128905e2dc74e6a834eda30110ab238e0da116d91bcff32bdb5dd7b64c5",
+      "shape": [
+        1,
+        2,
+        3,
+        128
+      ]
+    }
+  },
+  "seed": 940002
+}

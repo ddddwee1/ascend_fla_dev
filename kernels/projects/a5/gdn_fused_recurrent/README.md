@@ -7,8 +7,10 @@ casts, grouping and recurrence arithmetic occur inside the kernel.
 
 The public entry is `ascend_fla.ops.gdn_fused_recurrent.fused_recurrent_gdn`.
 See `docs/research/gdn_fused_recurrent_gate_range.md` for the ABI, numerical
-domain, frozen budgets and qualification status. Development is still in
-progress; do not interpret a candidate block dimension as completed acceptance.
+domain, frozen budgets and qualification status. Native inprocess execution is
+qualified at block_dim1/2/4/8/16/28 for the measured domain:528 grid cases,
+56 actual prefill→decode chains and132 byte-identical decode partitions.
+See [evidence](evidence/README.md) for source identities and stage-specific results.
 
 Select library `90cfcdc720bbcd66e8bd4361c4dd4fbc1a2a57b5` and kernels
 `b3b3f9c16df7c4626ed3c081032a1be5a753d0b1` through the accepted environment.
@@ -23,6 +25,7 @@ python kernels/projects/a5/gdn_fused_recurrent/run.py reference --output tmp/GDA
 python -m kernels.projects.a5.gdn_fused_recurrent.verify_native --block-dim 1 --output tmp/GDA-04/native
 python -m kernels.projects.a5.gdn_fused_recurrent.verify_integration --block-dim 4 --output tmp/GDA-04/integration
 python -m kernels.projects.a5.gdn_fused_recurrent.measure --block-dim 4 --output tmp/GDA-04/timing
+python -m kernels.projects.a5.gdn_fused_recurrent.audit_host_work --block-dim 4 --output tmp/GDA-04/host-work
 ```
 
 Hardware commands require Docker, fresh health/occupancy checks, the canonical

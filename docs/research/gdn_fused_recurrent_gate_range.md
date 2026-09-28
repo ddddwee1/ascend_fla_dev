@@ -1,8 +1,8 @@
 # GDN recurrent ABI and qualification ledger
 
-Task GDA-04, specification at `ad2184a`. This is an implementation-preflight
-record, not a completed qualification. The kernel is implemented; complete
-multi-bd, native integration and timing acceptance is still in progress.
+Task GDA-04, specification at `ad2184a`. Native inprocess qualification covers
+the measured FP32/BF16 domain below. Other launchers and arbitrary finite
+magnitudes are not inferred from this evidence.
 PM approved the exact CPU A identity in [issue #94 comment 5870217647](https://github.com/ddddwee1/ascend_fla_dev/issues/94#issuecomment-5870217647).
 
 ## ABI
@@ -19,7 +19,7 @@ PM approved the exact CPU A identity in [issue #94 comment 5870217647](https://g
 | Shape | Positive B/H, positive HV divisible by H, S=1..16; each GM element count <=2**31-1 |
 | Grouping | Consecutive HV/H value heads share one q/k head |
 | Scale/normalization | Fixed scale, raw unnormalized q/k |
-| Candidate bd grid | 1/2/4/8/16/28, **not yet qualified** |
+| Qualified native bd grid | 1/2/4/8/16/28; all88 cases at each, output/state bytes identical across bd |
 | Native host work | Metadata validation, allocation, cached compilation/dispatch |
 | Diagnostic launchers | `aclnn`/`board` accept CPU tensors and explicitly transfer them |
 | Exclusions | Other dtypes, normalization, head-first, varlen, alternate state layout, raw gate flags, backward/autograd and undeclared options |
@@ -101,9 +101,9 @@ ratios1/2/4/8 and S1/2/3/7/15/16; multi-batch and72 work items; None/zero/random
 state; g0/-.001/-30/-1000; beta0/1; zero q/k/all inputs; initial state scales16
 and1e-6; key norms1/2 and signed spikes. Key normalization in the seeded input
 generator defines a test profile only; it is not an operator transform.
-Numerical support claims will be limited to the measured domain.
+Numerical support claims are limited to this measured domain.
 
-## Integration and measurement plan
+## Integration and measurement method
 
 Chunk starts from zero and emits K-major state. Prefixes64/128/4032 with a
 64-token decode suffix produce legal whole-chunk lengths128/192/4096. Split
@@ -115,18 +115,19 @@ All chunk and decode kernels must be prepared before first aclnn use. Use one
 process and build per operator name and bd; cross-bd comparison uses identical
 input hashes and actual output bytes. BF16/FP32 preparation is kernel-side.
 
-The intended timing baseline is a native torch_npu composition of the same
-GDN recurrence with raw q/k and fresh state. It must actually run and be checked
-before any performance claim. Measure S1 fixed cost and S16 separately on the
-same card, three baseline/candidate/baseline rounds,10 warmup and50 synchronized
-samples per leg. No speed threshold or CUDA/Triton comparison is promised.
+The timing baseline is an actually executed native torch_npu composition of
+the same GDN recurrence with raw q/k and fresh state, checked against A/B.
+S1 fixed cost and S16 are measured separately on the same card, three
+baseline/candidate/baseline rounds,10 warmup and50 synchronized samples per leg.
+No speed threshold or CUDA/Triton comparison is used.
 
-## Evidence still required
+## Observed results
 
 Both typed entries passed static checks with0 errors and0 warnings and emitted
 pure-vector CCE. Lowered UB allocation is97KiB for FP32 and113KiB for BF16;
 the latter includes an explicit FP32 output stage before RNE narrowing.
-The44 canonical FP32 CPU reference cases and84 host tests passed.
+The44 canonical FP32 CPU reference cases and84 task tests passed on host and
+Docker. Full CPU host regression:1449 passed,10 skipped,5 warnings.
 
 The first complete native B1/S16/H16/HV32 workload passed for both dtypes, with
 actual torch_npu baseline outputs also checked. FP32 output/state maximum
@@ -139,13 +140,60 @@ The initial88-case bd1 grid had a foreign task observed during its window;
 its numerical results are retained separately. An isolated repeat passed all88
 cases, maximum budgeted relative L2=2.170130340355715e-7, with all44 BF16
 storage comparisons byte-identical. No foreign context was observed in that
-repeat. These results do not yet qualify the other candidate block dimensions.
+repeat. All six isolated bd grids subsequently passed528 total cases with the
+same maximum budgeted error,264 BF16 storage checks, and identical input and
+returned output/state hashes across all block dimensions. Each isolated run
+had zero sampled foreign contexts and empty contexts before and after.
 
 After the full hardware run, bounded FP32 B1/S2/H3/HV3 and BF16 B1/S2/H1/HV4
 with None state passed functional simulation and pipe simulation at bd1.
 The latter reported no event imbalance, hazard or deadlock. These are model
 diagnostics of repeated state reuse and cast footprints, not native evidence.
 
-Remaining: complete bd qualification and cross-bd byte checks, actual public
-prefill/decode integration, public host-work audit, same-card measurements and
-portable evidence closeout. The branch is not ready for DONE or PR acceptance.
+Actual chunk→decode integration passed14 cases/56 chains, with state passed
+directly between NPU calls. Against whole native chunk, maximum FP32 suffix
+token relative L2 was6.803415911187458e-7 and final-state error was
+5.530971869996005e-7. Against independent CPU B, the corresponding maxima were
+6.551472638786963e-7 and1.2300183594765942e-7. All132 S16 split comparisons
+matched native one-call output/state bytes. The first integration collection
+window observed a foreign test near its end; a fresh isolated repeat produced
+the same metrics with no foreign contexts observed.
+
+Same-card public-call latency, pooled medians of150 candidate and300 baseline
+samples per workload (three B/C/B rounds):
+
+| B/S/H/HV | dtype | Candidate μs | torch_npu baseline μs | Baseline / candidate |
+|---|---|---:|---:|---:|
+|1/1/16/32|FP32|66.455|120.416|1.812|
+|1/1/16/32|BF16|66.615|176.335|2.647|
+|1/16/16/32|FP32|157.206|1138.519|7.242|
+|1/16/16/32|BF16|155.614|1177.632|7.568|
+
+These synchronized wall times include public allocation and dispatch, with
+input generation, CPU references, H2D and compilation outside the timed region.
+No foreign contexts were observed. They are not device-only kernel times,
+CUDA/Triton comparisons, weight validation or a model-level speed claim.
+
+Actual ATen dispatch auditing covered both dtypes, None/nonzero initial state,
+and both output-state flags. The prepared public path issued only
+`aten.empty.memory_format`: two output allocations, plus one unread placeholder
+when initial state is None. Each typed binding additionally allocated its uint8
+workspace on first use, then reused it. Source call sites and all operations
+are retained in `native/host-audit-bd4-v2`; unexpected operations were empty.
+Source inspection additionally confirms all value checks/NaN poisoning are
+restricted to explicit CPU diagnostic paths and no runtime reference fallback
+is present. No kernel or shared runtime changes were needed for this audit.
+
+Environment: Python3.12.14, Torch2.12.0+cu130 with torch_npu2.12.0,
+Ascriptor0.1.0 at library pin90cfcdc, CANN/compiler/OPP9.1.0-beta.1,
+timestamp20260509_173000235, Ascend950PR_9579V100 for the isolated grids,
+integration and timing. SoC variants are recorded per execution; support is
+not inferred for other hardware. Exact hashes, all per-case metrics, every
+integration suffix token and raw timing samples are under
+`kernels/projects/a5/gdn_fused_recurrent/evidence/`.
+
+The CCE loop-type warnings are bounded by validated S1..16 and chunk bounds
+0..64; the allocator's32-byte compatibility warning concerns physical capacity.
+Warnings remain visible with source-based assessments in the evidence README.
+Diagnostic board/aclnn launchers remain unqualified. Sim/pipesim evidence is
+limited to the two documented cases; full model-grid acceptance is not claimed.
