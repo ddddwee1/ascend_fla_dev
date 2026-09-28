@@ -1,0 +1,150 @@
+{
+  "label": "full-first-bd1-v1",
+  "vendor_compile": "four stages completed, actual native execution returned",
+  "diagnostics": [
+    {
+      "kind": "CMake unused variable",
+      "detail": "CMAKE_CROSS_PLATFORM_COMPILER unused by native host build; generated host shared libraries built and loaded",
+      "impact": "No cross-host compilation is claimed"
+    },
+    {
+      "kind": "CANN header deprecation",
+      "detail": "ge_error_codes.h/ge_api_types.h deprecated for removal after 2027-06",
+      "impact": "Current CANN9.2 headers remain available; no missing-symbol diagnostic"
+    },
+    {
+      "kind": "Vendor Python SyntaxWarning",
+      "detail": "ascendc_impl_build.py invalid escape sequence \\d in embedded regular-expression source",
+      "impact": "Build generated ascend950 kernels and completed; not suppressed or patched"
+    }
+  ],
+  "additional_builds": [
+    {
+      "label": "matrix-bd1-v2",
+      "stage_count": 4,
+      "stages": [
+        {
+          "kernel": "pgdn_bwd_atk-f73af0951b52e568",
+          "raw_private_build_log_sha256": "8a4fc1ada3fc3bbf8cb59ab3b37f98b82cc7125d3303b7050878046a017196c9",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_cann_header_deprecation": 16,
+            "known_vendor_python_escape": 1
+          }
+        },
+        {
+          "kernel": "pgdn_bwd_atk_reverse-5a7c8a190deede28",
+          "raw_private_build_log_sha256": "73d6456452a2882f0647f2fc83fb2d482b0c76a7a857c553d59966d0f1ec25dd",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_cann_header_deprecation": 16,
+            "known_vendor_python_escape": 1
+          }
+        },
+        {
+          "kernel": "pgdn_bwd_checkpoints-a536805be0e31749",
+          "raw_private_build_log_sha256": "83f94f5a8141acca82083e02e1aee796746ad1566db88977cf12f222418c2c32",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_cann_header_deprecation": 16,
+            "known_vendor_python_escape": 1
+          }
+        },
+        {
+          "kernel": "pgdn_bwd_reverse-8d2b0ede239beae2",
+          "raw_private_build_log_sha256": "71db54de18314478941c0619566dfa8a9386af84767130d1c1cda292bb3c274a",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_cann_header_deprecation": 16,
+            "known_vendor_python_escape": 1
+          }
+        }
+      ]
+    },
+    {
+      "label": "matrix-bd2-v3",
+      "stage_count": 4,
+      "stages": [
+        {
+          "kernel": "pgdn_bwd_atk-fb2543363eca5f08",
+          "raw_private_build_log_sha256": "7b8067d97e15cbb9a09b12e1df3abc0896b22a0ae40782066d14271fe60dca7d",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_cann_header_deprecation": 16,
+            "known_vendor_python_escape": 1
+          }
+        },
+        {
+          "kernel": "pgdn_bwd_atk_reverse-4b74c373a808cce1",
+          "raw_private_build_log_sha256": "521d3b1e7f86e33da18c73b3969c7111c65d19328510517226985753b5a83169",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_cann_header_deprecation": 16,
+            "known_vendor_python_escape": 1
+          }
+        },
+        {
+          "kernel": "pgdn_bwd_checkpoints-05cd0897e5c9884b",
+          "raw_private_build_log_sha256": "e81e4f45c7442ab7933ade97dcbd2eba2a72eb0b752dc134297e0ac29d1e3b26",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_cann_header_deprecation": 16,
+            "known_vendor_python_escape": 1
+          }
+        },
+        {
+          "kernel": "pgdn_bwd_reverse-07705f95c5ac22c5",
+          "raw_private_build_log_sha256": "d85216ffd85b972348ebef6faed61e3f4a7b1fd94c605357c9528cef67808289",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_cann_header_deprecation": 16,
+            "known_vendor_python_escape": 1
+          }
+        }
+      ]
+    },
+    {
+      "label": "timing-bd2-v3",
+      "stage_count": 4,
+      "stages": [
+        {
+          "kernel": "pgdn_bwd_atk-fb2543363eca5f08",
+          "raw_private_build_log_sha256": "b45656e93cf0089d63bef883a40546fc3ddc9670dd804187da6333c560d7ec05",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_cann_header_deprecation": 16,
+            "known_vendor_python_escape": 1
+          }
+        },
+        {
+          "kernel": "pgdn_bwd_atk_reverse-4b74c373a808cce1",
+          "raw_private_build_log_sha256": "ab70f2fe799cfef7191a5ac5a85e5039c292fcddae7e667ef6c42cde900caa1d",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_cann_header_deprecation": 16,
+            "known_vendor_python_escape": 1
+          }
+        },
+        {
+          "kernel": "pgdn_bwd_checkpoints-05cd0897e5c9884b",
+          "raw_private_build_log_sha256": "9d355551ff5c6cce81e4c2a85958d08e5881e53758a2b6a865a9aacaa8a95b81",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_cann_header_deprecation": 16,
+            "known_vendor_python_escape": 1
+          }
+        },
+        {
+          "kernel": "pgdn_bwd_reverse-07705f95c5ac22c5",
+          "raw_private_build_log_sha256": "78efa19b6c38a4cfcd4e09d41aa22048a15d334f95730a91fa842a9cb862ba24",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_cann_header_deprecation": 16,
+            "known_vendor_python_escape": 1
+          }
+        }
+      ]
+    }
+  ],
+  "count_scope": "Warning-related log lines include the repeated source-line echo of CANN pragma messages; these are not counts of distinct defects. All matching lines were inspected, none suppressed."
+}

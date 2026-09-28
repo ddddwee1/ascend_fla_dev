@@ -1,0 +1,17 @@
+{
+  "stage": "device_environment_precheck_failed",
+  "acceptance_claim": false,
+  "block_dim": 1,
+  "source_manifests_issued": false,
+  "vendor_compilation": false,
+  "device_cases_executed": 0,
+  "device_health": "not_established_in_this_container",
+  "first_error": "DCMI initialization returned -8020 in the new nonprivileged device container.",
+  "raw_private_file_sha256": {
+    "run.json": "531998c04176b4617dfec3cd9081379288c992f791084952bb28c783b119f61d",
+    "npu-smi-before.log": "9aa4ffbb7e30a8eb5caa7e1bbacd78468cb5cd6e6eee6cf080020832e9acd703",
+    "host-contexts-before.json": "d82574a699a0e462c1e331965cae53d01fb955f747daf2913f8cf88c68399728",
+    "host-contexts-after.json": "c36472c9cc8d6af8fe81127121f658202c88c156ab89e18e4cfcd38347ecf650"
+  },
+  "remediation": "The original device container and host both returned successful health checks. Retain actual execution there; use a separate device-free build container and pinned runtime source-cache checks. Only the task-owned failed containers were stopped."
+}

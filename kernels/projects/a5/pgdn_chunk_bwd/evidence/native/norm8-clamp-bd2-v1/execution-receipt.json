@@ -1,0 +1,60 @@
+{
+  "stage": "actual_native_execution",
+  "block_dim": 2,
+  "external_host_lock_mode": "canonical_and_legacy",
+  "health_before": "Healthy",
+  "health_after": true,
+  "returncode": 0,
+  "environment": {
+    "python": "3.12.13 | packaged by Anaconda, Inc. | (main, Jul  9 2026, 14:38:16) [GCC 14.3.0]",
+    "torch": "2.12.0+cpu",
+    "torch_npu": "2.12.0",
+    "ascriptor": "0.1.0",
+    "soc": "Ascend 950PR_9589 V100",
+    "opp_packages": [
+      "config",
+      "ascend950",
+      "ascend910_93",
+      "scene.info",
+      "ascend910b",
+      "version.info"
+    ]
+  },
+  "reference_runtime": {
+    "torch_git_version": "7661cd9c6b841b62b7f411aa52ec51f05457263b",
+    "cpu_capability": "AVX2"
+  },
+  "component_versions": {
+    "compiler/version.info": {
+      "sha256": "604198c1934cf29ad9566ba130465921b80c8a9c15c6620678498d290fdd7ce0",
+      "version_fields": [
+        "Version=9.2.0",
+        "timestamp=20260805_101249091"
+      ]
+    },
+    "opp/version.info": {
+      "sha256": "abd4979cb7af44675c08c3dc04bbc68589e9a388778e057e365f820273717e58",
+      "version_fields": [
+        "Version=9.2.0",
+        "timestamp=20260805_101249091"
+      ]
+    },
+    "x86_64-linux/ascend_toolkit_install.info": {
+      "sha256": "cca1c26d11baee0a24d0d27df3ebaf8acdb432a2e4083d7291afa5f3a3f8e239",
+      "version_fields": [
+        "version=9.2.0",
+        "innerversion=V100R001C12B056"
+      ]
+    }
+  },
+  "occupancy": {
+    "samples": 208,
+    "empty_before": true,
+    "empty_after": true,
+    "samples_with_owned_context": 199,
+    "raw_samples_with_foreign_label": 2,
+    "resolved_owned_exit_context_samples": 2,
+    "unexplained_foreign_context_samples": 0,
+    "exit_resolution": "Only PROCESS_EXIT_RACE records whose exact driver registry kind/PID/context tuple was previously observed for the owned task process; original labels retained."
+  }
+}

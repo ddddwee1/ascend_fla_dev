@@ -1,0 +1,15 @@
+{
+  "acceptance_claim": false,
+  "owning_layer": "private container storage for the fixed vendor installer log",
+  "first_error": "Installer cannot create its log on the read-only container filesystem.",
+  "device_cases_executed": 0,
+  "source_locations": [
+    "library makeself-header.sh:50-54"
+  ],
+  "raw_private_log_sha256": {
+    "native.log": "2d9c84444653cb220b9af131a4aea2587181ea1aa67c3a6cf769303f45d3e4ad",
+    "build/pgdn_bwd_atk-071bd5e662fa62b8": "ef182fe2afaa4e88f5f82ac80c61a9a1a179f44fd19d6605d1a29cb6231f2d2b"
+  },
+  "remediation": "Use a task-owned read-only container with the installer log physically backed by an allowed private host directory. No HOME, fixed library or generated-source change.",
+  "first_kernel_cce_compilation_and_packaging_complete": true
+}

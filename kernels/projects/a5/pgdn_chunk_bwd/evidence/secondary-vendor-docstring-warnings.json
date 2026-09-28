@@ -1,0 +1,31 @@
+{
+  "owning_layer": "vendor Python source documentation strings",
+  "diagnostics": [
+    {
+      "file": "tbe/dsl/classifier/transdata/transdata_classifier.py",
+      "sha256": "c6bbad04ba7c5991c87b0c23b1411c093445d70fe4a689248f73799b9ac8d796",
+      "line": 223,
+      "message": "invalid escape sequence '\\B'",
+      "docstring": true,
+      "context": "    def create_bn_bh_result(self, category):\n        \"\"\"\n        Return BN\\BH SCH Result\n        BN: borrow normal axis that do not transpose.\n        BH: borrow transpose axis that do transpose."
+    },
+    {
+      "file": "tbe/dsl/unify_schedule/vector/transdata/common/graph/transdata_graph_info.py",
+      "sha256": "799e6e14d597fe72f5b58bb636a9879902b54e83211bb7626813b27e96110a65",
+      "line": 146,
+      "message": "invalid escape sequence '\\c'",
+      "docstring": true,
+      "context": "        Info from bn-computation:\n        1. In backward, tiling would not split C (combined by c1 and c0), find C based on t2.\n        2. In forward, tiling would not split c1 and c0, find c1\\c0 based on t2.\n        Backward: (N,H,C1*C0,16) -<f_reshape>- (N,H,C,16) -<transpose>- (N,16,H,C)\n        Forward: (N,H,C1,C0,16) -<transpose>- (N,C1,H,C0,16) -<transpose>- (N,16,C1,H,C0)"
+    },
+    {
+      "file": "tbe/dsl/unify_schedule/vector/transdata/common/graph/transdata_graph_info.py",
+      "sha256": "799e6e14d597fe72f5b58bb636a9879902b54e83211bb7626813b27e96110a65",
+      "line": 172,
+      "message": "invalid escape sequence '\\c'",
+      "docstring": true,
+      "context": "        \"\"\"\n        Info from bh-computation:\n        1. Forward: tiling would not split c1\\c0\\h0, find c1\\c0\\h1\\h0 based on t2\n        2. Backward: tiling would not split c\\h0, find c, h1\\h0 based on t2.\n        \"\"\""
+    }
+  ],
+  "impact": "All three reported lines lie inside function or method docstrings (verified with Python AST). The warning is about string literal escaping; these strings do not participate in generated PGDN arithmetic or synchronization. No warning filter or source edit was used.",
+  "raw_private_source_receipt": "Retained with task environment records; portable source paths and full source SHA256 appear above."
+}

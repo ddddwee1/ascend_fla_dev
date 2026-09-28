@@ -1,0 +1,103 @@
+{
+  "stage": "CPU_FP64_mathematical_gradcheck",
+  "cases": [
+    {
+      "ratio": 1,
+      "kind": "normal",
+      "B": 1,
+      "T": 3,
+      "H": 1,
+      "HV": 1,
+      "K": 3,
+      "V": 2,
+      "qk_parameterization_factor": 1.0,
+      "forward_loss_abs": 0.0,
+      "A_lifted": true,
+      "B_analytical": true
+    },
+    {
+      "ratio": 1,
+      "kind": "below",
+      "B": 1,
+      "T": 3,
+      "H": 1,
+      "HV": 1,
+      "K": 3,
+      "V": 2,
+      "qk_parameterization_factor": 1e-12,
+      "forward_loss_abs": 0.0,
+      "A_lifted": true,
+      "B_analytical": true
+    },
+    {
+      "ratio": 1,
+      "kind": "above",
+      "B": 1,
+      "T": 3,
+      "H": 1,
+      "HV": 1,
+      "K": 3,
+      "V": 2,
+      "qk_parameterization_factor": 1e-12,
+      "forward_loss_abs": 0.0,
+      "A_lifted": true,
+      "B_analytical": true
+    },
+    {
+      "ratio": 2,
+      "kind": "normal",
+      "B": 1,
+      "T": 3,
+      "H": 1,
+      "HV": 2,
+      "K": 3,
+      "V": 2,
+      "qk_parameterization_factor": 1.0,
+      "forward_loss_abs": 3.469446951953614e-18,
+      "A_lifted": true,
+      "B_analytical": true
+    },
+    {
+      "ratio": 2,
+      "kind": "below",
+      "B": 1,
+      "T": 3,
+      "H": 1,
+      "HV": 2,
+      "K": 3,
+      "V": 2,
+      "qk_parameterization_factor": 1e-12,
+      "forward_loss_abs": 0.0,
+      "A_lifted": true,
+      "B_analytical": true
+    },
+    {
+      "ratio": 2,
+      "kind": "above",
+      "B": 1,
+      "T": 3,
+      "H": 1,
+      "HV": 2,
+      "K": 3,
+      "V": 2,
+      "qk_parameterization_factor": 1e-12,
+      "forward_loss_abs": 1.734723475976807e-18,
+      "A_lifted": true,
+      "B_analytical": true
+    }
+  ],
+  "exact_clamp": "not checked by central differences across the kink",
+  "criteria": {
+    "eps": 1e-06,
+    "atol": 1e-08,
+    "rtol": 1e-05
+  },
+  "passed": true,
+  "sources": {
+    "__init__.py": "908967ae407626f0ddf501183b2b28f9b5a3b4965709a65ae2dfdf3ba1db6273",
+    "oracle.py": "4ab7152f950d31b12b6175b22fb8d52179e04fcca5609ac7f108540c2ee8c9cd",
+    "reference.py": "b3dbdf7b2a12964cb51373143cda3681c489163d8e745fe59a03196f21c28071",
+    "classification.py": "a3936121c3f21408bfa873cb976c49678e68c428d471255881faf2101548e7ec",
+    "gradcheck.py": "a4371b04704f8358ac5b75167008edecb5b1d5596071aa6a40cf12476e24a382"
+  }
+}

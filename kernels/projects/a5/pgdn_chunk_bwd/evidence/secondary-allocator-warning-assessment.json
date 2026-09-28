@@ -1,0 +1,67 @@
+{
+  "kind": "torch_npu_allocator_32_byte_padding",
+  "owner_git": "fa0f83fe49d309dcbc31e264e9e6ed6e5dc49d2d",
+  "torch_npu": "2.12.0",
+  "selected_cann": "9.1.0-beta.1",
+  "warning": "The current CANN and Soc versions require processing for 32 padding size, with memory allocation.",
+  "sources": [
+    {
+      "path": "torch_npu/csrc/core/npu/NPUCachingAllocator.cpp",
+      "sha256": "e582e9099555b54a9c0c41d89152dab4c2ed72759eae6851c19a53bdcd284527",
+      "url": "https://github.com/Ascend/pytorch/blob/fa0f83fe49d309dcbc31e264e9e6ed6e5dc49d2d/torch_npu/csrc/core/npu/NPUCachingAllocator.cpp",
+      "lines": [
+        [
+          109,
+          110
+        ],
+        [
+          192,
+          207
+        ],
+        [
+          2119,
+          2132
+        ],
+        [
+          3639,
+          3646
+        ]
+      ]
+    },
+    {
+      "path": "torch_npu/csrc/core/npu/GetCANNInfo.cpp",
+      "sha256": "bd9e9b06f110389ec1d1a2ef2613463dd37ef11f9ea1f44a597331b791a1eeef",
+      "url": "https://github.com/Ascend/pytorch/blob/fa0f83fe49d309dcbc31e264e9e6ed6e5dc49d2d/torch_npu/csrc/core/npu/GetCANNInfo.cpp",
+      "lines": [
+        [
+          229,
+          328
+        ],
+        [
+          523,
+          552
+        ]
+      ]
+    }
+  ],
+  "assessment": [
+    "The exact warning is the compatibility branch of AddPadSize; it returns32 bytes when the SoC/version condition for zero padding is false.",
+    "The selected beta release sorts below final9.1.0 in the pinned version parser. This explains the observed compatibility allocation branch, rather than an unsupported operator or synchronization instruction.",
+    "round_size adds32 bytes before allocator block rounding; uncached allocation likewise adds padding. It changes physical allocation capacity, not tensor logical dimensions, input values, arithmetic or stream synchronization.",
+    "The observed warning remains in complete private logs and portable numbered excerpts. No allocator/runtime/compiler/source setting is changed or warning suppressed.",
+    "The original256 actual-output checks in both runs complete with schema/input/branch checks, health and zero unexplained foreign samples; this does not claim a memory-sanitizer run. Subsequent complete supplemental and same-card timing evidence remain required.",
+    "Timing reports actual public-call allocation behavior under this environment; no cross-environment speedup inference is made."
+  ],
+  "original_runs": [
+    {
+      "label": "norm8-secondary-matrix-bd1-v5",
+      "line": 4,
+      "raw_log_sha256": "3b4d5b59e048800afffa2735bc22c32b1348bef6e7e0c9c65f3f2cbd7884df68"
+    },
+    {
+      "label": "norm8-secondary-matrix-bd2-v5",
+      "line": 4,
+      "raw_log_sha256": "1678769cd4d7d4fb8f9fffc7a680f1a1671b56de03b1f21a668a54f0db1b350e"
+    }
+  ]
+}

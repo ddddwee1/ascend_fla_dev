@@ -1,0 +1,79 @@
+{
+  "delivered_production_and_frozen_reference_sha256": {
+    "ascend_fla/ops/pgdn_chunk_bwd.py": "00266bf7be444f59dff9a3c7b10d043216dff29baea8ca6be2decd071a81c4f8",
+    "kernels/projects/a5/pgdn_chunk_bwd/kernels/__init__.py": "d22364924a666cf9fd3b98b3c0ea2a787875baab8e1c9a847e9745c9675b1103",
+    "kernels/projects/a5/pgdn_chunk_bwd/kernels/atk.py": "3c75bbec6a5a60dd3d4df39985d8dd47168373128f583c44f1ff65801efc0b08",
+    "kernels/projects/a5/pgdn_chunk_bwd/kernels/main.py": "e4332a741a0a05c235ddf00244e1823f83517cc2a98463d9abc61163c57ba4cb",
+    "kernels/projects/a5/pgdn_chunk_bwd/kernels/atk_reverse.py": "91805069672cf70176a3bfabd9e37b456f5f98d2380d555aa1db775e928c23d7",
+    "kernels/projects/a5/pgdn_chunk_bwd/kernels/pipeline.py": "df89568f93a625db503932f79f259e3bcd633ad17527ac6ed48f99a3d4052e77",
+    "kernels/projects/a5/pgdn_chunk_bwd/ref/__init__.py": "908967ae407626f0ddf501183b2b28f9b5a3b4965709a65ae2dfdf3ba1db6273",
+    "kernels/projects/a5/pgdn_chunk_bwd/ref/calibrate.py": "642aa37b8c07b65139d2dcee36b0a0ce55308f7f1fa71892c28ab543eec51445",
+    "kernels/projects/a5/pgdn_chunk_bwd/ref/classification.py": "a3936121c3f21408bfa873cb976c49678e68c428d471255881faf2101548e7ec",
+    "kernels/projects/a5/pgdn_chunk_bwd/ref/gradcheck.py": "a4371b04704f8358ac5b75167008edecb5b1d5596071aa6a40cf12476e24a382",
+    "kernels/projects/a5/pgdn_chunk_bwd/ref/oracle.py": "4ab7152f950d31b12b6175b22fb8d52179e04fcca5609ac7f108540c2ee8c9cd",
+    "kernels/projects/a5/pgdn_chunk_bwd/ref/reference.py": "b3dbdf7b2a12964cb51373143cda3681c489163d8e745fe59a03196f21c28071"
+  },
+  "runs": [
+    {
+      "label": "full-first-bd1-v1",
+      "source_receipt": "evidence/native/full-first-bd1-v1/source-manifest.json",
+      "production_and_frozen_reference_unchanged": true,
+      "other_files_changed_since_execution": [
+        "kernels/projects/a5/pgdn_chunk_bwd/README.md",
+        "kernels/projects/a5/pgdn_chunk_bwd/benchmark.py",
+        "kernels/projects/a5/pgdn_chunk_bwd/compare_runs.py",
+        "kernels/projects/a5/pgdn_chunk_bwd/contract.json",
+        "kernels/projects/a5/pgdn_chunk_bwd/ref/stages.py"
+      ],
+      "runtime_pin": "90cfcdc720bbcd66e8bd4361c4dd4fbc1a2a57b5",
+      "runtime_files": 205,
+      "oracle_sha256": "3baa67a5f35dc7230698e3f1761ec8675131318c15d4a27ed7f2fce11e84b5e8"
+    },
+    {
+      "label": "matrix-bd1-v2",
+      "source_receipt": "evidence/native/matrix-bd1-v2/source-manifest.json",
+      "production_and_frozen_reference_unchanged": true,
+      "other_files_changed_since_execution": [
+        "kernels/projects/a5/pgdn_chunk_bwd/README.md",
+        "kernels/projects/a5/pgdn_chunk_bwd/benchmark.py",
+        "kernels/projects/a5/pgdn_chunk_bwd/contract.json",
+        "kernels/projects/a5/pgdn_chunk_bwd/ref/verification.py"
+      ],
+      "runtime_pin": "90cfcdc720bbcd66e8bd4361c4dd4fbc1a2a57b5",
+      "runtime_files": 205,
+      "oracle_sha256": "3baa67a5f35dc7230698e3f1761ec8675131318c15d4a27ed7f2fce11e84b5e8"
+    },
+    {
+      "label": "matrix-bd2-v3",
+      "source_receipt": "evidence/native/matrix-bd2-v3/source-manifest.json",
+      "production_and_frozen_reference_unchanged": true,
+      "other_files_changed_since_execution": [
+        "kernels/projects/a5/pgdn_chunk_bwd/README.md",
+        "kernels/projects/a5/pgdn_chunk_bwd/contract.json"
+      ],
+      "runtime_pin": "90cfcdc720bbcd66e8bd4361c4dd4fbc1a2a57b5",
+      "runtime_files": 205,
+      "oracle_sha256": "3baa67a5f35dc7230698e3f1761ec8675131318c15d4a27ed7f2fce11e84b5e8"
+    },
+    {
+      "label": "timing-bd2-v3",
+      "source_receipt": "evidence/native/timing-bd2-v3/source-manifest.json",
+      "production_and_frozen_reference_unchanged": true,
+      "other_files_changed_since_execution": [
+        "kernels/projects/a5/pgdn_chunk_bwd/README.md",
+        "kernels/projects/a5/pgdn_chunk_bwd/contract.json"
+      ],
+      "runtime_pin": "90cfcdc720bbcd66e8bd4361c4dd4fbc1a2a57b5",
+      "runtime_files": 205,
+      "oracle_sha256": "3baa67a5f35dc7230698e3f1761ec8675131318c15d4a27ed7f2fce11e84b5e8"
+    }
+  ],
+  "notes": [
+    "Exact executed snapshots are recorded separately; later documentation and qualification metadata are not claimed to be their original contents.",
+    "First-run to matrix harness changes add retained device ranges, independent stage/byte-comparison helpers and range-observer instrumentation; production and frozen reference math are unchanged.",
+    "Between bd1 and bd2 only successful-report-neutral failure-status handling and whitespace changed in the harness; no failed/nonfinite case occurred in bd1.",
+    "Final documentation and contract qualification status summarize completed evidence."
+  ],
+  "artifact_commit": "c8e707337e0734113fa1c3a457c5318b4413dd48",
+  "scope": "Historical pre-repair artifact; current repair identities are in norm8-source-consistency.json."
+}

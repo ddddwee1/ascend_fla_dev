@@ -1,0 +1,308 @@
+{
+  "diagnostics": [
+    {
+      "kind": "CMake unused variable",
+      "detail": "CMAKE_CROSS_PLATFORM_COMPILER unused by native host build; generated host shared libraries built and loaded",
+      "impact": "No cross-host compilation is claimed"
+    },
+    {
+      "kind": "CANN header deprecation",
+      "detail": "ge_error_codes.h/ge_api_types.h deprecated for removal after 2027-06",
+      "impact": "Current CANN9.2 headers remain available; no missing-symbol diagnostic"
+    },
+    {
+      "kind": "Vendor Python SyntaxWarning",
+      "detail": "ascendc_impl_build.py invalid escape sequence \\d in embedded regular-expression source",
+      "impact": "Build generated ascend950 kernels and completed; not suppressed or patched"
+    },
+    {
+      "kind": "Vendor transdata docstring escapes",
+      "detail": "Three located Python string-literal warnings are within method docstrings, verified by AST and source hashes.",
+      "impact": "No generated PGDN arithmetic or synchronization depends on these strings; no warning was suppressed.",
+      "evidence": "evidence/secondary-vendor-docstring-warnings.json"
+    },
+    {
+      "kind": "torch_npu allocator32-byte compatibility padding",
+      "detail": "Pinned allocator adds32 bytes before block rounding under the selected beta CANN version.",
+      "impact": "Physical allocation capacity changes; tensor logical shape/arithmetic and stream synchronization do not. Exact warning retained in numbered native excerpts; no settings changed or warning suppressed.",
+      "evidence": "evidence/secondary-allocator-warning-assessment.json"
+    }
+  ],
+  "builds": [
+    {
+      "label": "norm8-full-first-bd1-v1",
+      "stage_count": 4,
+      "stages": [
+        {
+          "kernel": "pgdn_bwd_atk-071bd5e662fa62b8",
+          "raw_private_build_log_sha256": "326c14d4d7b67e06ea449600d546d6fc9b7a2f4c9e4e6b91d23de26a4ccd1820",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_cann_header_deprecation": 16,
+            "known_vendor_python_escape": 1
+          }
+        },
+        {
+          "kernel": "pgdn_bwd_atk_reverse-5a7c8a190deede28",
+          "raw_private_build_log_sha256": "fe296a5bf1bd160701869c89c26eabe35c1a509e970a4a76d49cd8dff91de7be",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_cann_header_deprecation": 16,
+            "known_vendor_python_escape": 1
+          }
+        },
+        {
+          "kernel": "pgdn_bwd_checkpoints-a536805be0e31749",
+          "raw_private_build_log_sha256": "3d393899d7fa0d50af655c28fd82a411842dd6d696070ff873c340cfcbe31662",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_cann_header_deprecation": 16,
+            "known_vendor_python_escape": 1
+          }
+        },
+        {
+          "kernel": "pgdn_bwd_reverse-8d2b0ede239beae2",
+          "raw_private_build_log_sha256": "35df63a0e740a5c522e36edc3e7482b58cdf5baa32aa7c2063c4c9ccde512f30",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_cann_header_deprecation": 16,
+            "known_vendor_python_escape": 1
+          }
+        }
+      ]
+    },
+    {
+      "label": "norm8-dense-clamp-bd2-v1",
+      "stage_count": 4,
+      "stages": [
+        {
+          "kernel": "pgdn_bwd_atk-ae3b9f59648a469c",
+          "raw_private_build_log_sha256": "8ad1d2e16476611d44d63e30a58363c825f672310236f3289c90771eb1b600e0",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_cann_header_deprecation": 16,
+            "known_vendor_python_escape": 1
+          }
+        },
+        {
+          "kernel": "pgdn_bwd_atk_reverse-4b74c373a808cce1",
+          "raw_private_build_log_sha256": "47d126af3de3d5cac562e4d3399e92e61408c8e9270e99d2a069f053f2ea63be",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_cann_header_deprecation": 16,
+            "known_vendor_python_escape": 1
+          }
+        },
+        {
+          "kernel": "pgdn_bwd_checkpoints-05cd0897e5c9884b",
+          "raw_private_build_log_sha256": "1fa7866c5054ede3793724dc319fa59a49dec8b8a41714fd37345a7f9990f6f3",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_cann_header_deprecation": 16,
+            "known_vendor_python_escape": 1
+          }
+        },
+        {
+          "kernel": "pgdn_bwd_reverse-07705f95c5ac22c5",
+          "raw_private_build_log_sha256": "812870812715fadd147d6262f7f25f1345fe4449d7a86fe2f7c0ab4b0929d04f",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_cann_header_deprecation": 16,
+            "known_vendor_python_escape": 1
+          }
+        }
+      ]
+    },
+    {
+      "label": "norm8-secondary-matrix-bd1-v5",
+      "stage_count": 4,
+      "stages": [
+        {
+          "kernel": "pgdn_bwd_atk-071bd5e662fa62b8",
+          "raw_private_build_log_sha256": "17adcc4167748bbba4364b126f8e0696c69e6c845e0cbd30e2906e8d9a7ec64c",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_vendor_python_escape": 1
+          }
+        },
+        {
+          "kernel": "pgdn_bwd_atk_reverse-5a7c8a190deede28",
+          "raw_private_build_log_sha256": "4ef709ead1d6cbaea9dad52bebd204938ff0c9005e530867fd81504e688d89b0",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_vendor_python_escape": 1
+          }
+        },
+        {
+          "kernel": "pgdn_bwd_checkpoints-a536805be0e31749",
+          "raw_private_build_log_sha256": "50d0993e58c9dbc8eb75b4e18bae8936ed40629acf67db785fdc81ff43afe7b3",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_vendor_python_escape": 1
+          }
+        },
+        {
+          "kernel": "pgdn_bwd_reverse-8d2b0ede239beae2",
+          "raw_private_build_log_sha256": "7559a293d7afcf25f79f967b9f122f63d0711b39b42d63678367b0712a6b1ac1",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_vendor_python_escape": 1
+          }
+        }
+      ]
+    },
+    {
+      "label": "norm8-secondary-matrix-bd2-v5",
+      "stage_count": 4,
+      "stages": [
+        {
+          "kernel": "pgdn_bwd_atk-ae3b9f59648a469c",
+          "raw_private_build_log_sha256": "34de55b95b3d50fff000ef5d364a041e165791f95597a75fe98d4f2a19b8c371",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_vendor_python_escape": 1
+          }
+        },
+        {
+          "kernel": "pgdn_bwd_atk_reverse-4b74c373a808cce1",
+          "raw_private_build_log_sha256": "1bb70326f678ea708a4879ba5ddc67bcf935df46cd534b07b2936a1a144a8fe8",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_vendor_python_escape": 1
+          }
+        },
+        {
+          "kernel": "pgdn_bwd_checkpoints-05cd0897e5c9884b",
+          "raw_private_build_log_sha256": "755c4e9dc647dc90c2540fbbdb706588f07a28fdb7c7ca049e7397b3ba908e91",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_vendor_python_escape": 1
+          }
+        },
+        {
+          "kernel": "pgdn_bwd_reverse-07705f95c5ac22c5",
+          "raw_private_build_log_sha256": "af09d7bd463a17e4d05d9ae88a7a85d91862aef2ea4bbc0427ae739350a61dac",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_vendor_python_escape": 1
+          }
+        }
+      ]
+    },
+    {
+      "label": "norm8-secondary-clamp-bd1-v1",
+      "stage_count": 4,
+      "stages": [
+        {
+          "kernel": "pgdn_bwd_atk-071bd5e662fa62b8",
+          "raw_private_build_log_sha256": "150182da82c5cc7b6717c7b5bea39583e15858cce94679920957b5a95a689fa6",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_vendor_python_escape": 1
+          }
+        },
+        {
+          "kernel": "pgdn_bwd_atk_reverse-5a7c8a190deede28",
+          "raw_private_build_log_sha256": "83e4cc7b03ee59d07e201140712e92764ae54af18b798231bfeb0e32fbe7466b",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_vendor_python_escape": 1
+          }
+        },
+        {
+          "kernel": "pgdn_bwd_checkpoints-a536805be0e31749",
+          "raw_private_build_log_sha256": "ce24ad299ac20264aa57e595022dee9a7262e326e5f7397b6ff5d1f1382377e1",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_vendor_python_escape": 1
+          }
+        },
+        {
+          "kernel": "pgdn_bwd_reverse-8d2b0ede239beae2",
+          "raw_private_build_log_sha256": "28747a08caae97d0f098ec473483dbeb9855ccb0401c06834125d122afb01f8a",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_vendor_python_escape": 1
+          }
+        }
+      ]
+    },
+    {
+      "label": "norm8-secondary-clamp-bd2-v1",
+      "stage_count": 4,
+      "stages": [
+        {
+          "kernel": "pgdn_bwd_atk-ae3b9f59648a469c",
+          "raw_private_build_log_sha256": "238e1015ccc188ca31949e4e0844a1adaf01bbb6b905b3b193e34cbae00612ad",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_vendor_python_escape": 1
+          }
+        },
+        {
+          "kernel": "pgdn_bwd_atk_reverse-4b74c373a808cce1",
+          "raw_private_build_log_sha256": "3f45b6fea9ed019c2efb9c9ff266e04f506ebaa6bcfb5dfc6d324abc5a105080",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_vendor_python_escape": 1
+          }
+        },
+        {
+          "kernel": "pgdn_bwd_checkpoints-05cd0897e5c9884b",
+          "raw_private_build_log_sha256": "73c989d1b0f93ffe8300b1a2aa9901058102d5a9e2cef21c7ee6d5bb0e82fd58",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_vendor_python_escape": 1
+          }
+        },
+        {
+          "kernel": "pgdn_bwd_reverse-07705f95c5ac22c5",
+          "raw_private_build_log_sha256": "89f84c77f5f5b589a7c063971145acef8a53b72b4e65922a9ffbae6570fb7e13",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_vendor_python_escape": 1
+          }
+        }
+      ]
+    },
+    {
+      "label": "norm8-secondary-timing-bd2-v1",
+      "stage_count": 4,
+      "stages": [
+        {
+          "kernel": "pgdn_bwd_atk-ae3b9f59648a469c",
+          "raw_private_build_log_sha256": "58e30eda1f5e712385f17df54c1d75d6cfc118617aed6b0080c918a4172c3c28",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_vendor_python_escape": 1
+          }
+        },
+        {
+          "kernel": "pgdn_bwd_atk_reverse-4b74c373a808cce1",
+          "raw_private_build_log_sha256": "935ac18f8b8503c9350af025cf22504f0193c825b0a86bfded8e2205055f87c5",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_vendor_python_escape": 1
+          }
+        },
+        {
+          "kernel": "pgdn_bwd_checkpoints-05cd0897e5c9884b",
+          "raw_private_build_log_sha256": "20ef023ddf85149d58c4252aea03248704f70d666481d025d2b2b28873d3911c",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_vendor_python_escape": 1
+          }
+        },
+        {
+          "kernel": "pgdn_bwd_reverse-07705f95c5ac22c5",
+          "raw_private_build_log_sha256": "c5aff6f0655ca9015b329aaae28ca5d995547a060b65316ef231118396804d58",
+          "warning_related_lines": {
+            "known_unused_native_cmake_variable": 1,
+            "known_vendor_python_escape": 1
+          }
+        }
+      ]
+    }
+  ],
+  "count_scope": "Warning-related lines include repeated source-line echoes. Full raw logs were inspected and hashed; no warnings were suppressed. This report covers repaired-source builds only."
+}

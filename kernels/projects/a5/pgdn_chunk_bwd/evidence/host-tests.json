@@ -1,0 +1,26 @@
+{
+  "scope": "Host regression tests; not device numerical qualification",
+  "host": {
+    "python": "3.11.15",
+    "torch": "2.10.0+cpu",
+    "command": "python -m pytest tests/ -q",
+    "passed": 1354,
+    "skipped": 10,
+    "warnings": 5,
+    "elapsed_seconds": 172.94,
+    "warning_scope": "Existing CPU-only torch_npu stub imports trigger pytest importorskip deprecation warnings; not suppressed"
+  },
+  "docker_cpu": {
+    "python": "3.12.13",
+    "torch": "2.12.0+cpu",
+    "torch_npu": "2.12.0",
+    "command": "python -m pytest tests/test_pgdn_chunk_bwd.py -q",
+    "passed": 115,
+    "elapsed_seconds": 6.68
+  },
+  "task_test_sha256": "99b14b78b7f278a2673e18ec0e6db99f57c69a268b1003346663f31861f4f6e3",
+  "repository_checks": {
+    "python tools/gen_matrix.py --check": "current",
+    "python tools/pm_board.py --check": "61 tasks, valid"
+  }
+}
