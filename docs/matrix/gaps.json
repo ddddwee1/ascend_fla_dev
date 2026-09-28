@@ -1,6 +1,6 @@
 {
   "schema": "ascend_fla.gaps/3",
-  "recorded_at": "2026-09-15",
+  "recorded_at": "2026-09-28T19:04Z",
   "produced_by": "phase 0, derived by cross-checking models.json against ops.json",
   "note": "缺口表。severity: P0 阻塞第一期 / P1 阻塞端到端可用 / P2 覆盖面与性能。applies_to 列出受影响的算子族 —— 多数限制是算子族特有的，不要当成全局限制。每条的 evidence 必须指向可核查的来源，proposed_action 是建议而非承诺。",
   "schema_changelog": [
@@ -877,13 +877,32 @@
       "blocks": [],
       "proposed_action": "P2：各族在接 a2 时用 A2-02 的同一个模式——`device` 默认 None → `resolve_soc`、对外入口先 `require_qualified`；单元路径接 `platform.unit_root(soc)`（第一个 a2 单元出现时一并做 KDA 侧的路径路由）。落点：GDN 的 A2 任务（A2-20 / kernel 批次 A2-K1）、PGDN / PKDA 的 a2 派生；`gdn2` 在 reserved_paths 内由仓主轨道自行处理。",
       "requires_kernel_change": false
+    },
+    {
+      "id": "a2-kda-bwd-gcumsum-bf16-precision",
+      "title": "【P1·真实缓存资格化中发现】A2 kda_bwd_stable 的 gc2（累积门控）四个消费者只吃 BF16，真实默认初始化跨度下 dg 可超 0.05 预算",
+      "category": "numerics",
+      "severity": "P1",
+      "applies_to": [
+        "kda"
+      ],
+      "evidence": "来源：A2-13（issue #40）用真实 kda_fwd_stable 产出的九个检查点（不是独立 fixture）驱动 kda_bwd_stable 做端到端资格化时发现，RISK kernel-change-needed（评论 5876471263，2026-09-28T18:56Z）与后续 STATUS（PR #137 评论 5876604634，2026-09-28T19:04Z）；申领人自述，PM 未复现（无 A2 真机）。\n两个 bd 完整粗扫 36 点：22 通过、10 有限梯度超预算、4 前向非有限（span192，按 finite-input 契约正确拒绝，不是 bug）。定位实验：uniform H=HV=32/T128/seed0，span 24/28/32/64/96/128，两 bd 逐位一致，dg 依次 0.036355/0.053919/0.063174/0.122838/0.137940/0.244574（预算 0.05，前两点在预算内，从 span32 起全部超）。CPU stage replay 消费完全相同的真机 BF16 缓存复现同量级误差（64/96/128 为 0.123686/0.139080/0.245634）；**只把 g_cumsum 一项换成真实前向的 FP32 值（gc*1/ln2），其余 8 项缓存不动**，同一 CPU 对照的六梯度在全部六个 span 点都回到0.05 预算内（依次 0.014029/0.014947/0.016146/0.022070/0.026545/0.030554）——干净地把责任定位到 g_cumsum 的 BF16 narrowing，不是其它缓存或反向算式本身。\n定位到的消费者：`kernels/projects/a2/kda_bwd_stable/unit.py:112/121/135/149/172` 的 `gc2` 只有四个消费者——`scan_fused`、`inverse_epilogue`、`finalize_pre`、`finalize_post`；其余五个反向 kernel 不直接吃 gc。这四处的 GM/UB 累积门控输入定义为 BF16，是精度损失的位置。\n该定位对照本身**不是**\"改后 kernel 真机通过\"的声明——现有 kernel 的 GM 输入与 `unit.validate_inputs` 强制 g_cumsum 为 BF16，测试侧不能绕过 ABI 直接喂 FP32 值给现有kernel，所以这不是能在现有写集内修的东西。另附带发现（如实记录，不隐藏）：normalized-input 的 span24/28/32 在 `finalize_pair` 中间检查上也超出既有 1e-5 界（最坏 t_beta 9.2949e-5）；FP64 诊断显示该残差远小于 FP32（0/8.97e-7/2.84e-9），提示是 FP32 累加/前级舍入敏感，但FP64 不替代 golden，1e-5 失败原样保留，不构成\"已修复\"的证据。",
+      "impact": "A2 上 `kda_bwd_stable`（KDA 反向的正式 backward kernel）在真实默认初始化会产生的门控跨度（fla 默认初始化 8 seed 实测下界 max≈106.4，本条在 span32 起就已超预算）下，`dg` 梯度相对 CPU FP32 完整自动微分的误差可能静默超出 0.05 验收预算而不报任何错误（有限值，量级正常，只是数值偏了）——这正是 §7 要求装闸防的那类问题。目前 A2-13 尚未给 A2 的 `max_gate_span[\"stable\"][\"backward\"]` 填任何数字、`qualified` 仍是 `False`，公开 `ascend_fla.ops.kda` 未接 A2，所以**当前没有产品路径会静默吃到这个错误**——风险仅存在于\"如果不管这个发现直接填一个只看有限性、不看这条精度曲线的闸值\"这种假设路径，实际未发生。",
+      "blocks": [
+        "A2-13 的宽域精度曲线资格化（backward 闸的上下边界目前互相打架：预算安全域上限低于默认初始化真实会用到的跨度下界）",
+        "A2-15（A2 KDA 层：前反向 + prefill→decode + torch_npu 基线，依赖 A2-13）"
+      ],
+      "proposed_action": "申领人提议（评论 5876471263）：保留现有 BF16 `kda_bwd_stable` 单元及其历史资格不动，新增一个 A2 派生的 FP32-g_cumsum 反向单元——只改四个消费者（`scan_fused`、`inverse_epilogue`、`finalize_pre`、`finalize_post`）的 GM/UB 类型与相应载入/转换，新 unit.py/reference.py/contract.json，其余 8 项缓存与返回梯度仍 BF16，五个非 gc 消费者复用冻结实现。gc 缓存会从 32MiB 增到 64MiB（B1/T4096/HV32，仅张量字节数，非性能数字）。需要全新 UB/ABI/同步 preflight、全部 vendor 预编译、完整原始+真实工作负载+范围真机验收。**这是新建 kernel 代码（不是本仓不改 ascriptor 那条边界内的事——是本仓自己在 `kernels/projects/a2/` 下建派生单元，符合 AGENTS.md §3 的路径，但超出 A2-13 当前写集与\"单元级资格化、不碰 kernel\"的范围），按 §6.5 记账，攒批或获批准后再动手；PM 已把\"批准新建这个 kernel 单元 / 是否纳入一次 kernel 批次\"这个决定转给用户，assignee 在裁定前保持kernel 只读，继续独立定位与文档化。**另一条不冲突的路径：A2-13 本身可以不等这个修复，以\"资格化未通过、根因已定位并归档\"收尾，把 kernel 修复列为独立的后续候选（由用户决定是否、何时纳入 kernel 批次）。",
+      "status_note": "2026-09-28：PM 记账（AGENTS.md §6.5 步骤①），已转告用户是否批准新建这个 A2 派生 backward 单元 / 纳入 kernel 批次；用户决定前 A2-13 不动 kernel、不填 backward 能力值、不翻 qualified，可以按\"资格化未通过+根因已定位\"的方式收尾（待 PM/用户对 A2-13 收尾方式的后续裁定）。",
+      "requires_kernel_change": true,
+      "kernel_change_note": "只改本仓 A2 派生单元（`kernels/projects/a2/kda_bwd_stable/**`），不碰 A5 源码、不碰上游 ascriptor：新建派生单元（不是原地改现有冻结单元），四个消费者 `unit.py:112/121/135/149/172` 的 `gc2` 输入类型从 BF16 改 FP32（GM/UB 声明 + 载入/转换），`scan_fused`/`inverse_epilogue`/`finalize_pre`/`finalize_post` 四个 kernel 跟着改，其余五个 kernel 与其余 8 项缓存不动。需要新 UB/ABI/同步 preflight、全部 vendor 预编译、完整真机验收。属 kernel 批次候选，要用户批准（同 `a2-splitk-fp32-cube`/`kda-bwd-scan-dh0-nondeterministic` 的先例）。"
     }
   ],
   "summary": {
     "P0": 2,
-    "P1": 23,
+    "P1": 24,
     "P2": 16,
-    "total": 54,
+    "total": 55,
     "first_milestone": "第一期五项已全部有结论，并补齐了同机性能对比：aclnn 编译、runtime 桥、kda_fwd 接线、KDA 本地基线均实测通过；自编译算子在 block_dim=4 下比 torch_npu 组合快 4.43x（kimi_linear_layer）/ 2.38x（long_context T=4096）/ 19.7x（smoke）。过程中修掉两个自己的 bug（bridge-per-call-overhead、op-name-collision-in-process），它们先后让 block_dim 的效果被完全掩盖。当前最大的性能项是 block-dim-ceiling（已升 P1）：扩展性一路线性到契约上限 4，而硬件有 28 cube。第二期的前置障碍 kda-fwd-bwd-dtype-mismatch 已量化（降 P2）。",
     "second_milestone": "第二期已完成：kda_bwd 九 kernel 链 + 九个前向检查点 + autograd + KDA layer（含 2 modules），训练步在 bd=4 下比 torch_npu 组合版快 4.83x~5.67x。\n过程中发现并根治了第二期最关键的一个缺口：**按 fla 的默认初始化（chunk 内门控跨度 ~94），上游 kernel 在前向与反向各有一处量程失效，方向相反** —— 前向在 87.3 下溢、反向在 88.72 上溢。两处都在本仓建了派生单元（kda_fwd_stable / kda_bwd_stable），把成对衰减分解的锚点从区间端点改到中点，数学同义。\n门控闸因此做成二维 `{impl: {forward, backward}}`：前向 155（受有限性约束，到 155.97 精度完全不退化）、反向 100（受**精度**约束，它先于有限性到来 —— 梯度到 169.8 都有限但 dq 在 130 处超预算）。**「不吐 NaN」不等于「能用」，两者要分别测、闸按更严的定。**\n剩一项端到端确认（默认初始化下整层反向的精度）卡在机器可用性上 —— 算子层面的同一件事已由 test_kda_bwd_deep_npu.py 在跨度 94 测过，六项梯度全在契约预算内。\n当前最大的性能项仍是 block-dim-ceiling（P1）。",
     "recommended_first_target": "KDA（Kimi-Linear / fla-kda-default 形状）。其 ABI 已是 token-major BTHK、GQA 原生支持、initial_state 与 final_state 均为 FP32、backward 产出 dh0 —— 上述多数 ABI 缺口对它都不适用。唯一需要前置补齐的是本地验证证据（kda-no-local-evidence）。",
@@ -902,7 +921,7 @@
       ]
     },
     "resolved": 13,
-    "kernel_fix_policy": "**kernel 源码层面的问题统一修一轮，不零散改。** 这是 2026-09-11 定的：发现一条就去改一条，会在 ascriptor 侧留下一串互相干扰的小改动，而且每改一次都要重跑全部 case。做法：发现时把它记进本表并打 `requires_kernel_change`，本仓侧先按 AGENTS.md §7 **装闸报错或记为声明限制**，保证不静默出错；等攒够一批再统一进 ascriptor 侧（§3：本仓不改那个仓，要改走那一侧的流程或建本仓派生单元）。当前队列 27 项，见下表。",
+    "kernel_fix_policy": "**kernel 源码层面的问题统一修一轮，不零散改。** 这是 2026-09-11 定的：发现一条就去改一条，会在 ascriptor 侧留下一串互相干扰的小改动，而且每改一次都要重跑全部 case。做法：发现时把它记进本表并打 `requires_kernel_change`，本仓侧先按 AGENTS.md §7 **装闸报错或记为声明限制**，保证不静默出错；等攒够一批再统一进 ascriptor 侧（§3：本仓不改那个仓，要改走那一侧的流程或建本仓派生单元）。当前队列 28 项，见下表。",
     "kernel_fix_queue": [
       "c1-multihead-o-corrupt",
       "decode-call-overhead",
@@ -930,7 +949,8 @@
       "gdn2-decode-fragmentation",
       "kda-bwd-inverse-mm-mutex-over-budget",
       "a2-splitk-fp32-cube",
-      "kda-bwd-scan-dh0-nondeterministic"
+      "kda-bwd-scan-dh0-nondeterministic",
+      "a2-kda-bwd-gcumsum-bf16-precision"
     ]
   }
 }
