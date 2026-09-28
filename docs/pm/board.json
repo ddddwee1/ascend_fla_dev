@@ -1229,6 +1229,10 @@
         {
           "at": "2026-09-23T11:36",
           "summary": "DONE（10:51Z，自述，#104，PR #131 draft，头 7599c02，7 个提交）：GDN-2 chunk 前向 BF16 原生 kernel 全部验收项完成，含门控跨度七点（上限如实标未确立）与性能三明治负结果（慢 2.3%，原因讲清楚）如实披露；过程中自查自修算子名冲突缺陷。PM 深度审查（NPU-free，本机排除 torch_npu）：写集干净（33 文件精确匹配声明范围）、reserved_paths 0 命中、隐私扫描仅 1 处误报（已脱敏路径片段）；host 算子审计/校准/契约/bd 逐位/FP32 逐位五份原始证据逐项核对数字精确吻合；性能与门控跨度日志读原始文件（含未过滤 CANN 噪声）核对；独立跑既有 test_gdn2_chunk_fwd.py 确认声明但未建的 test_gdn2_chunk_fwd_bf16.py 无功能缺口（仅 DONE 未交代，不算 rework 理由）；全量测试合入前后 1207/13/0，0 回归。**REVIEW accept，按 D-PM-33 自行合入**（squash，先 mark ready for review → 1bb9e1e；P0 BF16 任务，无预算/闸/域改动，无写集越界，无争议）。合入后 main 全量复跑同为 1207 passed/13 skipped，合入内容与已审分支逐字节相同（对合入提交的直接父提交做 diff 核实）。"
+        },
+        {
+          "at": "2026-09-28T01:46",
+          "summary": "RISK correction-absolute-timings-void（issue #104 评论 5861861913，session gd202-a5-realdevice-1；任务已 done/PR #131 已合入 1bb9e1e3，此为事后订正记录）。GD2-02 复用同一脚本重跑发现：README（kernels/projects/a5/gdn2_chunk_fwd_bf16/README.md）报的两个绝对值（baseline FP32 43.007ms / candidate BF16 43.996ms）**作废**，同机同卡同形状重跑测得 3.303/3.411ms（约低 13 倍），归因为当时机器争用把同步等待计入墙钟。**比值结论不变**（BF16 比 FP32 慢约 2~3%，1.023→1.033 同量级同方向），PR 的定性结论与合入依据不受影响。PM 核实 `docs/matrix/gaps.json` 未引用这两个具体数字，无需额外标注。裁定：订正并入 GD2-02 的交付（GD2-02 本来就要重做这个三明治），不单独开订正 PR，避免额外一轮评审。"
         }
       ],
       "result": {
@@ -2915,7 +2919,7 @@
       "wave": "W-A2",
       "soc": "a2",
       "priority": "P1",
-      "status": "assigned",
+      "status": "in_progress",
       "model": [
         "kimi-linear-48b-a3b"
       ],
@@ -2934,7 +2938,9 @@
         "tests/test_kda_decode.py",
         "kernels/projects/a2/kda_fused_recurrent/contract.json",
         "kernels/projects/a2/kda_fused_recurrent/README.md",
-        "ascend_fla/platform.py"
+        "ascend_fla/platform.py",
+        "docs/research/a2_decode.md",
+        "benchmarks/a2/evidence/decode/**"
       ],
       "needs": {
         "npu": true,
@@ -2969,6 +2975,10 @@
         {
           "at": "2026-09-26T02:10",
           "summary": "ASSIGN（PM）。规格已写入 docs/pm/tasks/A2-14.md：真实 Kimi-Linear 形状（H=HV=32）acc 双 oracle、chunk↔decode 状态传递一致性、bd∈{1,2}/GQA split 逐位比对、splitK 豁免记录、platform.py 补 decode block_dim 能力表、contract.json 的 board stage 按 A2-11 新规则落地。申领人 source_check（真实 ABI 是 q/k/v/o BF16、g/beta/h0/final_state FP32，看板旧 dtype=['fp32'] 是粗粒度骨架标签，与契约不一致）已核实为真，dtype 字段已订正为 ['bf16','fp32']；write_set 补上 ascend_fla/platform.py（只改 CAPABILITIES['a2']['supported_block_dim'] 这一个字典字面量，同 A2-12 的约束）。公共入口路由/新 dtype 实现明确不在范围（与 A2-12 对 chunk 路径的先例对称）；A2-13 与本任务互不依赖，写集不重叠，可任意顺序或并行。"
+        },
+        {
+          "at": "2026-09-28T02:05",
+          "summary": "ACK（issue #41 评论 5862008621，session 01a0b7ce-3daf-7550-a7bf-31c67eb91ca3；ASSIGN 于 2026-09-26T01:47:01Z，ACK 迟到约 48h，因指派方会话中间不活跃，非申领人责任，同 BF-09 先例不收回）。同时提了三条 RISK，PM 逐条裁定：\n① timebox-slip：接受不追责，timebox_h=10 从本次 resume（02:05Z）重新起算。\n② contradicts-handoff：核实属实——`kda_fused_recurrent/reference.py` 的 `independent_reference` 实际是 FP64 内部算术、FP32 输出，不是规格原文字面说的'CPU FP32 参考'，是 PM 用词不精确。裁定按申领人方案：验证器新增显式逐元素 FP32 算术的独立 CPU 递推作主金标准，既有 FP64 内部参考保留作补充诊断，第二 oracle 用 Torch NPU FP32 递推；不改现有单元 reference.py/kernel。规格已更正措辞。\n③ write-set-expansion：批准 `docs/research/a2_decode.md`（新建）+ `benchmarks/a2/evidence/decode/**`（新建），已核对与 A2-13 写集无冲突，只放脱敏文本/JSON。\nassigned -> in_progress。计划：验证 pinned 源码与环境→precompile 六个 decode/chunk vendor→真实 Kimi T=1/4/8/16 与 GQA case、CPU FP32/Torch NPU 双 oracle、跨 bd 逐位对比→prefix128+续接64 vs 整 chunk192、分段解码 vs T16→ETA 10h。"
         }
       ],
       "result": null
@@ -3155,6 +3165,18 @@
         {
           "at": "2026-09-26T03:00",
           "summary": "STATUS（issue #44 评论 5842590000，MikejR2904）。范围发现：a5 gdn_chunk_{fwd,bwd} 移植源是 @vf（寄存器 value-function）kernel（fwd 6 处、bwd 13 处），a2 facade 没有 @vf——与 A2-03 当年对 KDA 的发现同类。已核实：已交付的 a2 单元（kda_fwd_stable 等、gdn2_recurrent 的 A2 移植）全部是 tensor-vector 重写，零 @vf，是本任务唯一可参照的先例。结论：Batch A 要保留 a5 的算法/ABI 不变，但每个 stage 都要按 a2 tensor-vector 模型重写——比规格原来估的'M（接线 + 机械 settle）'工作量大，向量侧重写才是主要工作量。正面：a5 单元本来就带 HV 轴（v/g/beta/initial_state 按 HV 索引），1.1 GQA/GVA 机制已基本具备，不用从零设计。产出：task/A2-K1 分支 + kernels/projects/a2/gdn_chunk_fwd/DESIGN.md 已推到 fork（含 barrier 落点、测试计划、这条 @vf 发现、两条已裁定问题的记录），尚无 kernel 代码。ETA 从此前的 34h 上修，具体数字待搭好 gdn_chunk_prepare 的 tensor-vector 重写并过双 oracle 验证后再给。PM 备注：ACK 于 2026-09-24T11:12，距今约 40h，逼近 timebox_h=40 但尚未过 50%（60h）——本轮不构成需要上报用户的超时，下一轮若仍无代码且总耗时过 60h 则升级处理（参照 A2-03 的拆分先例）。assigned -> in_progress（此前 ACK 时漏转，随本次一并补正）。"
+        },
+        {
+          "at": "2026-09-27T00:13",
+          "summary": "STATUS（issue #44 评论 5851176063，MikejR2904，24h check-in）。无实质进展：仍在计划/分支阶段，DESIGN.md 记着六项 ABI 缺口方案、barrier 落点、测试计划、两条已裁定问题、@vf 范围发现；下一步是把 gdn_chunk_prepare 先重写成 tensor-vector 版本、过双 oracle 验证。仍无 kernel 代码。ETA 待第一阶段脚手架完成后再给具体数字。"
+        },
+        {
+          "at": "2026-09-27T21:25",
+          "summary": "STATUS（issue #44 评论 5859963111，MikejR2904，再一次 24h check-in）。仍无实质变化，同上一条内容（计划/分支阶段，无 kernel 代码），@vf 重写范围判断不变。"
+        },
+        {
+          "at": "2026-09-28T02:17",
+          "summary": "PM 备注：距 ACK（2026-09-24T11:12）已 87.1h，timebox_h=40，**超时 117.7%**，已达到需要向用户上报的阈值（>50%）。申领人的两次 STATUS 都如实说明'仍在计划阶段、无 kernel 代码'，没有虚报进度，但客观上已经远超原估。按 AGENTS.md §6.5 与 A2-03 先例（20h 低估到 123h 后被拆分），这个任务的范围可能同样被低估了——本轮不单方面拆分或收回，留给用户决定：继续按现状等、要求申领人给出阶段性里程碑或修订后的 timebox、还是考虑参照 A2-03 拆分。"
         }
       ],
       "result": null
@@ -3909,6 +3931,10 @@
         {
           "at": "2026-09-26T02:37",
           "summary": "STATUS（issue #63 评论 5842435143，session gd202-a5-realdevice-1；PING 后回应，取消收回）。真机：机器 B，Ascend950PR / CANN 9.2.0 / opp 含 ascend950,ascend910b,ascend910_93 / compiler 2026-08-04T16:57:23+08:00 / Python 3.12.13 / torch 2.12.0+cpu / torch_npu 2.12.0，物理卡 1，持锁执行。①两台 A5 opp 普查均含 ascend950，torch_npu 计算算子可用，§5 的 D2H 绕行不需要。②GD2-01 契约全集真机通过：a5.gdn2_chunk_fwd 的 board/aclnn stage 从 untested 升级为 passed（12 cases）。③bd∈{1,2,4,8} 在 t64/t65/t192（整 chunk/尾块/奇数 chunk）三个形状上输出 o/final_state 逐位相同（bitwise hash 一致）。尚未：12 个 case 的逐条 rel-L2/max_abs（目前只有 harness 总判 passed:true）、95B 整网端到端、性能三明治——如实标注未做，无整网/性能数字。assigned -> in_progress（此前 ACK 时漏转，本次一并补正，非实质变化）。"
+        },
+        {
+          "at": "2026-09-28T01:33",
+          "summary": "STATUS（issue #63 评论 5861753731 + 5861854992，session gd202-a5-realdevice-1，head 76c24f3）。写集文件 benchmarks/bench_gdn2_chunk_fwd_a5.py 已提交，把 §6 两条铁律写进结构（prepare() 一次编完、dtype 显式打印）。**自查发现本轮测量方法本身不对**：`--dtype float32` 时 candidate 与 baseline 是同一路径，ratio=0.995 只能证明测量稳定，证明不了'比 torch_npu 基线快'（任务真正要的对比）；下一步把 baseline 换成 torch_npu 组合实现。**同时定位出一个更大的发现**：今天同机同卡同形状重跑 BF-05 那个脚本（一字未改），FP32/BF16 分别测到 3.303/3.411 ms，与 BF-05 原报的 43.007/43.996 ms 相差约 13 倍；比值稳定（1.023→1.033，同量级同方向），绝对值不稳定（今天两个独立脚本互相印证 3.3ms 可复现，43ms 不可复现）。归因为'当时机器争用把 torch.npu.synchronize() 的排队时间计入墙钟'——按 §6 第一条铁律，profile 前不下结论，这个处理方式对。方法论总结：三明治只能抓运行期间的漂移，抓不到整轮恒定的抬高，绝对值需要机器占用旁证，比值不需要。PM 已回复：接受方案（换 baseline），方法论总结并入本任务交付物；BF-05 的订正见下面 BF-05 的记录。next：baseline 换 torch_npu 组合实现并重跑三明治、95B checkpoint 端到端。"
         }
       ],
       "result": null
