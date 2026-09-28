@@ -5403,6 +5403,10 @@
         {
           "at": "2026-09-28T13:56",
           "summary": "DONE（issue #94 评论 5871363190，session dev-20260928T020159Z-609dfa8f；PR #136 ready，head 9bdb23807400b0bbf5f919463c53753aa87f50d4，92 文件/+290831/-0）。声称：ABI 冻结表/S_MAX/bd 合法值/state 布局/A↔B 一致性/量程复核完成（沿用 NOTE 5870217647 裁定的 A，未重新定义）；六个 bd 各 88 例共 528 例全通过，对 A/B 最大相对 L2=2.170130340355715e-7（1e-4 预算内），跨 bd 输入/output/state 哈希一致，264 组 BF16 与同输入 FP32 RNE 输出/state 逐位一致；真实 prefill→decode（14 组/56 条链，直传 NPU state）132 次分段对照逐位一致；同卡三轮 B/C/B（真实 torch_npu GDN 组合基线，1800 个原始样本）；入口显式拒绝域外组合；92 个交付文件全在四项写集内，GDN chunk/bwd、GDN-2、共享 runtime 均未改动；未声称 CUDA/Triton/权重验证/其它 SoC 结论。真机：SoC a5，CANN 9.1.0-beta.1，Ascend950PR_9579V100。host 全套 1449 passed/10 skipped。两次观测到外来任务占用后正确换设备重跑，未碰他人进程或复位卡。按 D-PM-33 走完整审查，不因自述免检——这是从零建 kernel（不是资格化），需要真正的代码质量审查，已派发独立复核（写集边界、生产代码/门控纪律、关键数字复算、bd 跨维度逐位一致性独立验证、host 测试重跑），结果另记。in_progress -> review。"
+        },
+        {
+          "at": "2026-09-28T14:09",
+          "summary": "STATUS（issue #94 评论 5871636453，PR #136 仍是同一个 head 9bdb238，不是新提交）。DONE 后自查补充了一个 signed32 state 索引边界测试（恰为 2**31 个 state 元素），用 meta 张量不真分配 8GiB，断言在 kernel 加载前拒绝；提交 07de668，9bdb238 补齐相应日志/研究表/manifest。最新这个纯测试新增单独跑 85 passed（4.18s）；此前 Docker 84 passed 与全量 1449 passed/10 skipped/5 warnings 的记录原样保留，明确声明全量测试是在这次纯测试新增之前跑的，**不把两次计数相加冒充重新跑过全量**——诚实披露。kernel/公共执行代码/预算/设备产物均未变化。70 项证据 manifest、12 轮源码回执对账、92 文件写集与提交历史隐私检查复核通过。等待 PM 审查（已在跑），无阻塞。"
         }
       ],
       "result": null,
