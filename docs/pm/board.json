@@ -2919,7 +2919,7 @@
       "wave": "W-A2",
       "soc": "a2",
       "priority": "P1",
-      "status": "in_progress",
+      "status": "review",
       "model": [
         "kimi-linear-48b-a3b"
       ],
@@ -3005,6 +3005,18 @@
         {
           "at": "2026-09-28T02:53",
           "summary": "BLOCKED（issue #41 评论 5862421775）：等待上面那条 write-set-expansion 批准才能改那一行。PM 已在此轮批准并回复，解除阻塞。真机 32/32 精度 case、19 组跨 bd 逐位一致、全部 128 续接步满足严格 state 预算，双 oracle 均测过；private 3163 文件 + public 54 文件归档 SHA 核对完毕。未声称 DONE。"
+        },
+        {
+          "at": "2026-09-28T04:31",
+          "summary": "DONE（issue #41 评论 5863401671，session 01a0b7ce-...；PR #135 ready，head 7745847728e4f70e46692144d22d8907b59d603e，36 文件/+17685/-7）。声称：真实 Kimi H=HV=32 与 H16/HV32、K=V=128、T=1/4/8/16 在 bd1/2 上，加上原有 8 例，共 32/32 通过（CPU FP32 主金标准 + Torch NPU FP32 第二 oracle），最大相对 L2 o=1.72e-3/state=1.02e-7；真实 prefix128+64 单 token 续接全部 128 步满足原 1e-5 预算（最大 1.79e-7），vs 整 chunk192 满足既有预算，T16 分段 vs 一次性两个头配置两个 bd 逐位一致；19 组跨 bd 输出/state 对逐位相同；decode kernel AST 确认零 matmul 调用，splitK/手写 MMAD 不适用已记入 contract；`CAPABILITIES[\"a2\"][\"supported_block_dim\"][\"decode\"]=(1,2)`，`qualified` 仍 False，无公共路由改动；contract.json board stage 逐项点名A2-11 四项前提并指向本任务自己的证据；host 全套 1369 passed/6 skipped，36 个改动路径全在批准写集内（含两处一行断言更正）。声称是本任务自己独立测的，不是转述 A2-03。按 D-PM-33 走完整审查，不因自述免检；in_progress -> review。"
+        },
+        {
+          "at": "2026-09-28T05:31",
+          "summary": "STATUS（issue #41 评论 5864077378）。重申 DONE 状态不变，等待 REVIEW；下一任务的条件 APPLY 已在 issue #28 排队（明确等 A2-14 实际合入/CLOSE 后才生效，不是并发）。"
+        },
+        {
+          "at": "2026-09-28T05:51",
+          "summary": "STATUS（issue #41 评论 5864266151）。等待 REVIEW 期间做的只读预检，为未来 A2-13/A2-15 定范围用（不是本 PR 的改动，也不是新真机声称）：`kda_fwd_stable` 的前向契约不产出 `v_new`/逐 chunk `h` checkpoint（只返回 o/final_state），而 `kda_bwd_stable` 的 `saved` 输入要求九个 BF16 checkpoint（g_cumsum/Aqk/Akk/w/u/qg/kg/v_new/h，多个 dtype/布局细节）。结论：现有 A2 前向输出不能直接当反向 cache 用，需要一个显式设计过的 device 侧生产者/适配器（host 侧转换违反 D-PM-35/37）。记入以后写 A2-13/A2-15 规格时要用的信息，PM 尚未核实这条技术细节本身（只记录，不代表采纳）。"
         }
       ],
       "result": null
@@ -3203,6 +3215,18 @@
         {
           "at": "2026-09-28T02:17",
           "summary": "PM 备注：距 ACK（2026-09-24T11:12）已 87.1h，timebox_h=40，**超时 117.7%**，已达到需要向用户上报的阈值（>50%）。申领人的两次 STATUS 都如实说明'仍在计划阶段、无 kernel 代码'，没有虚报进度，但客观上已经远超原估。按 AGENTS.md §6.5 与 A2-03 先例（20h 低估到 123h 后被拆分），这个任务的范围可能同样被低估了——本轮不单方面拆分或收回，留给用户决定：继续按现状等、要求申领人给出阶段性里程碑或修订后的 timebox、还是考虑参照 A2-03 拆分。"
+        },
+        {
+          "at": "2026-09-28T04:06",
+          "summary": "STATUS（issue #44 评论 5863143693，MikejR2904）。**首次真机进展**：五个前向 stage 全部移植成 a2 tensor-vector 模型（无 @vf）并在真机 910B3（device 0）上验证，对 torch 参考，GVA HV=2/H=2，N=2 chunks，小 gate span：prepare（精确/≤1e-7）、scores（1.45e-7/1.43e-7）、wy（bit-exact/6.1e-8，有序下三角求解）、scan（states 1.9e-7/delta 2.9e-7/final_state 3.0e-7，非零 initial_state，纯向量无 cube——A2-01 提过 b3 的 L0C DMA 不可用）、output（1.4e-7）。已交付到 fork MikejR2904/ascend_fla_dev_a2 分支 task/A2-K1（`kernels/projects/a2/gdn_chunk_fwd/kernels/`）。next：反向单元（dh0）、搭 contract.json/unit.py、接 ops 入口，再做非对称 HV!=H 的双 oracle 全算子验证。ETA 仍从 34h 上修中（确认是整段向量侧重写，不是搬文件）。"
+        },
+        {
+          "at": "2026-09-28T06:19",
+          "summary": "STATUS（issue #44 评论 5864553605，MikejR2904）。完整前向流水线（prepare→scores→wy→scan→output）在功能模拟器上对**两个 oracle 都**端到端验证通过（GVA HV=4/H=2，N=2，小 gate span）：o 对 grouped_recurrent 3.3e-7/对 block_solve 3.2e-7，final_state 对 grouped_recurrent 3.0e-7/对 block_solve 3.1e-7。**说明真机 e2e 暂缓的原因**：910B3 卡被其他用户的任务占满，长 kernel 间歇性撞 `rtDeviceSynchronizeWithTimeout`（D-PM-28：机器占用归 assignee 自己管理，PM 不介入）；已有的分 stage 真机验证 + 这次的 sim 端到端对双 oracle，两者一起构成前向正确性证据，等卡空出来再补一次真机端到端。同时提到一个好的工程细节：进程内 `compile_kernel` 连跑 5 次会撞一进程一 build 的限制（AGENTS.md §6 铁律二），改用 unit runner 逐个单独 build 规避。next：反向 port plan 已定（DESIGN.md，解析伴随法），先在 sim 上建+验（设备无关），再过真机。"
+        },
+        {
+          "at": "2026-09-28T06:30",
+          "summary": "PM 备注：更新对超时状况的判断——上一条 PM 备注（87.1h/超时117.7%）时还没有任何代码，现在**前向五个 stage 已经在真机上逐一验证通过**（误差量级 1e-7~1e-8），完整流水线也在 sim 上对双 oracle 端到端过了，只是真机端到端因为卡被占用暂缓（不是技术问题）。范围确实比原估大（申领人多次强调是整段向量侧重写），但不是空转——这个信息更新了之前留给用户的那个'继续等/要求里程碑/拆分'的决策依据，供参考。"
         }
       ],
       "result": null
@@ -3961,6 +3985,14 @@
         {
           "at": "2026-09-28T01:33",
           "summary": "STATUS（issue #63 评论 5861753731 + 5861854992，session gd202-a5-realdevice-1，head 76c24f3）。写集文件 benchmarks/bench_gdn2_chunk_fwd_a5.py 已提交，把 §6 两条铁律写进结构（prepare() 一次编完、dtype 显式打印）。**自查发现本轮测量方法本身不对**：`--dtype float32` 时 candidate 与 baseline 是同一路径，ratio=0.995 只能证明测量稳定，证明不了'比 torch_npu 基线快'（任务真正要的对比）；下一步把 baseline 换成 torch_npu 组合实现。**同时定位出一个更大的发现**：今天同机同卡同形状重跑 BF-05 那个脚本（一字未改），FP32/BF16 分别测到 3.303/3.411 ms，与 BF-05 原报的 43.007/43.996 ms 相差约 13 倍；比值稳定（1.023→1.033，同量级同方向），绝对值不稳定（今天两个独立脚本互相印证 3.3ms 可复现，43ms 不可复现）。归因为'当时机器争用把 torch.npu.synchronize() 的排队时间计入墙钟'——按 §6 第一条铁律，profile 前不下结论，这个处理方式对。方法论总结：三明治只能抓运行期间的漂移，抓不到整轮恒定的抬高，绝对值需要机器占用旁证，比值不需要。PM 已回复：接受方案（换 baseline），方法论总结并入本任务交付物；BF-05 的订正见下面 BF-05 的记录。next：baseline 换 torch_npu 组合实现并重跑三明治、95B checkpoint 端到端。"
+        },
+        {
+          "at": "2026-09-28T02:47",
+          "summary": "STATUS（issue #63 评论 5862375378，session gd202-a5-realdevice-1，head d4be06a）。baseline 换成任务真正要的 torch_npu 组合实现（§6 双 oracle 第二个），旧 FP32-路径基线保留成 `--baseline fp32_path` 选项。真机三轮（机器 B/物理卡1/T256/H16/bd8）：baseline torch_npu 组合中位 66.543ms，candidate 自编译 kernel 中位 1.090ms，**ratio 0.016（约快 61 倍）**——两轮 baseline 漂移 6.06%，但相对 61 倍的差距完全不敏感，结论稳。明确澄清口径：这是'比朴素逐 token torch_npu 组合快 61 倍'，不是'比任何 torch 实现快 61 倍'（手写分块版会快不少），已写进脚本 docstring 防止外推。回执新增 `machine_witness`字段（卡健康或本机并发进程数），呼应 BF-05 那次教训——绝对值需要独立旁证。"
+        },
+        {
+          "at": "2026-09-28T03:44",
+          "summary": "STATUS（issue #63 评论 5862942687，同 session，head 不变）。95B checkpoint 端到端（`torch` 与 `cce` 两条后端，FP32，8 token）都跑通：退出码 0，`last_token_argmax` 一致，`logits_max/min` 相差1.9e-6/5.7e-6（相对约 5e-7），`cache_check` 各自内部一致性 0.0（**不是**跨后端比较，明确澄清不要误读）。**明确声明尚未完成的部分**：还没做两条后端之间 logits 的逐元素相对 L2，所以现在不能说 'FP32 预算 1e-3 已满足'——只是摘要统计指向差距很小。`load/forward_seconds` 的数字不当性能结论（单次墙钟，非三明治）。next：落盘两条后端 logits/cache，算相对 L2 对 1e-3（FP32）与 1e-2（BF16）判定，然后出证据包开 draft PR。"
         }
       ],
       "result": null
@@ -5299,6 +5331,10 @@
         {
           "at": "2026-09-20T03:48",
           "summary": "用户 2026-09-20 放行（D-PM-43「其他的也放行」）：gated → open。来自外部需求 #89，用户批准；仍是骨架，PM 派单前先补全规格（GDA-04 / PK-06 / GDA-05 还要等各自的前置）。"
+        },
+        {
+          "at": "2026-09-28T06:25",
+          "summary": "只读预检 STATUS（issue #94 评论 5864624329，session dev-20260928T020159Z-609dfa8f；GDA-04 assignee 仍是 None，这条不构成正式验收，仅记为后续写规格的参考输入）。未写 kernel/公共入口代码、未占真机跑数值 case，符合此前 NOTE 的要求。给规格的四点发现：①现有 `chunk_gdn` 要求 T 为 64 的倍数且≤4096，prefill64+decode1 的总长 65 不能直接喂一次性 chunk，需明确分割网格；②chunk 与 decode 的 kernel 必须在该进程首次执行前 prepare 完，按 bd 分进程/build；③`g≤0` 只保证 `exp(g)≤1`，不能单独保证递推稳定（更新矩阵含 `I-beta*k*k^T`），需要明确数值量程前置条件；④`initial_state` 的 None/张量支持、输出 state 开关、fresh/nonmutation 规则、近零分母口径需要在规格里说清楚，不能照搬 PK-05 的披露分类。CPU 探针（4 组形状）显示对 literal naive 的相对 L2 在 5e-8 量级，负控制（故意错误实现）能被判别（0.79~1.37）。这些形状不构成支持域承诺。"
         }
       ],
       "result": null,
