@@ -2902,7 +2902,7 @@
       },
       "spec": "docs/pm/tasks/A2-13.md",
       "issue": 40,
-      "pr": null,
+      "pr": 137,
       "assignee": "limjiunnbin",
       "assignee_caps": {
         "agent": "Codex / GPT-6",
@@ -2948,6 +2948,14 @@
         {
           "at": "2026-09-28T18:35",
           "summary": "RISK silent-wrong-result（issue #40 评论 5876157911，已转告用户）。真实缓存 18/18 case 通过（六梯度最坏相对 L2 0.00971，两 bd 逐位一致）；但 H=HV=32/T128/seed0/uniform 深衰减门控在目标 span32（BF16 输入实际 span32.0176）时，dg 相对 CPU FP32 完整自动微分 = 0.06317 > 0.05 预算（其余五梯度 dq0.0224/dk0.0478/dv0.0030/dbeta0.0033/dh00.0024 都在预算内）；全部 33 中间量与六梯度仍有限（不是 overflow），两 bd 逐位同错（dg sha256 1571683f...）。粗扫 uniform span：16 通过(0.0326)，64/96/128/160 依次 0.1228/0.1379/0.2446/0.2639，精度随跨度单调变差，不是只有溢出才失效。**关键张力**：8 seed 默认初始化跨度下界 max=106.38（FP32），若统一闸要覆盖这个下界，就会连带纳入已经失败的 span32.0176——\"覆盖默认初始化典型跨度\"与\"守住 0.05 预算\"可能不兼容，比 A5 当年更窄。申领人处理方式完全正确：不拿独立 fixture 的 dg0.25 预算去掩盖端到端 0.05 的失败、不填 backward 能力值、不翻 qualified、不报 DONE，继续定位根因（算术/缓存精度）与责任层，粗扫仍在跑。这是申领人主动、透明报出的潜在静默错误风险，不是已经发生的静默错误，也不是分歧——按标准流程记录，PM 未做任何裁决（无需要现在裁的东西），继续跟踪。"
+        },
+        {
+          "at": "2026-09-28T18:56",
+          "summary": "RISK kernel-change-needed（issue #40 评论 5876471263，draft PR #137 -> 69cab018）。两 bd 完整粗扫 36 点：22 通过、10 有限梯度超预算、4 前向非有限（span192，按 finite-input 契约正确拒绝）。定位：uniform H=HV=32/T128/seed0 在 span 24/28/32/64/96/128 的 dg 分别 0.036/0.054/0.063/0.123/0.138/0.245，两 bd 逐位一致；CPU stage replay 消费同一份真机 BF16 缓存复现同量级误差；**只把 g_cumsum 换成真实前向 FP32 值（其余 8 项缓存不动），同一 CPU 对照六梯度全部回到 0.05 预算内**——干净定位到 g_cumsum 的 BF16 narrowing 是主因，不是其它缓存或反向算式。定位到的消费者：kernels/projects/a2/kda_bwd_stable/unit.py:112/121/135/149/172 的 gc2，只有 scan_fused/inverse_epilogue/finalize_pre/finalize_post 四个 kernel 吃它。现有 kernel 的 GM 输入与 unit.validate_inputs 强制 BF16，测试侧无法绕过 ABI 直喂 FP32，这不是当前写集能修的。另如实记录一条独立发现：normalized-input span24/28/32 的 finalize_pair 中间检查也超既有 1e-5 界（最坏 t_beta 9.2949e-5），FP64 诊断显示残差远小于 FP32（暗示是累加/舍入敏感），但明确说FP64 不替代 golden、失败原样保留、不构成已修复的证据。主机回归 1454 passed/6 skipped 不变，写集边界、AST、隐私扫描全过。申领人提议：新建 A2 派生 FP32-g_cumsum backward 单元（保留现有 BF16 单元不动），或按 §6.5 走 kernel 批次；在 PM/用户裁定前保持 kernel 只读，不填能力值、不翻 qualified、不报 DONE。**这超出 PM 自行裁定范围**（新建 kernel 代码的写集扩大 + kernel 批次批准，两者都在\"只问用户\"清单上）——已记入 docs/matrix/gaps.json（a2-kda-bwd-gcumsum-bf16-precision，requires_kernel_change）并转告用户，等裁定。"
+        },
+        {
+          "at": "2026-09-28T19:04",
+          "summary": "STATUS（PR #137 评论 5876604634，commit 38c83cf，draft）。补充 pair-replay 只读 CPU 分析：用实际 native finalize_pre 输入重算，span24/qk_right、28/t_beta、32/t_beta 相对 CPU FP32 矩阵乘分别 4.77e-5/1.44e-5/9.29e-5；FP64 诊断分别 0/8.97e-7/2.84e-9（提示 FP32 累加/前级舍入敏感，但明确不替代 golden、原 1e-5 失败保留、不声称硬件已修好）。主机回归不变，104 个新增文件均为文档/证据追加。下一步继续读四个 gc 消费者的存储/载入/同步契约，准备可评审的修复 preflight；kernel 批次/写集裁定仍待定，未改冻结 kernel、未填能力值。"
         }
       ],
       "result": null
