@@ -3306,6 +3306,10 @@
         {
           "at": "2026-09-28T23:35",
           "summary": "STATUS（issue #44 评论 5880725321，MikejR2904；首行格式不对——em dash 又被转成乱码，poll 标了警告，PM 直接读原文核实）。之前卡住的 reverse kernel 分解已完成：replay -> reverse_rec（递推，产出 dv/dh0/back_tape）-> {dq, dbeta, dg, dk_bz, dk_ddr} -> group_reduce，dh0 与非零 dht 路径都在 recurrence kernel 里。前向+反向现在都在功能 sim 上对双 oracle（正向：grouped_recurrent+block_solve；反向：解析 adjoint ref/reference.py）端到端过：o~3.3e-7/final_state~3.0e-7，dq/dk/dv/dg/dbeta 均 ~1.2e-7~1.7e-7。前向仍是逐 stage 真机 910B3 board 验证过；**反向目前只有 sim 验证，还没有真机 board 端到端**——8 张 910B3 仍被其他用户占用（按 D-PM-28 记录不上报不仲裁）。申领人原话'kernel-level correctness is complete'，剩余工作是给 fwd+bwd 建 unit 脚手架（contract/unit.py/pipeline、算子命名、barrier 位点）并在卡空出来后跑真机 board 双oracle e2e。全部工作在其 fork（MikejR2904/ascend_fla_dev_a2，task/A2-K1）。真实进展，非空转；心跳按此重置。"
+        },
+        {
+          "at": "2026-09-30T02:08",
+          "summary": "STATUS（issue #44 评论 5902664419，MikejR2904，格式正常）。正式确认此前的 sim 端到端结论：前向 5 stage + 反向 8-kernel reverse chain 对解析 adjoint 端到端过（dq/dk/dv/dg/dbeta 相对误差 ~1.3~1.7e-7），前向仍有逐 stage 真机 910B3 验证。新增内容：在 kernels/projects/a2/gdn_chunk_bwd/bench/ 加了一个 fla-Triton 延迟/利用率基准（对比 triton-ascend 上同 NPU 的 chunk_gated_delta_rule，方法论照抄 gdn2 的 BENCHMARK_TRITON——msprof 测 device us、wall 时间、PipeUtilization），已推到 task/A2-K1 分支（未开 PR）。剩余工作全部要真机：board e2e、device 时间/利用率、Triton 对比，卡在 8 张 910B3 全部 90%+ AICore 占用（按 D-PM-28 记录不上报不仲裁）。申领人原话'无需 PM 动作'。"
         }
       ],
       "result": null
