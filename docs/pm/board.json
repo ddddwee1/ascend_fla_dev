@@ -4006,7 +4006,7 @@
       "wave": "W0",
       "soc": "a5",
       "priority": "P1",
-      "status": "in_progress",
+      "status": "open",
       "model": [
         "gdn2-1.3b-fineweb-edu-100b"
       ],
@@ -4031,19 +4031,8 @@
       "spec": "docs/pm/tasks/GD2-02.md",
       "issue": 63,
       "pr": null,
-      "assignee": "limjiunnbin",
-      "assignee_caps": {
-        "agent": "自述为与 A2-09 同一 agent（APPLY 里写「我手上的 A2-09」，session 值不同）",
-        "socs": [
-          "a5"
-        ],
-        "soc_details": "自述（ACK 15:44Z）：A5 真机，在任务容器内执行；CANN 9.2.0（只读共享安装）、opp 含 ascend950（与 ascend910b、ascend910_93 并存，torch_npu 计算算子可用）、compiler timestamp 2026-05-09T12:45:09+08:00（clang 15.0.5，bisheng 与 ccec 同一份）、Python 3.12.14、torch 2.12.0+cu130、torch_npu 2.12.0、设备 Ascend950PR；与 BF-03 / BF-07 的机器环境不同。机器与卡归 assignee 管理（D-PM-28），结论只对其实际验证的这一套成立",
-        "ascriptor": "library 90cfcdc720bb…、kernels b3b3f9c16df7…（自述，取自 compatibility.json）",
-        "fla": "864a87f6ce5b…（v0.5.2-123-g864a87f6，自述）——与 GD2-01 / PK-02 / PK-03 的 pin e52dbc0e 不同，已要求对齐（见 reports）",
-        "fork": "limjiunnbin/ascend_fla_dev",
-        "session": "gd202-a5-realdevice-1",
-        "note": "APPLY（12:54Z）用 BF-05 的已合入证据证明 agent-a5-access 门真实满足（两台 A5，Ascend950PR/CANN 9.2.0，两台编译器 build 不同已按 machine_specs.md 分开记）；GD2-01 已 done，依赖满足，直接派。"
-      },
+      "assignee": null,
+      "assignee_caps": null,
       "branch": "task/GD2-02",
       "timebox_h": 16,
       "origin": {
@@ -4092,6 +4081,10 @@
         {
           "at": "2026-09-30T13:22",
           "summary": "心跳：距上一次 STATUS（2026-09-28T13:22）满 48h 无更新，按协议发 PING（issue #63 评论 5912202284）。再过 24h（到 2026-09-30T13:22 之后的 2026-10-01T13:22）仍无回应则收回任务重新放出。"
+        },
+        {
+          "at": "2026-10-01T13:26",
+          "summary": "收回：48h 无 STATUS 的 PING（2026-09-30T13:22，issue #63 评论 5912202284）之后再等 24h（到 2026-10-01T13:22）仍无任何回应——匿名核对 #63 自 PING 起的全部评论（截至 2026-10-01T13:26:57Z），只有 PING 这一条，没有 STATUS/RISK/BLOCKED/WITHDRAW。按 PROTOCOL.md §5：'进行中的任务 48 小时没有 STATUS 会收到 PING，再 24 小时没动静就收回，状态回 open，分支留着'。in_progress -> open，清空 assignee/assignee_caps（同 PK-05 24h-无-ACK 收回先例）；分支 task/GD2-02 保留。任务已有的真实进展（GD2-01 契约全集真机通过、bd 跨档位逐位一致、95B FP32 logits 跨后端相对 L2=4.09e-5 在预算内）不因收回而作废——下一个申领人可以在现有分支基础上接续，未完成项是：cache 跨后端比对（落盘脚本未拿到cache 张量）、BF16 轮次（预算 1e-2）、性能三明治出包、draft PR。"
         }
       ],
       "result": null
