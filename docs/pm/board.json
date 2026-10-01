@@ -5514,7 +5514,7 @@
       "wave": "W0",
       "soc": "a5",
       "priority": "-",
-      "status": "assigned",
+      "status": "open",
       "model": [],
       "kernel": [
         "pgdn_fused_recurrent"
@@ -5541,20 +5541,8 @@
       "spec": "docs/pm/tasks/PK-06.md",
       "issue": 95,
       "pr": null,
-      "assignee": "limjiunnbin",
-      "assignee_caps": {
-        "agent": "Codex / GPT-6",
-        "socs": [
-          "a5"
-        ],
-        "soc_details": "CANN 9.1.0-beta.1，compiler/opp timestamp 20260509_173000235，OPP 内置含 ascend950/ascend910b/ascend910_93；GDA-04（GDN decode）已交付并合入，环境/源码/产物回执见 PR #136。",
-        "ascriptor": "yes library 90cfcdc720bbcd66e8bd4361c4dd4fbc1a2a57b5 / kernels b3b3f9c16df7c4626ed3c081032a1be5a753d0b1",
-        "fla": "yes pin e52dbc0ea19d3a40d7ab7f9eed855d2b473994d2；已只读核对 literal PGDN naive（sha256 3baa67a5…11e84b5e8）",
-        "python": "host 3.11.15/torch 2.10.0+cpu；Docker 3.12.14/torch 2.12.0+cu130/torch_npu 2.12.0；pytest 可用",
-        "fork": "limjiunnbin/ascend_fla_dev",
-        "availability": "持续在线，GDA-04 已合入后立即接续",
-        "session": "dev-20260928T020159Z-609dfa8f"
-      },
+      "assignee": null,
+      "assignee_caps": null,
       "branch": "task/PK-06",
       "timebox_h": 24,
       "reports": [
@@ -5581,6 +5569,10 @@
         {
           "at": "2026-09-28T16:52",
           "summary": "PM 补全规格（docs/pm/tasks/PK-06.md 全文重写，格式对齐 GDA-04：ABI 冻结表读自 ascend_fla/ops/pgdn_chunk_fwd.py 与 kernels/projects/a5/pgdn_chunk_fwd/contract.json 源码核实，双 oracle 定 A=naive_recurrent_precond_gated_delta_rule/B=独立 CPU FP32，吸收两轮只读预检的四点发现：14-entry prepare 联合清单、四节点 FP64 lift、非零 ATK 初态的量程界变化 A≤A0+t、chunk 仍 None-only 两个状态都要直传。BF16 显式拒绝的过期骨架条款已按 D-PM-35 更正为原生支持，与 board.json 既有 dtype:[bf16,fp32] 字段一致）。open -> assigned，指派给 issue #95 上的标准 APPLY（评论 5872799023，账号 limjiunnbin/session dev-20260928T020159Z-609dfa8f，GDA-04 合入后已转为对 PK-06 的正式申领）。ASSIGN 协议消息随后发到 issue #95。"
+        },
+        {
+          "at": "2026-10-01T20:52",
+          "summary": "收回（PM 自查发现的流程纠正，不是新事件触发）：ASSIGN 于 2026-09-28T17:05:02Z（issue #95 评论 5874796273，ack_within_h: 24），24h 窗口本应在 2026-09-29T17:05到期。核对 #95 自 ASSIGN 起的全部评论，没有任何 ACK 或其它协议消息——这条 24h-无-ACK 的收回在此之前的若干轮里被漏掉了（本 session 的心跳跟踪只续用了上下文里已有的两个截止时间 GD2-02/A2-13，没有在每轮重新推导全部在飞任务的截止时间，这是本 PM 的流程缺口，如实记录）。现按 PROTOCOL.md §3.3（与 PK-05 的 24h-无-ACK 收回同一先例）处理：assigned -> open，清空 assignee/assignee_caps，分支 task/PK-06 保留。规格docs/pm/tasks/PK-06.md 的完整工作（ABI 冻结表、双 oracle、14-entry prepare 清单、ATK 非零初态量程界等）继续有效，不因收回而重新讨论，下一个申领人直接按现有规格接。"
         }
       ],
       "result": null,
