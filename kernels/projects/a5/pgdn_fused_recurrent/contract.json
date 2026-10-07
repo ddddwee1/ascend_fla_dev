@@ -1,0 +1,1131 @@
+{
+  "schema": "ascriptor.kernel-unit/1",
+  "id": "a5.pgdn_fused_recurrent",
+  "kind": "kernel",
+  "description": "Short-step PGDN with head-local ATK and independent grouped main state, native BF16/FP32.",
+  "inputs": {
+    "q": {
+      "dtype": "float32",
+      "shape": [
+        "B",
+        "S",
+        "H",
+        128
+      ]
+    },
+    "k": {
+      "dtype": "float32",
+      "shape": [
+        "B",
+        "S",
+        "H",
+        128
+      ]
+    },
+    "v": {
+      "dtype": "float32",
+      "shape": [
+        "B",
+        "S",
+        "HV",
+        128
+      ]
+    },
+    "g_atk": {
+      "dtype": "float32",
+      "shape": [
+        "B",
+        "S",
+        "H"
+      ]
+    },
+    "g": {
+      "dtype": "float32",
+      "shape": [
+        "B",
+        "S",
+        "HV"
+      ]
+    },
+    "beta_atk": {
+      "dtype": "float32",
+      "shape": [
+        "B",
+        "S",
+        "H"
+      ]
+    },
+    "beta": {
+      "dtype": "float32",
+      "shape": [
+        "B",
+        "S",
+        "HV"
+      ]
+    },
+    "initial_state": {
+      "dtype": "float32",
+      "shape": [
+        "B",
+        "HV",
+        128,
+        128
+      ]
+    },
+    "initial_A_state": {
+      "dtype": "float32",
+      "shape": [
+        "B",
+        "H",
+        128
+      ]
+    }
+  },
+  "outputs": {
+    "o": {
+      "dtype": "float32",
+      "shape": [
+        "B",
+        "S",
+        "HV",
+        128
+      ]
+    },
+    "final_state": {
+      "dtype": "float32",
+      "shape": [
+        "B",
+        "HV",
+        128,
+        128
+      ]
+    },
+    "final_A_state": {
+      "dtype": "float32",
+      "shape": [
+        "B",
+        "H",
+        128
+      ]
+    }
+  },
+  "domain": {
+    "S": "1..16",
+    "K": 128,
+    "V": 128,
+    "grouping": "HV positive multiple of H; contiguous value-head groups",
+    "state": "independent None/nonzero main and ATK states, both fresh outputs",
+    "normalization": "FP32 x/max(norm(x),1e-12), q then scales128**-.5",
+    "numeric": "finite, nonnegative A, g/g_atk<=0, beta/beta_atk in[0,1], no FP32 intermediate overflow",
+    "block_dim": [
+      1,
+      2,
+      4,
+      8,
+      16,
+      28
+    ],
+    "qualification": "Candidate grid; hardware qualification pending",
+    "constants": {
+      "x": 1.5,
+      "eps": 1e-06,
+      "log_atk_scale": -0.2
+    }
+  },
+  "dependencies": {
+    "python": ">=3.10",
+    "ascriptor": "==0.1.0",
+    "host": [
+      "torch>=2.9",
+      "numpy",
+      "einops"
+    ]
+  },
+  "comparison": {
+    "default": {
+      "mode": "allclose",
+      "atol": 2e-05,
+      "rtol": 0.0002,
+      "max_relative_l2": 0.0001,
+      "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution."
+    }
+  },
+  "cases": [
+    {
+      "id": "full_float32",
+      "seed": 950000,
+      "parameters": {
+        "B": 1,
+        "S": 16,
+        "H": 16,
+        "HV": 32,
+        "state": "random",
+        "atk": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r1_s1_float32",
+      "seed": 950001,
+      "parameters": {
+        "B": 1,
+        "S": 1,
+        "H": 3,
+        "HV": 3,
+        "state": "random",
+        "atk": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r1_s2_float32",
+      "seed": 950002,
+      "parameters": {
+        "B": 1,
+        "S": 2,
+        "H": 3,
+        "HV": 3,
+        "state": "random",
+        "atk": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r1_s3_float32",
+      "seed": 950003,
+      "parameters": {
+        "B": 1,
+        "S": 3,
+        "H": 3,
+        "HV": 3,
+        "state": "random",
+        "atk": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r1_s7_float32",
+      "seed": 950004,
+      "parameters": {
+        "B": 1,
+        "S": 7,
+        "H": 3,
+        "HV": 3,
+        "state": "random",
+        "atk": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r1_s15_float32",
+      "seed": 950005,
+      "parameters": {
+        "B": 1,
+        "S": 15,
+        "H": 3,
+        "HV": 3,
+        "state": "random",
+        "atk": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r1_s16_float32",
+      "seed": 950006,
+      "parameters": {
+        "B": 1,
+        "S": 16,
+        "H": 3,
+        "HV": 3,
+        "state": "random",
+        "atk": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r2_s1_float32",
+      "seed": 950007,
+      "parameters": {
+        "B": 1,
+        "S": 1,
+        "H": 3,
+        "HV": 6,
+        "state": "random",
+        "atk": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r2_s2_float32",
+      "seed": 950008,
+      "parameters": {
+        "B": 1,
+        "S": 2,
+        "H": 3,
+        "HV": 6,
+        "state": "random",
+        "atk": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r2_s3_float32",
+      "seed": 950009,
+      "parameters": {
+        "B": 1,
+        "S": 3,
+        "H": 3,
+        "HV": 6,
+        "state": "random",
+        "atk": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r2_s7_float32",
+      "seed": 950010,
+      "parameters": {
+        "B": 1,
+        "S": 7,
+        "H": 3,
+        "HV": 6,
+        "state": "random",
+        "atk": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r2_s15_float32",
+      "seed": 950011,
+      "parameters": {
+        "B": 1,
+        "S": 15,
+        "H": 3,
+        "HV": 6,
+        "state": "random",
+        "atk": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r2_s16_float32",
+      "seed": 950012,
+      "parameters": {
+        "B": 1,
+        "S": 16,
+        "H": 3,
+        "HV": 6,
+        "state": "random",
+        "atk": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r4_s1_float32",
+      "seed": 950013,
+      "parameters": {
+        "B": 1,
+        "S": 1,
+        "H": 3,
+        "HV": 12,
+        "state": "random",
+        "atk": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r4_s2_float32",
+      "seed": 950014,
+      "parameters": {
+        "B": 1,
+        "S": 2,
+        "H": 3,
+        "HV": 12,
+        "state": "random",
+        "atk": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r4_s3_float32",
+      "seed": 950015,
+      "parameters": {
+        "B": 1,
+        "S": 3,
+        "H": 3,
+        "HV": 12,
+        "state": "random",
+        "atk": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r4_s7_float32",
+      "seed": 950016,
+      "parameters": {
+        "B": 1,
+        "S": 7,
+        "H": 3,
+        "HV": 12,
+        "state": "random",
+        "atk": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r4_s15_float32",
+      "seed": 950017,
+      "parameters": {
+        "B": 1,
+        "S": 15,
+        "H": 3,
+        "HV": 12,
+        "state": "random",
+        "atk": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r4_s16_float32",
+      "seed": 950018,
+      "parameters": {
+        "B": 1,
+        "S": 16,
+        "H": 3,
+        "HV": 12,
+        "state": "random",
+        "atk": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r8_s1_float32",
+      "seed": 950019,
+      "parameters": {
+        "B": 1,
+        "S": 1,
+        "H": 3,
+        "HV": 24,
+        "state": "random",
+        "atk": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r8_s2_float32",
+      "seed": 950020,
+      "parameters": {
+        "B": 1,
+        "S": 2,
+        "H": 3,
+        "HV": 24,
+        "state": "random",
+        "atk": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r8_s3_float32",
+      "seed": 950021,
+      "parameters": {
+        "B": 1,
+        "S": 3,
+        "H": 3,
+        "HV": 24,
+        "state": "random",
+        "atk": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r8_s7_float32",
+      "seed": 950022,
+      "parameters": {
+        "B": 1,
+        "S": 7,
+        "H": 3,
+        "HV": 24,
+        "state": "random",
+        "atk": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r8_s15_float32",
+      "seed": 950023,
+      "parameters": {
+        "B": 1,
+        "S": 15,
+        "H": 3,
+        "HV": 24,
+        "state": "random",
+        "atk": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "r8_s16_float32",
+      "seed": 950024,
+      "parameters": {
+        "B": 1,
+        "S": 16,
+        "H": 3,
+        "HV": 24,
+        "state": "random",
+        "atk": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "initial_none_none_float32",
+      "seed": 950025,
+      "parameters": {
+        "B": 2,
+        "S": 3,
+        "H": 2,
+        "HV": 8,
+        "state": "none",
+        "atk": "none",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "initial_none_zero_float32",
+      "seed": 950026,
+      "parameters": {
+        "B": 2,
+        "S": 3,
+        "H": 2,
+        "HV": 8,
+        "state": "none",
+        "atk": "zero",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "initial_none_random_float32",
+      "seed": 950027,
+      "parameters": {
+        "B": 2,
+        "S": 3,
+        "H": 2,
+        "HV": 8,
+        "state": "none",
+        "atk": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "initial_zero_none_float32",
+      "seed": 950028,
+      "parameters": {
+        "B": 2,
+        "S": 3,
+        "H": 2,
+        "HV": 8,
+        "state": "zero",
+        "atk": "none",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "initial_zero_zero_float32",
+      "seed": 950029,
+      "parameters": {
+        "B": 2,
+        "S": 3,
+        "H": 2,
+        "HV": 8,
+        "state": "zero",
+        "atk": "zero",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "initial_zero_random_float32",
+      "seed": 950030,
+      "parameters": {
+        "B": 2,
+        "S": 3,
+        "H": 2,
+        "HV": 8,
+        "state": "zero",
+        "atk": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "initial_random_none_float32",
+      "seed": 950031,
+      "parameters": {
+        "B": 2,
+        "S": 3,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "atk": "none",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "initial_random_zero_float32",
+      "seed": 950032,
+      "parameters": {
+        "B": 2,
+        "S": 3,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "atk": "zero",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "initial_random_random_float32",
+      "seed": 950033,
+      "parameters": {
+        "B": 2,
+        "S": 3,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "atk": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "many_heads_float32",
+      "seed": 950034,
+      "parameters": {
+        "B": 3,
+        "S": 3,
+        "H": 28,
+        "HV": 224,
+        "state": "random",
+        "atk": "random",
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "g_zero_float32",
+      "seed": 950035,
+      "parameters": {
+        "B": 2,
+        "S": 16,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "atk": "random",
+        "g": 0.0,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "g_large_float32",
+      "seed": 950036,
+      "parameters": {
+        "B": 2,
+        "S": 16,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "atk": "random",
+        "g": -30.0,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "g_underflow_float32",
+      "seed": 950037,
+      "parameters": {
+        "B": 2,
+        "S": 16,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "atk": "random",
+        "g": -1000.0,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "ga_zero_float32",
+      "seed": 950038,
+      "parameters": {
+        "B": 2,
+        "S": 16,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "atk": "random",
+        "g_atk": 0.0,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "ga_large_float32",
+      "seed": 950039,
+      "parameters": {
+        "B": 2,
+        "S": 16,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "atk": "random",
+        "g_atk": -30.0,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "ga_underflow_float32",
+      "seed": 950040,
+      "parameters": {
+        "B": 2,
+        "S": 16,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "atk": "random",
+        "g_atk": -1000.0,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "beta_zero_float32",
+      "seed": 950041,
+      "parameters": {
+        "B": 2,
+        "S": 16,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "atk": "random",
+        "beta": 0.0,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "beta_one_float32",
+      "seed": 950042,
+      "parameters": {
+        "B": 2,
+        "S": 16,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "atk": "random",
+        "beta": 1.0,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "ba_zero_float32",
+      "seed": 950043,
+      "parameters": {
+        "B": 2,
+        "S": 16,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "atk": "random",
+        "beta_atk": 0.0,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "ba_one_float32",
+      "seed": 950044,
+      "parameters": {
+        "B": 2,
+        "S": 16,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "atk": "random",
+        "beta_atk": 1.0,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "zero_q_float32",
+      "seed": 950045,
+      "parameters": {
+        "B": 2,
+        "S": 16,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "atk": "random",
+        "zero_q": true,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "zero_k_float32",
+      "seed": 950046,
+      "parameters": {
+        "B": 2,
+        "S": 16,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "atk": "random",
+        "zero_k": true,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "all_zero_float32",
+      "seed": 950047,
+      "parameters": {
+        "B": 2,
+        "S": 16,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "atk": "random",
+        "all_zero": true,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "norm_below_clamp_float32",
+      "seed": 950048,
+      "parameters": {
+        "B": 2,
+        "S": 16,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "atk": "random",
+        "qk_scale": 1e-14,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "norm_above_clamp_float32",
+      "seed": 950049,
+      "parameters": {
+        "B": 2,
+        "S": 16,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "atk": "random",
+        "qk_scale": 1e-11,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "state_large_float32",
+      "seed": 950050,
+      "parameters": {
+        "B": 2,
+        "S": 16,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "atk": "random",
+        "state_scale": 16.0,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "state_small_float32",
+      "seed": 950051,
+      "parameters": {
+        "B": 2,
+        "S": 16,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "atk": "random",
+        "state_scale": 1e-06,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "atk_large_float32",
+      "seed": 950052,
+      "parameters": {
+        "B": 2,
+        "S": 16,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "atk": "random",
+        "atk_scale": 1e+30,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "atk_small_float32",
+      "seed": 950053,
+      "parameters": {
+        "B": 2,
+        "S": 16,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "atk": "random",
+        "atk_scale": 1e-30,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "atk_tiny_decay_large_initial_float32",
+      "seed": 950054,
+      "parameters": {
+        "B": 2,
+        "S": 1,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "atk": "random",
+        "atk_scale": 1e+30,
+        "g_atk": -100.0,
+        "beta_atk": 0.0,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "signed_spikes_float32",
+      "seed": 950055,
+      "parameters": {
+        "B": 2,
+        "S": 16,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "atk": "random",
+        "spikes": true,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "atk_decay_87.3_float32",
+      "seed": 950056,
+      "parameters": {
+        "B": 2,
+        "S": 1,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "atk": "random",
+        "atk_scale": 1e+30,
+        "g_atk": -87.3,
+        "beta_atk": 0.0,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "atk_decay_87.34_float32",
+      "seed": 950057,
+      "parameters": {
+        "B": 2,
+        "S": 1,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "atk": "random",
+        "atk_scale": 1e+30,
+        "g_atk": -87.34,
+        "beta_atk": 0.0,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "atk_decay_88_float32",
+      "seed": 950058,
+      "parameters": {
+        "B": 2,
+        "S": 1,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "atk": "random",
+        "atk_scale": 1e+30,
+        "g_atk": -88.0,
+        "beta_atk": 0.0,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "atk_decay_90_float32",
+      "seed": 950059,
+      "parameters": {
+        "B": 2,
+        "S": 1,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "atk": "random",
+        "atk_scale": 1e+30,
+        "g_atk": -90.0,
+        "beta_atk": 0.0,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "atk_decay_95_float32",
+      "seed": 950060,
+      "parameters": {
+        "B": 2,
+        "S": 1,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "atk": "random",
+        "atk_scale": 1e+30,
+        "g_atk": -95.0,
+        "beta_atk": 0.0,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "atk_decay_103_float32",
+      "seed": 950061,
+      "parameters": {
+        "B": 2,
+        "S": 1,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "atk": "random",
+        "atk_scale": 1e+30,
+        "g_atk": -103.0,
+        "beta_atk": 0.0,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    },
+    {
+      "id": "atk_decay_104_float32",
+      "seed": 950062,
+      "parameters": {
+        "B": 2,
+        "S": 1,
+        "H": 2,
+        "HV": 8,
+        "state": "random",
+        "atk": "random",
+        "atk_scale": 1e+30,
+        "g_atk": -104.0,
+        "beta_atk": 0.0,
+        "dtype": "float32"
+      },
+      "block_dim": 1
+    }
+  ],
+  "support": [
+    {
+      "device": "a5",
+      "backend": "cce",
+      "stage": "reference",
+      "status": "untested",
+      "reason": "Current candidate acceptance pending; no inherited qualification."
+    },
+    {
+      "device": "a5",
+      "backend": "cce",
+      "stage": "emit",
+      "status": "untested",
+      "reason": "Current candidate acceptance pending; no inherited qualification."
+    },
+    {
+      "device": "a5",
+      "backend": "cce",
+      "stage": "compile",
+      "status": "untested",
+      "reason": "Current candidate acceptance pending; no inherited qualification."
+    },
+    {
+      "device": "a5",
+      "backend": "cce",
+      "stage": "sim",
+      "status": "untested",
+      "reason": "Current candidate acceptance pending; no inherited qualification."
+    },
+    {
+      "device": "a5",
+      "backend": "cce",
+      "stage": "pipesim",
+      "status": "untested",
+      "reason": "Current candidate acceptance pending; no inherited qualification."
+    },
+    {
+      "device": "a5",
+      "backend": "cce",
+      "stage": "board",
+      "status": "untested",
+      "reason": "Current candidate acceptance pending; no inherited qualification."
+    }
+  ],
+  "provenance": {
+    "algorithm": "FLA pinned naive_recurrent_precond_gated_delta_rule; literal hash-checked A plus independent B",
+    "implementation": "Head-local ATK and grouped main state in one pure-vector PGDN launch",
+    "library": "90cfcdc720bbcd66e8bd4361c4dd4fbc1a2a57b5",
+    "kernels": "b3b3f9c16df7c4626ed3c081032a1be5a753d0b1"
+  }
+}
