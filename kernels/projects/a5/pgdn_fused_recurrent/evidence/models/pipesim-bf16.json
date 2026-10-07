@@ -1,0 +1,37 @@
+{
+  "case": {"id": "bf16_S3_H2_HV4_independent_initial", "B": 1, "S": 3, "H": 2, "HV": 4, "state": "none", "atk": "random", "dtype": "bfloat16", "seed": 954001},
+  "stage": "pipesim",
+  "comparison": {
+    "passed": true,
+    "metrics": {
+      "A": {
+        "o": {"relative_l2": 0.0016393649413572607, "max_abs": 5.823001265525818e-05, "finite": true, "reference_norm": 0.21127112203017673, "error_norm": 0.00034635047057748333},
+        "final_state": {"relative_l2": 2.3412859918618012e-08, "max_abs": 2.9802322387695312e-08, "finite": true, "reference_norm": 16.510382728188617, "error_norm": 3.865552780178504e-07},
+        "final_A_state": {"relative_l2": 0.0, "max_abs": 0.0, "finite": true, "reference_norm": 3.640147029364453, "error_norm": 0.0}
+      },
+      "B": {
+        "o": {"relative_l2": 0.0016393696500128004, "max_abs": 5.823001265525818e-05, "finite": true, "reference_norm": 0.2112711225619399, "error_norm": 0.00034635146625217885},
+        "final_state": {"relative_l2": 1.7251770669764847e-08, "max_abs": 2.9802322387695312e-08, "finite": true, "reference_norm": 16.510382724046814, "error_norm": 2.8483333642530305e-07},
+        "final_A_state": {"relative_l2": 0.0, "max_abs": 0.0, "finite": true, "reference_norm": 3.640147029364453, "error_norm": 0.0}
+      }
+    }
+  },
+  "execution": [
+    {
+      "kernel": "pgdn_recurrent_bf16",
+      "device": "a5",
+      "requested_backend": "cce",
+      "stage": "pipesim",
+      "launcher": "pipesim",
+      "block_dim": 1,
+      "model": "lowered events and hazards",
+      "backend_executed": false,
+      "event_balance": [],
+      "hazards": [],
+      "deadlock": null,
+      "model_cycles": 27272,
+      "sim_processes": "threads"
+    }
+  ],
+  "passed": true
+}

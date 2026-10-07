@@ -1,0 +1,128 @@
+{
+  "stage": "source_emission",
+  "device_execution": false,
+  "files_sha256": {"zero_atk.h": "3b1d0333d1e2812cb0cfb75cb4a8e8826ef099e06ea75482e068dba0057188e9", "widen.h": "74b6bf60fcf1875258d8c9c08517b71cd7e74c542d2111e6c4588599a3f32527", "atk_tile.h": "6740cf52b27f96926090d49fad83a9a5008baf3ac736323fc6f5989d25f7a9e6", "zero_state.h": "73b519847a66c84b1cbf577363e88c1865e5298a5aab9bfbf2bf0ea7d7b192b1", "advance.h": "538fc8da9b79fae446fb244ac7eccc175faf28ef46dbed13ee164269e2fbb32a", "narrow_output.h": "8f23bfc5a8fbd34e2c61ac4d53053b9a3e0c611f4acff09a7a4d7f46317c3b1e", "pgdn_recurrent_bf16_vec.h": "766ff5fa2ceaf9330e51083c74b2a2f2c51c0b6a07272b70ffc0c52bbde0153c", "pgdn_recurrent_bf16.cpp": "06b371c79163671678c542ae66d5e5c285be82900be6d86e958df1577012bc70", "tensorutils_cce.h": "73965f4ed6c9afaf1eb96724a47b6a3cca2e15c9615afc4958b05831782d2bc9", "scalar_math.h": "a49ae04e54ad1999222c1ca925a1f624f36df2551ae9fed73a8b0a1461081f7e", "manifest.json": "4da8daa3ed33122a5d33804a276dbf834299577958129edff294a4db2c45f1c1"},
+  "UB_bytes": 125472,
+  "manifest": {
+    "backend": "cce",
+    "arch": "c310",
+    "kernel": "pgdn_recurrent_bf16",
+    "ir_kernel": "pgdn_recurrent_bf16",
+    "device": "950",
+    "mode": "vec",
+    "task_type": "KERNEL_TYPE_AIV_ONLY",
+    "block_dim": 1,
+    "params": [
+      {
+        "name": "q",
+        "ir_name": "q",
+        "kind": "tensor",
+        "dtype": "bf16",
+        "dims": ["B", "S", "H", 128],
+        "output": false
+      },
+      {
+        "name": "k",
+        "ir_name": "k",
+        "kind": "tensor",
+        "dtype": "bf16",
+        "dims": ["B", "S", "H", 128],
+        "output": false
+      },
+      {
+        "name": "v",
+        "ir_name": "v",
+        "kind": "tensor",
+        "dtype": "bf16",
+        "dims": ["B", "S", "HV", 128],
+        "output": false
+      },
+      {
+        "name": "g_atk",
+        "ir_name": "g_atk",
+        "kind": "tensor",
+        "dtype": "f32",
+        "dims": ["B", "S", "H"],
+        "output": false
+      },
+      {
+        "name": "g",
+        "ir_name": "g",
+        "kind": "tensor",
+        "dtype": "f32",
+        "dims": ["B", "S", "HV"],
+        "output": false
+      },
+      {
+        "name": "beta_atk",
+        "ir_name": "beta_atk",
+        "kind": "tensor",
+        "dtype": "f32",
+        "dims": ["B", "S", "H"],
+        "output": false
+      },
+      {
+        "name": "beta",
+        "ir_name": "beta",
+        "kind": "tensor",
+        "dtype": "f32",
+        "dims": ["B", "S", "HV"],
+        "output": false
+      },
+      {
+        "name": "initial_state",
+        "ir_name": "initial_state",
+        "kind": "tensor",
+        "dtype": "f32",
+        "dims": ["B", "HV", 128, 128],
+        "output": false
+      },
+      {
+        "name": "initial_A_state",
+        "ir_name": "initial_A_state",
+        "kind": "tensor",
+        "dtype": "f32",
+        "dims": ["B", "H", 128],
+        "output": false
+      },
+      {
+        "name": "o",
+        "ir_name": "o",
+        "kind": "tensor",
+        "dtype": "bf16",
+        "dims": ["B", "S", "HV", 128],
+        "output": true
+      },
+      {
+        "name": "final_state",
+        "ir_name": "final_state",
+        "kind": "tensor",
+        "dtype": "f32",
+        "dims": ["B", "HV", 128, 128],
+        "output": true
+      },
+      {
+        "name": "final_A_state",
+        "ir_name": "final_A_state",
+        "kind": "tensor",
+        "dtype": "f32",
+        "dims": ["B", "H", 128],
+        "output": true
+      },
+      {"name": "B", "ir_name": "B", "kind": "scalar", "dtype": "i32"},
+      {"name": "S", "ir_name": "S", "kind": "scalar", "dtype": "i32"},
+      {"name": "H", "ir_name": "H", "kind": "scalar", "dtype": "i32"},
+      {"name": "HV", "ir_name": "HV", "kind": "scalar", "dtype": "i32"},
+      {"name": "HAS_INITIAL", "ir_name": "HAS_INITIAL", "kind": "scalar", "dtype": "i32"},
+      {"name": "HAS_A", "ir_name": "HAS_A", "kind": "scalar", "dtype": "i32"}
+    ],
+    "outputs": ["o", "final_state", "final_A_state"],
+    "workspaces": [],
+    "sides": ["vec"],
+    "vf": ["zero_atk", "widen", "atk_tile", "zero_state", "advance", "narrow_output"],
+    "simt": {},
+    "ops": 427,
+    "files": ["advance.h", "atk_tile.h", "narrow_output.h", "pgdn_recurrent_bf16.cpp", "pgdn_recurrent_bf16_vec.h", "scalar_math.h", "tensorutils_cce.h", "widen.h", "zero_atk.h", "zero_state.h"],
+    "entry": "pgdn_recurrent_bf16.cpp"
+  }
+}

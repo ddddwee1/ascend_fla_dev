@@ -1,0 +1,25 @@
+{
+  "sha256": "9841a4c5ee3f5d6bf8fe77ceb56819f898bb3e76ae69edf1c42b436a84095eb0",
+  "lines": [
+    {"line": 1, "text": "#include \"tensorutils_cce.h\""},
+    {"line": 2, "text": "using namespace ascrip;"},
+    {"line": 3, "text": "#include \"pgdn_recurrent_fp32_vec.h\""},
+    {"line": 4, "text": ""},
+    {"line": 5, "text": ""},
+    {"line": 6, "text": "extern \"C\" __global__ __aicore__ void pgdn_recurrent_fp32(GM_ADDR q, GM_ADDR k, GM_ADDR v, GM_ADDR g_atk, GM_ADDR g, GM_ADDR beta_atk, GM_ADDR beta, GM_ADDR initial_state, GM_ADDR initial_A_state, GM_ADDR o, GM_ADDR final_state, GM_ADDR final_A_state, GM_ADDR workspace, GM_ADDR tiling)"},
+    {"line": 7, "text": "{"},
+    {"line": 8, "text": "    KERNEL_TASK_TYPE_DEFAULT(KERNEL_TYPE_AIV_ONLY);"},
+    {"line": 9, "text": "    GET_TILING_DATA(tiling_data, tiling);"},
+    {"line": 10, "text": "    pipe_barrier(PIPE_ALL);"},
+    {"line": 11, "text": "    const int32_t B = tiling_data.B;"},
+    {"line": 12, "text": "    const int32_t S = tiling_data.S;"},
+    {"line": 13, "text": "    const int32_t H = tiling_data.H;"},
+    {"line": 14, "text": "    const int32_t HV = tiling_data.HV;"},
+    {"line": 15, "text": "    const int32_t HAS_INITIAL = tiling_data.HAS_INITIAL;"},
+    {"line": 16, "text": "    const int32_t HAS_A = tiling_data.HAS_A;"},
+    {"line": 17, "text": "    if ASCEND_IS_AIV {"},
+    {"line": 18, "text": "        pgdn_recurrent_fp32_vec(q, k, v, g_atk, g, beta_atk, beta, initial_state, initial_A_state, o, final_state, final_A_state, B, S, H, HV, HAS_INITIAL, HAS_A, workspace);"},
+    {"line": 19, "text": "    }"},
+    {"line": 20, "text": "}"}
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "sha256": "3b1d0333d1e2812cb0cfb75cb4a8e8826ef099e06ea75482e068dba0057188e9",
+  "lines": [
+    {"line": 1, "text": "#pragma once"},
+    {"line": 2, "text": "#include \"tensorutils_cce.h\""},
+    {"line": 3, "text": "using namespace ascrip;"},
+    {"line": 4, "text": ""},
+    {"line": 5, "text": "__aicore__ inline void zero_atk(__ubuf__ float* state)"},
+    {"line": 6, "text": "{"},
+    {"line": 7, "text": "    __VEC_SCOPE__"},
+    {"line": 8, "text": "    {"},
+    {"line": 9, "text": "        vector_f32 value_0;  // #38"},
+    {"line": 10, "text": "        vector_f32 value_1;  // #39"},
+    {"line": 11, "text": "        vbr(value_0, (float)(0.0f));  // #40"},
+    {"line": 12, "text": "        vbr(value_1, (float)(0.0f));  // #41"},
+    {"line": 13, "text": "        vsts((vector_u32&)value_0, (__ubuf__ uint32_t*)state, 0, NORM_B32, pset_b8(PAT_ALL));  // #42"},
+    {"line": 14, "text": "        vsts((vector_u32&)value_1, (__ubuf__ uint32_t*)state, 64, NORM_B32, pset_b8(PAT_ALL));  // #43"},
+    {"line": 15, "text": "        mem_bar(VST_VLD);  // #44"},
+    {"line": 16, "text": "    }"},
+    {"line": 17, "text": "}"}
+  ]
+}

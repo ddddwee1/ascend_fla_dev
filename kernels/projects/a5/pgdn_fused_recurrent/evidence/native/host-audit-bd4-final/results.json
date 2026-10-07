@@ -1,0 +1,959 @@
+{
+  "stage": "native_public_host_work_audit",
+  "block_dim": 4,
+  "observed": "ATen operations within prepared public inprocess calls; CCE execution is outside ATen.",
+  "excluded": "Preparation, input generation, H2D, CPU oracle execution and result copies are outside observation.",
+  "records": [
+    {
+      "case": {"id": "float32_none_none", "B": 1, "S": 16, "H": 16, "HV": 32, "dtype": "float32", "state": "none", "atk": "none", "seed": 953100},
+      "operations": [
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 32, 128, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 60, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 19, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 60, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 20, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 32, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 60, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 21, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 32, 128, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 60, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 22, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 60, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 23, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [16777216],
+          "dtype": "torch.uint8",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 60, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 28, "function": "run"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 131, "function": "launch"},
+            {"file": "ascend_fla/runtime/compile.py", "line": 128, "function": "__call__"},
+            {"file": "ascend_fla/runtime/binding.py", "line": 318, "function": "__call__"},
+            {"file": "ascend_fla/runtime/binding.py", "line": 273, "function": "_workspace"}
+          ]
+        }
+      ],
+      "output_final_state_false_operations": [
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 32, 128, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 71, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 19, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 71, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 20, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 32, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 71, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 21, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 32, 128, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 71, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 22, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 71, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 23, "function": "run"}
+          ]
+        }
+      ],
+      "expected_allocations": 5,
+      "unexpected": [],
+      "additional_binding_workspace_allocations": 1,
+      "output_flag_checked": true,
+      "comparison": {
+        "passed": true,
+        "metrics": {
+          "A": {
+            "o": {"relative_l2": 2.208823258738192e-07, "max_abs": 1.4901161193847656e-08, "finite": true, "reference_norm": 1.771526432442915, "error_norm": 3.912988787449403e-07},
+            "final_state": {"relative_l2": 1.2535266220183587e-07, "max_abs": 1.1920928955078125e-07, "finite": true, "reference_norm": 63.51630860048451, "error_norm": 7.961938376304097e-06},
+            "final_A_state": {"relative_l2": 9.927445176797077e-08, "max_abs": 1.4901161193847656e-08, "finite": true, "reference_norm": 1.3450380740164314, "error_norm": 1.3352791740502852e-07}
+          },
+          "B": {
+            "o": {"relative_l2": 2.1918299640957746e-07, "max_abs": 1.4901161193847656e-08, "finite": true, "reference_norm": 1.7715264343502746, "error_norm": 3.882884720996678e-07},
+            "final_state": {"relative_l2": 1.233773219905982e-07, "max_abs": 1.1920928955078125e-07, "finite": true, "reference_norm": 63.51630858277598, "error_norm": 7.836472055671348e-06},
+            "final_A_state": {"relative_l2": 9.927445176797077e-08, "max_abs": 1.4901161193847656e-08, "finite": true, "reference_norm": 1.3450380740164314, "error_norm": 1.3352791740502852e-07}
+          }
+        }
+      },
+      "passed": true
+    },
+    {
+      "case": {"id": "float32_none_random", "B": 1, "S": 16, "H": 16, "HV": 32, "dtype": "float32", "state": "none", "atk": "random", "seed": 953100},
+      "operations": [
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 32, 128, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 60, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 19, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 32, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 60, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 21, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 32, 128, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 60, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 22, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 60, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 23, "function": "run"}
+          ]
+        }
+      ],
+      "output_final_state_false_operations": [
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 32, 128, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 71, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 19, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 32, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 71, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 21, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 32, 128, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 71, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 22, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 71, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 23, "function": "run"}
+          ]
+        }
+      ],
+      "expected_allocations": 4,
+      "unexpected": [],
+      "additional_binding_workspace_allocations": 0,
+      "output_flag_checked": true,
+      "comparison": {
+        "passed": true,
+        "metrics": {
+          "A": {
+            "o": {"relative_l2": 2.2089498140619198e-07, "max_abs": 1.6763806343078613e-08, "finite": true, "reference_norm": 1.6695379797413874, "error_norm": 3.687925609919051e-07},
+            "final_state": {"relative_l2": 1.2393499165369193e-07, "max_abs": 1.1920928955078125e-07, "finite": true, "reference_norm": 61.532368074372194, "error_norm": 7.626013523729218e-06},
+            "final_A_state": {"relative_l2": 1.245299429634112e-07, "max_abs": 5.960464477539063e-08, "finite": true, "reference_norm": 3.093562967842929, "error_norm": 3.8524121993920093e-07}
+          },
+          "B": {
+            "o": {"relative_l2": 2.1907066133209378e-07, "max_abs": 1.4901161193847656e-08, "finite": true, "reference_norm": 1.6695379801431047, "error_norm": 3.65746789428998e-07},
+            "final_state": {"relative_l2": 1.2210269749402046e-07, "max_abs": 1.1920928955078125e-07, "finite": true, "reference_norm": 61.53236808774669, "error_norm": 7.5132681267088526e-06},
+            "final_A_state": {"relative_l2": 1.245299429634112e-07, "max_abs": 5.960464477539063e-08, "finite": true, "reference_norm": 3.093562967842929, "error_norm": 3.8524121993920093e-07}
+          }
+        }
+      },
+      "passed": true
+    },
+    {
+      "case": {"id": "float32_random_none", "B": 1, "S": 16, "H": 16, "HV": 32, "dtype": "float32", "state": "random", "atk": "none", "seed": 953100},
+      "operations": [
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 60, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 20, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 32, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 60, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 21, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 32, 128, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 60, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 22, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 60, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 23, "function": "run"}
+          ]
+        }
+      ],
+      "output_final_state_false_operations": [
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 71, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 20, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 32, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 71, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 21, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 32, 128, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 71, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 22, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 71, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 23, "function": "run"}
+          ]
+        }
+      ],
+      "expected_allocations": 4,
+      "unexpected": [],
+      "additional_binding_workspace_allocations": 0,
+      "output_flag_checked": true,
+      "comparison": {
+        "passed": true,
+        "metrics": {
+          "A": {
+            "o": {"relative_l2": 2.1597570901367252e-07, "max_abs": 1.862645149230957e-08, "finite": true, "reference_norm": 2.3723914866215425, "error_norm": 5.123789333810883e-07},
+            "final_state": {"relative_l2": 1.3301871006350345e-07, "max_abs": 1.341104507446289e-07, "finite": true, "reference_norm": 65.61875696772061, "error_norm": 8.728522407816726e-06},
+            "final_A_state": {"relative_l2": 9.927445176797077e-08, "max_abs": 1.4901161193847656e-08, "finite": true, "reference_norm": 1.3450380740164314, "error_norm": 1.3352791740502852e-07}
+          },
+          "B": {
+            "o": {"relative_l2": 2.1226907335477025e-07, "max_abs": 2.2351741790771484e-08, "finite": true, "reference_norm": 2.372391486058506, "error_norm": 5.035853423803854e-07},
+            "final_state": {"relative_l2": 1.3018246961609556e-07, "max_abs": 1.341104507446289e-07, "finite": true, "reference_norm": 65.61875696147504, "error_norm": 8.542411834383184e-06},
+            "final_A_state": {"relative_l2": 9.927445176797077e-08, "max_abs": 1.4901161193847656e-08, "finite": true, "reference_norm": 1.3450380740164314, "error_norm": 1.3352791740502852e-07}
+          }
+        }
+      },
+      "passed": true
+    },
+    {
+      "case": {"id": "float32_random_random", "B": 1, "S": 16, "H": 16, "HV": 32, "dtype": "float32", "state": "random", "atk": "random", "seed": 953100},
+      "operations": [
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 32, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 60, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 21, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 32, 128, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 60, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 22, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 60, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 23, "function": "run"}
+          ]
+        }
+      ],
+      "output_final_state_false_operations": [
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 32, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 71, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 21, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 32, 128, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 71, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 22, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 71, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 23, "function": "run"}
+          ]
+        }
+      ],
+      "expected_allocations": 3,
+      "unexpected": [],
+      "additional_binding_workspace_allocations": 0,
+      "output_flag_checked": true,
+      "comparison": {
+        "passed": true,
+        "metrics": {
+          "A": {
+            "o": {"relative_l2": 2.1537605861287446e-07, "max_abs": 1.862645149230957e-08, "finite": true, "reference_norm": 2.2975589736587887, "error_norm": 4.94839196177271e-07},
+            "final_state": {"relative_l2": 1.3208028647882262e-07, "max_abs": 1.1920928955078125e-07, "finite": true, "reference_norm": 63.70173428838715, "error_norm": 8.413743314008014e-06},
+            "final_A_state": {"relative_l2": 1.245299429634112e-07, "max_abs": 5.960464477539063e-08, "finite": true, "reference_norm": 3.093562967842929, "error_norm": 3.8524121993920093e-07}
+          },
+          "B": {
+            "o": {"relative_l2": 2.1181054026392683e-07, "max_abs": 1.4901161193847656e-08, "finite": true, "reference_norm": 2.2975589707671102, "error_norm": 4.866472068864133e-07},
+            "final_state": {"relative_l2": 1.2964693672956518e-07, "max_abs": 1.1920928955078125e-07, "finite": true, "reference_norm": 63.701734279993715, "error_norm": 8.258734713761919e-06},
+            "final_A_state": {"relative_l2": 1.245299429634112e-07, "max_abs": 5.960464477539063e-08, "finite": true, "reference_norm": 3.093562967842929, "error_norm": 3.8524121993920093e-07}
+          }
+        }
+      },
+      "passed": true
+    },
+    {
+      "case": {"id": "bfloat16_none_none", "B": 1, "S": 16, "H": 16, "HV": 32, "dtype": "bfloat16", "state": "none", "atk": "none", "seed": 953100},
+      "operations": [
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 32, 128, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 60, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 19, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 60, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 20, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 32, 128],
+          "dtype": "torch.bfloat16",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 60, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 21, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 32, 128, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 60, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 22, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 60, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 23, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [16777216],
+          "dtype": "torch.uint8",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 60, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 28, "function": "run"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 131, "function": "launch"},
+            {"file": "ascend_fla/runtime/compile.py", "line": 128, "function": "__call__"},
+            {"file": "ascend_fla/runtime/binding.py", "line": 318, "function": "__call__"},
+            {"file": "ascend_fla/runtime/binding.py", "line": 273, "function": "_workspace"}
+          ]
+        }
+      ],
+      "output_final_state_false_operations": [
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 32, 128, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 71, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 19, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 71, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 20, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 32, 128],
+          "dtype": "torch.bfloat16",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 71, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 21, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 32, 128, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 71, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 22, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 71, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 23, "function": "run"}
+          ]
+        }
+      ],
+      "expected_allocations": 5,
+      "unexpected": [],
+      "additional_binding_workspace_allocations": 1,
+      "output_flag_checked": true,
+      "comparison": {
+        "passed": true,
+        "metrics": {
+          "A": {
+            "o": {"relative_l2": 0.0016681416622938584, "max_abs": 0.00012142211198806763, "finite": true, "reference_norm": 1.7715411562918992, "error_norm": 0.0029551816092787528},
+            "final_state": {"relative_l2": 1.2405580283110995e-07, "max_abs": 1.1920928955078125e-07, "finite": true, "reference_norm": 63.51627903982259, "error_norm": 7.879562989129993e-06},
+            "final_A_state": {"relative_l2": 1.0210219960365603e-07, "max_abs": 1.862645149230957e-08, "finite": true, "reference_norm": 1.345061807626838, "error_norm": 1.373337691615698e-07}
+          },
+          "B": {
+            "o": {"relative_l2": 0.0016681432644851228, "max_abs": 0.00012142211198806763, "finite": true, "reference_norm": 1.771541157765159, "error_norm": 0.0029551844500841262},
+            "final_state": {"relative_l2": 1.2230006370366102e-07, "max_abs": 1.1920928955078125e-07, "finite": true, "reference_norm": 63.51627905298583, "error_norm": 7.768044974399677e-06},
+            "final_A_state": {"relative_l2": 1.0210219960365603e-07, "max_abs": 1.862645149230957e-08, "finite": true, "reference_norm": 1.345061807626838, "error_norm": 1.373337691615698e-07}
+          }
+        }
+      },
+      "passed": true
+    },
+    {
+      "case": {"id": "bfloat16_none_random", "B": 1, "S": 16, "H": 16, "HV": 32, "dtype": "bfloat16", "state": "none", "atk": "random", "seed": 953100},
+      "operations": [
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 32, 128, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 60, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 19, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 32, 128],
+          "dtype": "torch.bfloat16",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 60, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 21, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 32, 128, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 60, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 22, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 60, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 23, "function": "run"}
+          ]
+        }
+      ],
+      "output_final_state_false_operations": [
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 32, 128, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 71, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 19, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 32, 128],
+          "dtype": "torch.bfloat16",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 71, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 21, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 32, 128, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 71, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 22, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 71, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 23, "function": "run"}
+          ]
+        }
+      ],
+      "expected_allocations": 4,
+      "unexpected": [],
+      "additional_binding_workspace_allocations": 0,
+      "output_flag_checked": true,
+      "comparison": {
+        "passed": true,
+        "metrics": {
+          "A": {
+            "o": {"relative_l2": 0.0016619454483344873, "max_abs": 0.00011531263589859009, "finite": true, "reference_norm": 1.6695500378473842, "error_norm": 0.0027747010861671312},
+            "final_state": {"relative_l2": 1.248770611840101e-07, "max_abs": 1.1920928955078125e-07, "finite": true, "reference_norm": 61.53227933258303, "error_norm": 7.68397021100657e-06},
+            "final_A_state": {"relative_l2": 1.1998530887106804e-07, "max_abs": 4.470348358154297e-08, "finite": true, "reference_norm": 3.0935815204764343, "error_norm": 3.711843342521933e-07}
+          },
+          "B": {
+            "o": {"relative_l2": 0.0016619443937816287, "max_abs": 0.00011531263589859009, "finite": true, "reference_norm": 1.669550038107102, "error_norm": 0.0027746993259700026},
+            "final_state": {"relative_l2": 1.226850242378728e-07, "max_abs": 1.1920928955078125e-07, "finite": true, "reference_norm": 61.53227933302446, "error_norm": 7.549089181383664e-06},
+            "final_A_state": {"relative_l2": 1.1998530887106804e-07, "max_abs": 4.470348358154297e-08, "finite": true, "reference_norm": 3.0935815204764343, "error_norm": 3.711843342521933e-07}
+          }
+        }
+      },
+      "passed": true
+    },
+    {
+      "case": {"id": "bfloat16_random_none", "B": 1, "S": 16, "H": 16, "HV": 32, "dtype": "bfloat16", "state": "random", "atk": "none", "seed": 953100},
+      "operations": [
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 60, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 20, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 32, 128],
+          "dtype": "torch.bfloat16",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 60, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 21, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 32, 128, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 60, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 22, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 60, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 23, "function": "run"}
+          ]
+        }
+      ],
+      "output_final_state_false_operations": [
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 71, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 20, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 32, 128],
+          "dtype": "torch.bfloat16",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 71, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 21, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 32, 128, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 71, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 22, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 71, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 23, "function": "run"}
+          ]
+        }
+      ],
+      "expected_allocations": 4,
+      "unexpected": [],
+      "additional_binding_workspace_allocations": 0,
+      "output_flag_checked": true,
+      "comparison": {
+        "passed": true,
+        "metrics": {
+          "A": {
+            "o": {"relative_l2": 0.0016680449676635314, "max_abs": 0.0001214146614074707, "finite": true, "reference_norm": 2.372357192246112, "error_norm": 0.003957198476026512},
+            "final_state": {"relative_l2": 1.3191337570670689e-07, "max_abs": 1.1920928955078125e-07, "finite": true, "reference_norm": 65.61873763785458, "error_norm": 8.65598919142214e-06},
+            "final_A_state": {"relative_l2": 1.0210219960365603e-07, "max_abs": 1.862645149230957e-08, "finite": true, "reference_norm": 1.345061807626838, "error_norm": 1.373337691615698e-07}
+          },
+          "B": {
+            "o": {"relative_l2": 0.0016680455142651716, "max_abs": 0.00012140721082687378, "finite": true, "reference_norm": 2.372357187922266, "error_norm": 0.0039571997655484725},
+            "final_state": {"relative_l2": 1.2945563289251124e-07, "max_abs": 1.1920928955078125e-07, "finite": true, "reference_norm": 65.61873764336104, "error_norm": 8.494715211228956e-06},
+            "final_A_state": {"relative_l2": 1.0210219960365603e-07, "max_abs": 1.862645149230957e-08, "finite": true, "reference_norm": 1.345061807626838, "error_norm": 1.373337691615698e-07}
+          }
+        }
+      },
+      "passed": true
+    },
+    {
+      "case": {"id": "bfloat16_random_random", "B": 1, "S": 16, "H": 16, "HV": 32, "dtype": "bfloat16", "state": "random", "atk": "random", "seed": 953100},
+      "operations": [
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 32, 128],
+          "dtype": "torch.bfloat16",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 60, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 21, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 32, 128, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 60, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 22, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 60, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 23, "function": "run"}
+          ]
+        }
+      ],
+      "output_final_state_false_operations": [
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 32, 128],
+          "dtype": "torch.bfloat16",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 71, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 21, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 32, 128, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 71, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 22, "function": "run"}
+          ]
+        },
+        {
+          "operator": "aten.empty.memory_format",
+          "shape": [1, 16, 128],
+          "dtype": "torch.float32",
+          "call_sites": [
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 92, "function": "<module>"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/audit_host_work.py", "line": 71, "function": "main"},
+            {"file": "ascend_fla/ops/pgdn_fused_recurrent.py", "line": 141, "function": "fused_recurrent_pgdn"},
+            {"file": "kernels/projects/a5/pgdn_fused_recurrent/kernels/pipeline.py", "line": 23, "function": "run"}
+          ]
+        }
+      ],
+      "expected_allocations": 3,
+      "unexpected": [],
+      "additional_binding_workspace_allocations": 0,
+      "output_flag_checked": true,
+      "comparison": {
+        "passed": true,
+        "metrics": {
+          "A": {
+            "o": {"relative_l2": 0.0016678715914141464, "max_abs": 0.00012164190411567688, "finite": true, "reference_norm": 2.297522922308001, "error_norm": 0.0038319732127403256},
+            "final_state": {"relative_l2": 1.3192594173539902e-07, "max_abs": 1.1920928955078125e-07, "finite": true, "reference_norm": 63.70165734741643, "error_norm": 8.403901135663613e-06},
+            "final_A_state": {"relative_l2": 1.1998530887106804e-07, "max_abs": 4.470348358154297e-08, "finite": true, "reference_norm": 3.0935815204764343, "error_norm": 3.711843342521933e-07}
+          },
+          "B": {
+            "o": {"relative_l2": 0.0016678714639764614, "max_abs": 0.00012164562940597534, "finite": true, "reference_norm": 2.297522920591697, "error_norm": 0.003831972917086749},
+            "final_state": {"relative_l2": 1.3016336796413799e-07, "max_abs": 1.1920928955078125e-07, "finite": true, "reference_norm": 63.70165737825712, "error_norm": 8.291622269251527e-06},
+            "final_A_state": {"relative_l2": 1.1998530887106804e-07, "max_abs": 4.470348358154297e-08, "finite": true, "reference_norm": 3.0935815204764343, "error_norm": 3.711843342521933e-07}
+          }
+        }
+      },
+      "passed": true
+    }
+  ],
+  "passed": true
+}

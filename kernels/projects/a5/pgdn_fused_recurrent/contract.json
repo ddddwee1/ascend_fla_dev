@@ -125,7 +125,7 @@
       16,
       28
     ],
-    "qualification": "Candidate grid; hardware qualification pending",
+    "qualification": "Native inprocess: 126 FP32/BF16 cases at each listed block_dim, with byte-identical outputs; measured magnitudes and oracle identity are in evidence. No arbitrary-finite-input accuracy claim.",
     "constants": {
       "x": 1.5,
       "eps": 1e-06,
@@ -1083,43 +1083,43 @@
       "device": "a5",
       "backend": "cce",
       "stage": "reference",
-      "status": "untested",
-      "reason": "Current candidate acceptance pending; no inherited qualification."
+      "status": "passed",
+      "reason": "63 canonical FP32 cases; 126 A/B input calibrations in each recorded CPU environment; lifted FP64 check separately labeled."
     },
     {
       "device": "a5",
       "backend": "cce",
       "stage": "emit",
-      "status": "untested",
-      "reason": "Current candidate acceptance pending; no inherited qualification."
+      "status": "passed",
+      "reason": "Both typed CCE entries emitted; explicit UB109088/125472 bytes; exact source hashes in evidence/emission."
     },
     {
       "device": "a5",
       "backend": "cce",
       "stage": "compile",
-      "status": "untested",
-      "reason": "Current candidate acceptance pending; no inherited qualification."
+      "status": "passed",
+      "reason": "Two decode entries vendor-compiled at bd1/2/4/8/16/28; 14-entry joint package at bd2 includes unchanged chunk entries. Receipts distinguish compilation and cached verification."
     },
     {
       "device": "a5",
       "backend": "cce",
       "stage": "sim",
       "status": "untested",
-      "reason": "Current candidate acceptance pending; no inherited qualification."
+      "reason": "Full-grid sim untested. Focused FP32 B1/S1/H3/HV6 and BF16 B1/S3/H2/HV4 at bd1 passed; see evidence/models."
     },
     {
       "device": "a5",
       "backend": "cce",
       "stage": "pipesim",
       "status": "untested",
-      "reason": "Current candidate acceptance pending; no inherited qualification."
+      "reason": "Full-grid pipesim untested. The same two focused cases passed with no hazards, imbalance or deadlock."
     },
     {
       "device": "a5",
       "backend": "cce",
       "stage": "board",
       "status": "untested",
-      "reason": "Current candidate acceptance pending; no inherited qualification."
+      "reason": "Standalone board/aclnn harness unqualified. Actual inprocess NPU acceptance is recorded in measured.native_inprocess."
     }
   ],
   "provenance": {
@@ -1127,5 +1127,29 @@
     "implementation": "Head-local ATK and grouped main state in one pure-vector PGDN launch",
     "library": "90cfcdc720bbcd66e8bd4361c4dd4fbc1a2a57b5",
     "kernels": "b3b3f9c16df7c4626ed3c081032a1be5a753d0b1"
+  },
+  "measured": {
+    "native_inprocess": {
+      "device": "a5",
+      "backend": "cce",
+      "block_dim": [
+        1,
+        2,
+        4,
+        8,
+        16,
+        28
+      ],
+      "cases_per_block_dim": 126,
+      "status": "passed",
+      "evidence": "evidence/index.json",
+      "budget": {
+        "fp32_o_and_both_fp32_states_relative_l2": 0.0001,
+        "bf16_o": "quality plus exact native FP32 companion RNE",
+        "zero_reference_norm": "exact zero residual"
+      },
+      "oracle_environment": "CPU Python3.12.14 / Torch2.12.0+cu130, git7661cd9c6b841b62b7f411aa52ec51f05457263b",
+      "known_boundaries": "See research ledger and evidence/reference/known-cross-environment-boundaries.json; PM NOTE6033949597."
+    }
   }
 }

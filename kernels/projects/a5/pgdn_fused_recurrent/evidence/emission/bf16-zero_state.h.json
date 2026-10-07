@@ -1,0 +1,25 @@
+{
+  "sha256": "73b519847a66c84b1cbf577363e88c1865e5298a5aab9bfbf2bf0ea7d7b192b1",
+  "lines": [
+    {"line": 1, "text": "#pragma once"},
+    {"line": 2, "text": "#include \"tensorutils_cce.h\""},
+    {"line": 3, "text": "using namespace ascrip;"},
+    {"line": 4, "text": ""},
+    {"line": 5, "text": "__aicore__ inline void zero_state(__ubuf__ float* state)"},
+    {"line": 6, "text": "{"},
+    {"line": 7, "text": "    __VEC_SCOPE__"},
+    {"line": 8, "text": "    {"},
+    {"line": 9, "text": "        vector_f32 zero_0;  // #237"},
+    {"line": 10, "text": "        vector_f32 zero_1;  // #238"},
+    {"line": 11, "text": "        vbr(zero_0, (float)(0.0f));  // #239"},
+    {"line": 12, "text": "        vbr(zero_1, (float)(0.0f));  // #240"},
+    {"line": 13, "text": "        for (uint16_t row = 0; row < 128; row += 1) {  // #241"},
+    {"line": 14, "text": "            __ubuf__ float* view = (__ubuf__ float*)((__ubuf__ uint8_t*)state + (((row * 128) * 4)));  // #244"},
+    {"line": 15, "text": "            vsts((vector_u32&)zero_0, (__ubuf__ uint32_t*)view, 0, NORM_B32, pset_b8(PAT_ALL));  // #245"},
+    {"line": 16, "text": "            vsts((vector_u32&)zero_1, (__ubuf__ uint32_t*)view, 64, NORM_B32, pset_b8(PAT_ALL));  // #246"},
+    {"line": 17, "text": "        }"},
+    {"line": 18, "text": "        mem_bar(VST_VLD);  // #247"},
+    {"line": 19, "text": "    }"},
+    {"line": 20, "text": "}"}
+  ]
+}

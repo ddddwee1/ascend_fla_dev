@@ -1,0 +1,128 @@
+{
+  "stage": "source_emission",
+  "device_execution": false,
+  "files_sha256": {"zero_atk.h": "bd55bc13794d3530c3ef8acffc8a023cfa19305f99cb1f847685bb781a711cb2", "atk_tile.h": "6af1319bd2edaec61d2cb5f0194722e2b5cec905105776378490a7b7c2138d40", "zero_state.h": "4c8e393c0b44bda3874837b61eaa1b0b16cc36e203f7dd9a33cfbc22c3bd5c03", "advance.h": "92c1c3191183d9775a24f759ed82f3e4aece09ed700081b17b1943b5e093d8bc", "pgdn_recurrent_fp32_vec.h": "0d480699e86dfe14b6cddbfa4361fd0464909dba2d17d4671dbc3b578428ed2f", "pgdn_recurrent_fp32.cpp": "9841a4c5ee3f5d6bf8fe77ceb56819f898bb3e76ae69edf1c42b436a84095eb0", "tensorutils_cce.h": "73965f4ed6c9afaf1eb96724a47b6a3cca2e15c9615afc4958b05831782d2bc9", "scalar_math.h": "a49ae04e54ad1999222c1ca925a1f624f36df2551ae9fed73a8b0a1461081f7e", "manifest.json": "842fe53808d6d3e50398975f691e7d8fedcdbb08d02bb2fe444a911d0f317f9b"},
+  "UB_bytes": 109088,
+  "manifest": {
+    "backend": "cce",
+    "arch": "c310",
+    "kernel": "pgdn_recurrent_fp32",
+    "ir_kernel": "pgdn_recurrent_fp32",
+    "device": "950",
+    "mode": "vec",
+    "task_type": "KERNEL_TYPE_AIV_ONLY",
+    "block_dim": 1,
+    "params": [
+      {
+        "name": "q",
+        "ir_name": "q",
+        "kind": "tensor",
+        "dtype": "f32",
+        "dims": ["B", "S", "H", 128],
+        "output": false
+      },
+      {
+        "name": "k",
+        "ir_name": "k",
+        "kind": "tensor",
+        "dtype": "f32",
+        "dims": ["B", "S", "H", 128],
+        "output": false
+      },
+      {
+        "name": "v",
+        "ir_name": "v",
+        "kind": "tensor",
+        "dtype": "f32",
+        "dims": ["B", "S", "HV", 128],
+        "output": false
+      },
+      {
+        "name": "g_atk",
+        "ir_name": "g_atk",
+        "kind": "tensor",
+        "dtype": "f32",
+        "dims": ["B", "S", "H"],
+        "output": false
+      },
+      {
+        "name": "g",
+        "ir_name": "g",
+        "kind": "tensor",
+        "dtype": "f32",
+        "dims": ["B", "S", "HV"],
+        "output": false
+      },
+      {
+        "name": "beta_atk",
+        "ir_name": "beta_atk",
+        "kind": "tensor",
+        "dtype": "f32",
+        "dims": ["B", "S", "H"],
+        "output": false
+      },
+      {
+        "name": "beta",
+        "ir_name": "beta",
+        "kind": "tensor",
+        "dtype": "f32",
+        "dims": ["B", "S", "HV"],
+        "output": false
+      },
+      {
+        "name": "initial_state",
+        "ir_name": "initial_state",
+        "kind": "tensor",
+        "dtype": "f32",
+        "dims": ["B", "HV", 128, 128],
+        "output": false
+      },
+      {
+        "name": "initial_A_state",
+        "ir_name": "initial_A_state",
+        "kind": "tensor",
+        "dtype": "f32",
+        "dims": ["B", "H", 128],
+        "output": false
+      },
+      {
+        "name": "o",
+        "ir_name": "o",
+        "kind": "tensor",
+        "dtype": "f32",
+        "dims": ["B", "S", "HV", 128],
+        "output": true
+      },
+      {
+        "name": "final_state",
+        "ir_name": "final_state",
+        "kind": "tensor",
+        "dtype": "f32",
+        "dims": ["B", "HV", 128, 128],
+        "output": true
+      },
+      {
+        "name": "final_A_state",
+        "ir_name": "final_A_state",
+        "kind": "tensor",
+        "dtype": "f32",
+        "dims": ["B", "H", 128],
+        "output": true
+      },
+      {"name": "B", "ir_name": "B", "kind": "scalar", "dtype": "i32"},
+      {"name": "S", "ir_name": "S", "kind": "scalar", "dtype": "i32"},
+      {"name": "H", "ir_name": "H", "kind": "scalar", "dtype": "i32"},
+      {"name": "HV", "ir_name": "HV", "kind": "scalar", "dtype": "i32"},
+      {"name": "HAS_INITIAL", "ir_name": "HAS_INITIAL", "kind": "scalar", "dtype": "i32"},
+      {"name": "HAS_A", "ir_name": "HAS_A", "kind": "scalar", "dtype": "i32"}
+    ],
+    "outputs": ["o", "final_state", "final_A_state"],
+    "workspaces": [],
+    "sides": ["vec"],
+    "vf": ["zero_atk", "atk_tile", "zero_state", "advance"],
+    "simt": {},
+    "ops": 371,
+    "files": ["advance.h", "atk_tile.h", "pgdn_recurrent_fp32.cpp", "pgdn_recurrent_fp32_vec.h", "scalar_math.h", "tensorutils_cce.h", "zero_atk.h", "zero_state.h"],
+    "entry": "pgdn_recurrent_fp32.cpp"
+  }
+}
