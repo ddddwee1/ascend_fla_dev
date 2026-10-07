@@ -1,0 +1,11 @@
+--- a/tests/test_kda_fwd_a2.py
++++ b/tests/test_kda_fwd_a2.py
+@@ -169,7 +169,7 @@
+     guard = _range_guard()
+     assert CAPABILITIES["a2"]["qualified"] is False
+     assert CAPABILITIES["a2"]["supported_block_dim"] == {"chunk": (1, 2), "decode": (1, 2)}
+-    assert CAPABILITIES["a2"]["max_gate_span"] == {"stable": {"forward": float(guard)}}
++    assert CAPABILITIES["a2"]["max_gate_span"]["stable"]["forward"] == float(guard)
+     for bd in (1, 2):
+         defaults = _records(f"defaults-bd{bd}")
+         assert max(r["calibration"]["initialization_span"] for r in defaults) < guard

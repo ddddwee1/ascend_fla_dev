@@ -6,16 +6,31 @@ eight cached values, math order, synchronization protocol, CPU FP32 golden and
 numerical thresholds are unchanged. The frozen BF16 unit remains available.
 D-PM-60 authorization is issue #40 comment 6033288361.
 
-This is an in-progress qualification with retained failures. Public dispatch
-remains unqualified, no backward capability limit is set, and no DONE is claimed.
-The working candidate is identified by `candidate-source-manifest.json` and each
-run's source manifest; the earlier PR head alone does not identify this artifact.
+The A2-13 actual-cache end-to-end acceptance cases pass, and the measured
+backward capability is 128 for this FP32-gate unit. Independent fixture and
+strict checkpoint failures remain failures, reported separately as required by
+the original task and D-PM-60. Public dispatch remains `qualified=False`.
+This is not a blanket unit or checkpoint qualification. Artifact identities
+are recorded in `candidate-source-manifest.json` and each run's source manifest.
+
+The capability addition exposed one host integration assertion that requires
+the capability dictionary to contain only `forward`. The assigned checkout's
+latest full regression is **1 failed / 1453 passed / 6 skipped**; the failure
+is `tests/test_kda_fwd_a2.py:172`. A one-line proposal checking the measured
+forward key (with the complete dictionary still checked in `test_platform.py`)
+passes **1454 / 6** in an isolated copy. The original test remains untouched
+pending its explicit write-set addition, requested in issue40 comment6034165170.
+The failed run, concrete patch and isolated passing run are retained under
+`host/`. This integration check prevents final DONE until the patch is applied
+and the assigned checkout passes. It does not alter the native results below.
 
 ## Completed stages
 
 | Experiment | Observed result | Scope |
 |---|---|---|
-| Host regression | 1454 passed / 6 skipped | Host only |
+| Host before capability addition | 1454 passed / 6 skipped | Host only |
+| Host after capability addition | 1 failed / 1453 passed / 6 skipped | Existing forward dictionary assertion; integration pending |
+| Host with isolated one-line proposal | 1454 passed / 6 skipped | Proposal validated; not yet applied to assigned checkout |
 | Vendor compilation | 5 forward + 9 backward at each bd=1,2 | Compilation only, zero custom launches |
 | CPU ABI checks | FP32 gc accepted; wrong gc/cache dtype and NaN rejected | Other eight fixture caches unchanged bytewise |
 | Independent fixture | 26 executed; 23 cases pass all checks | All 156 final-gradient checks pass; 3 intermediate checks fail |
@@ -99,7 +114,7 @@ FP32 exponential rounding followed by BF16 materialization. It does not
 justify weakening allclose or replacing the CPU golden. The raw inputs,
 intermediate numbers and other cases are in `fp32gc-exp-localization-v1-bd1/`.
 
-## Model scope and remaining work
+## Model scope and delivery boundary
 
 Models run only after the complete native workloads. Reduced captures are
 B1/H1/HV1/C2 and B1/H1/HV2/C1 at bd1, preserving chunk reuse or repeated heads,
@@ -121,8 +136,35 @@ passed, full fixture board failed, and full-unit model stages untested
 (the reduced leaf model scope is separate). This post-validation metadata
 change leaves code, ABI, cases and all comparison numbers unchanged; the
 contract-status attestation maps the before/after hashes. Strict checkpoint
-mismatches still prevent a blanket unit-pass claim. Capability disposition
-and formal review remain pending. Reproduction uses the checked-in harness:
+mismatches still prevent a blanket unit-pass claim. Formal PM review remains
+pending. The A2-13 acceptance checklist explicitly asks for independent-fixture
+results to be reported separately; it does not require those results to be
+folded into the six-gradient end-to-end acceptance. All original thresholds
+and failed results remain intact.
+
+The backward capability is **128**, 20% below the deepest sampled budget pass
+at160, whose dg0.04953734 nearly reaches0.05. It exceeds the independently
+measured eight-seed initialization maximum106.38469696. Fresh seed and long
+sequence tests at128 provide the additional evidence above (worst long dg
+0.03857105213, approximately23% below the0.05 budget). This is an empirical
+bound for the listed shapes/distributions; it is not an exhaustive guarantee
+for arbitrary inputs. Span192 nonfinite failures remain outside the domain.
+
+Future A2-15 public wiring must select `kda_bwd_stable_fp32gc` with FP32 log2
+gates and preserve the other eight cache ABIs. The capability128 must not be
+applied to the frozen BF16-gate unit, which still fails the wider accuracy
+domain. `qualified=False` continues to block all A2 public entry points;
+this PR changes neither their routing nor the global qualification switch.
+
+Read-only handoff checks against the delivered source identify the remaining
+public integration boundaries: `chunk_bwd.py::_stable_bwd_root` still selects
+the A5 directory; `kda_bwd_kernels` caches by implementation without a SoC key;
+`_check` checks every cache as BF16; `chunk.py::tok` narrows all nine token
+caches to BF16, and `_layout_runtime` selects the A5 layout implementation.
+These are future public-wiring work, outside A2-13. Changing only the global
+qualification flag would not connect the measured A2 FP32-gate unit correctly.
+
+Reproduction uses the checked-in harness:
 
 ```bash
 python benchmarks/probe_bwd_span.py --soc a2 --block-dim 1 --a2-gc-dtype fp32 --a2-suite fixture --a2-out <fresh-fixture-output>

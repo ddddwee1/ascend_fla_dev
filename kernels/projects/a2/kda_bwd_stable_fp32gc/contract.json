@@ -594,9 +594,9 @@
     ],
     "block_dim_note": "Both1 and2 executed in separate native processes; original fixture checkpoint failures remain. Per-case and cross-bd evidence is in A2-13 fp32gc-v1.",
     "gate_span": {
-      "recommended_limit": null,
-      "status": "end-to-end measured; final qualification disposition pending",
-      "note": "Actual-cache sweeps through target160 pass six-gradient CPU FP32 budget0.05, with dg0.04953734 at160; target192 forward caches are nonfinite. Target128 also passes seeds1/2/3 and T64/512/4096 in both gate profiles, with bd1/2. Original checkpoint failures are retained; no blanket bound or predecessor qualification is inherited."
+      "recommended_limit": 128.0,
+      "status": "measured actual-cache end-to-end bound; full fixture qualification failed",
+      "note": "A2-13/D-PM-60 six-gradient CPU FP32 relative-L2 budget0.05 only, with FP32 g_cumsum. Target160 dg0.04953734 has little margin; choose128 (20% below160), above the eight-seed initialization maximum106.38469696. Target128 passes new seeds1/2/3 and T64/512/4096 for both gate profiles at bd1/2; worst dg0.03857105213. Original checkpoint failures remain failures and are reported separately. Not a full unit/checkpoint qualification or a bound for the frozen BF16-gate predecessor."
     },
     "accumulate_settle": "Every repeated MMAD against one L0C block carries an explicit barrier(Pipe.M) (A2-01 / ascriptor M10-081); no BF16/FP16 splitk below M=64."
   },

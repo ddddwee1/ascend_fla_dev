@@ -10,8 +10,9 @@ Vendor compilation passed at bd1/2. Original fixture qualification failed
 3 of26 cases at strict intermediate checkpoints; all final-gradient checks
 and the listed actual-cache end-to-end runs passed. See
 [the A2-13 report](../../../../benchmarks/a2/evidence/kda_bwd/fp32gc-v1/README.md).
-Qualification disposition remains pending. The original BF16 unit and its historical evidence
-remain untouched. Real-cache acceptance uses CPU FP32 full-chain autograd
+The measured actual-cache end-to-end backward limit is128; strict fixture
+qualification remains failed. The original BF16 unit and its historical evidence
+remain untouched; this limit must not be used for that predecessor. Real-cache acceptance uses CPU FP32 full-chain autograd
 with relative L2 <= 0.05 for each of six gradients; fixture/stage comparisons
 remain separate. No public dispatch or `qualified` flag is changed.
 

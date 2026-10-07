@@ -58,7 +58,12 @@ CAPABILITIES: dict[str, dict[str, Any]] = {
     "a2": {
         "qualified": False,
         "supported_block_dim": {"chunk": (1, 2), "decode": (1, 2)},
-        "max_gate_span": {"stable": {"forward": 158.0}},
+        "max_gate_span": {"stable": {
+            "forward": 158.0,
+            # A2-13: kda_bwd_stable_fp32gc real-cache end-to-end evidence only;
+            # benchmarks/a2/evidence/kda_bwd/fp32gc-v1/README.md records limitations.
+            "backward": 128.0,
+        }},
         "unit_root": "kernels/projects/a2",
         "evidence": (
             "A2-12：910B3/CANN 9.0.0 的 stable 前向单元实测，qkv BF16、状态 FP32；"
