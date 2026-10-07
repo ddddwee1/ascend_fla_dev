@@ -66,6 +66,8 @@ def verify():
             comparison(row)
             if row['case']['dtype'] == 'bfloat16':
                 assert all(row['bf16_storage'].values()) and len(row['bf16_storage']) == 3
+                comparison(dict(case={'dtype': 'float32'},
+                                comparison=row['same_input_fp32_comparison']))
             for oracle in row['comparison']['metrics'].values():
                 for name, values in oracle.items():
                     if name != 'o' or row['case']['dtype'] == 'float32':
