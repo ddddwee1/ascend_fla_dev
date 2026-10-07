@@ -2894,7 +2894,8 @@
         "ascend_fla/platform.py",
         "tests/test_platform.py",
         "benchmarks/a2/evidence/kda_bwd/**",
-        "kernels/projects/a2/kda_bwd_stable_fp32gc/**"
+        "kernels/projects/a2/kda_bwd_stable_fp32gc/**",
+        "tests/test_kda_fwd_a2.py"
       ],
       "needs": {
         "npu": true,
@@ -2977,6 +2978,10 @@
         {
           "at": "2026-10-07T07:35",
           "summary": "用户裁定（D-PM-60，直接决定，原话'批了，新建派生单元修这个'）：批准新建 A2 派生的 `kda_bwd_stable_fp32gc` 反向单元，修复 gc2（累积门控）四个消费者（`scan_fused`、`inverse_epilogue`、`finalize_pre`、`finalize_post`）只吃 BF16 导致 dg 梯度超预算的问题（`docs/matrix/gaps.json` 的 `a2-kda-bwd-gcumsum-bf16-precision`）。按申领人 2026-09-28 RISK kernel-change-needed（评论 5876471263）里的方案：保留现有 `kda_bwd_stable`（BF16）单元及其历史资格不动；新建派生单元只改上述四个消费者的 gc2 输入类型（BF16→FP32）与相应载入/转换，其余 5 个反向 kernel 与其余 8 项缓存不动；新 unit.py/reference.py/contract.json（同本仓 unit 协议，§3）；gc 缓存会从 32MiB 增到 64MiB（B1/T4096/HV32，仅字节数，非性能数字）。\n\n写集扩大为新增 `kernels/projects/a2/kda_bwd_stable_fp32gc/**`（现有写集的测试/platform.py/证据目录几项已覆盖新单元的验证路径，不必重复加）。blocked -> in_progress。PM 已回复申领人（issue #40），按此范围继续；验收仍按 A2-13 原规格的 0.05 预算（端到端六梯度对 CPU FP32 完整自动微分），独立 fixture 检查继续单独报数字，不合并陈述；门控跨度（backward）重测仍按原规格方法论，用新单元的真实缓存重扫而不是旧结论。`qualified` 仍留 `False`（PM 审过之后才改，不是 assignee 自行翻）。"
+        },
+        {
+          "at": "2026-10-07T09:10",
+          "summary": "D-PM-60 实现进展的 STATUS/RISK 链（issue #40，session 01a0b7ce-...，07:59~09:02Z，本轮一次性记录）：\n1. 新单元 `kda_bwd_stable_fp32gc` 建好，只改四个 gc2 消费者为 FP32 输入，其余五个 kernel/八项缓存字节不变（6033616471 @07:59，6034626111 @09:02 的 manifest 核对均确认）。真实缓存完整链 18/18 通过（H32 T64/128/512/4096、GQA、奇数 chunk、B2）。\n2. 门控跨度（backward）48 点重扫：44 有限有效，4 个 span192 前向非有限（按契约正确拒绝）。新 uniform dg 在各 span 全面优于旧 BF16 路径（span32: 0.014 vs 旧 0.063）；span160=0.0495 贴近预算边缘；8 seed 初始化下界仍 106.38。候选 backward=128（留 ~20% 余量，超过初始化下界）——**申领人一度在 RISK 6034035125（@08:26）问是否需要先消除全部独立 fixture 的严格中间检查失败才能填值，随后自己在 STATUS 6034120124（@08:31）更正：原规格本来就把'独立 fixture 单独报、不与端到端结论合并'写清楚了，不需要再问**——已直接填 `max_gate_span.stable.backward=128.0`。原 fixture 的严格中间检查失败（gentle_decay qk_left relL2=1.659e-5>1e-5、grid_c1_hv2 kg 2032 vs 2040 的 allclose 失败）如实保留，已定位到 finalize_pre.py 里 FP32 exp→乘法→BF16 materialization 正好落在舍入边界两侧，不算入端到端结论。\n3. **RISK write-set-expansion**（6034165170 @08:34）：填 backward 键后，全量测试暴露 A2-12 遗留的精确字典断言 `tests/test_kda_fwd_a2.py:172` 要求 `max_gate_span` 只能有 forward 键——同 A2-14 当年踩过的'给 CAPABILITIES 加键必然打破精确断言'那一类坑。申领人只请求把这一行改成只断言 forward 子键（不改 A5 断言、不改前向实测边界/数值阈值），补丁已在隔离副本验证（1454 passed/6 skipped）。**PM 批准**（本轮，不需要问用户——范围极窄、机制与 A2-14 先例一致，属于 PROTOCOL.md RISK 表里'write-set-expansion: PM 查过冲突再批'这条，已核实无其它在飞任务的 write_set 命中这个文件）：`tests/test_kda_fwd_a2.py` 加入写集，仅限按申领人方案收紧断言为 forward 子键这一行。\n4. 仍 `in_progress`，未报 DONE，`qualified` 仍 `False`，公共入口未改。"
         }
       ],
       "result": null
@@ -3212,7 +3217,7 @@
       "wave": "W-A2",
       "soc": "a2",
       "priority": "P1",
-      "status": "in_progress",
+      "status": "review",
       "gate": null,
       "model": [
         "kimi-linear-48b-a3b",
@@ -3355,6 +3360,10 @@
         {
           "at": "2026-10-07T02:14",
           "summary": "用户裁定（D-PM-59，直接决定，原话'先排在 KDA/GDN 既定顺序之后，不现在立项'）：上一条 STATUS 里申领人提议的'chunk-parallel 重写'（为了追上 fla Triton baseline 的 ~5.9× 差距）**不现在立项**，排在现有 KDA/GDN 既定顺序之后——不是否决，是暂不排期，AGENTS.md §2 的 A2→A3→A5、KDA 先于 GDN 的排期不变。已写入 docs/handoff.md 顶部（下次有人重提同一提案时先查这条，不必重新问用户）。已回复申领人（issue #44）：按原验收清单开 PR 发 DONE 即可，chunk-parallel 重写不要动手。A2-K1 本身任务状态不变（仍 in_progress，等 PR）。"
+        },
+        {
+          "at": "2026-10-07T07:36",
+          "summary": "DONE（issue #44 评论 6032766686，MikejR2904，07:01:53Z）：声称 A2-K1 全部验收项在真机 910B3 通过（1.1 GVA/GQA、1.2 token-major、1.3 非零 initial_state、1.4 dh0+接受 dht、1.7 scale+no-tail-path、分段 chaining 逐位一致、barrier 负对照、写集范围、host pytest 计数）。1.5（final_state fp32 vs bf16 / BF16 host 审计）因 chunk 单元全程 fp32、没有 bf16-state 分支而标 N/A。**首次 DONE 没有 PR**——另一个共享 `limjiunnbin` 账号的 PM 进程（下面有说明）在 07:28:43Z 指出按协议 §3.7 DONE 必须先开 PR 才算数；MikejR2904 在 07:36:45Z 补开 **PR #138**（`MikejR2904:task/A2-K1` → `main`，30 commits/27 files/+3287 行，diff 范围确认只在写集内，无 KDA/A5/保留路径）。\n\n**status 改为 review——尚未做过独立审查，不能合入**：assigned->in_progress->done 的链路里，DONE+PR 只到 review 这一步，真机证据/数字需要 PM 独立复算、写集边界需要 PM 自己核验diff，这些都还没做（本轮只记录事件，审查是下一步）。"
         }
       ],
       "result": null
@@ -5547,7 +5556,7 @@
       "wave": "W0",
       "soc": "a5",
       "priority": "-",
-      "status": "assigned",
+      "status": "review",
       "model": [],
       "kernel": [
         "pgdn_fused_recurrent"
@@ -5623,6 +5632,10 @@
         {
           "at": "2026-10-07T03:27",
           "summary": "ASSIGN（PM，对应 limjiunnbin 的三次 APPLY 6029451834/6029714542/6030280407，累计补充同一申请，不是新开 session 或撤销前一条）。PK-06 此前因 24h 未 ACK 被收回（2026-10-01），分支 task/PK-06 与规格 docs/pm/tasks/PK-06.md 原样保留，直接复用。**并发持有判断**：该账号同时是 A2-13 的 assignee（blocked，等用户裁定），但本次 APPLY 填了与 A2-13 不同的 session 值（dev-20261007T021301Z-pk06-afaf8516 vs 01a0b7ce-3daf-7550-a7bf-31c67eb91ca3），满足 PROTOCOL.md §3.1 并发接第二个任务的形式条件（两边都填、且不同），按协议本身的设计走，不是 PM 自定义放宽。"
+        },
+        {
+          "at": "2026-10-07T09:09",
+          "summary": "ACK（issue #95 评论 6033224718，07:34:28Z，session dev-20261007T021301Z-pk06-afaf8516）：冻结短 S/双状态/原生 ABI/固定常量/naive 归一化，计划 literal A+独立 B+FP64 lift 校准 -> 单 launch 前向 -> 真机扫分组/bd/状态/量程 -> 双状态 prefill/decode 续接 -> 同卡三轮 baseline/candidate/baseline，eta_h=24。assigned -> in_progress（随 ACK）。\n\n**STATUS**（6033424329 @07:46）：vendor compile 阶段，112 组 CPU 校准完成（host A/B max relL2=1.506502e-7，FP64 lift max=2.663938e-16），两个独立环境分别复算一致。\n\n**RISK silent-wrong-result**（6033506362 @07:51，已记入不隐藏）：新单元未资格化候选在小 ATK 衰减×大非零初态时，独立 ATK 输出超预算（final_A_state 相对 L2=1.0），o/主状态仍通过；申领人**自己拦下，未提交为合格实现**，提议在任务既有写集内定位修复，不缩域、不删 case、不改 host/共享路径。按协议该类 RISK 应立即上报用户——这里是自我拦截，未产生实际静默错误结果，PM 本轮向用户汇报但不升级处理。\n\n**STATUS**（6033618980 @07:59）：定位到根因——g_atk∈[-87.34,-100] 附近 native exp 输出为 0，literal CPU FP32 是正的 subnormal，在 exp 边界本身丢失（不是主状态/分组同步问题）；已写候选修复（FP32 subnormal mantissa 的 RNE 整数表示 + 两个 normal 幂因子相乘）。\n\n**STATUS**（6033810952 @08:11）：v2 修复验证通过——bd1 完整 126 case（原 112 + 7 门控×2 dtype）全部通过，之前失败的 g_atk=-100/A0 1e30 case 现在 literal A 与独立 B 逐位一致；host-work audit 8 组仅见分配类算子，无 host 算术/转换。\n\n**RISK numeric-reference-boundary**（6033824586 @08:12，另一个共享账号 PM 进程 08:20:43Z 已裁定，本次补记）：同一 pin/hash 的 literal CPU FP32 naive 在两套环境（验收一直用的 Docker Torch2.12.0+cu130 vs 主机 Torch2.10.0）在 subnormal exp 处 1 ulp 舍入不同，两个新边界点在 Docker oracle 过、在主机 oracle 超 1e-4。**裁定**：冻结 Docker CPU 环境（Python 3.12.14/Torch 2.12.0+cu130，torch_git7661cd9c6b841b62b7f411aa52ec51f05457263b）为本任务 literal CPU FP32 oracle 身份，与 ascriptor/fla pin 同等写入证据包；主机 Torch2.10 的两个边界点记为'已知跨环境边界'，不算这两点失败，不要求同时满足两套环境——是浮点环境本身差异，不是预算放宽或量程扩大，不需要再问用户（PM 判断：合理，不复核）。\n\n**DONE**（6034704784 @09:07，**PR #139**，commits b6f2613/b76de80）：六项验收全部 [x]，126 case×6 bd=756，三输出对 A/B 独立 FP32 预算全部 ≤1e-4（o=2.35e-7/主state=1.94e-7/ATK state=2.42e-7），BF16 companion 378 组逐位一致；prefill→decode 14 组/56 条续接链/150 段对照逐位一致；同卡三轮 baseline/candidate/baseline 真实执行（4 组×2 warmup/50 samples）；8 组 host-work audit 仅分配无算术；写集检查 126 文件全在 4 条授权路径内。host 1582 passed/10 skipped。device=a5 cann=9.1.0-beta.1。handoff_notes 里明确记录了上面那条 oracle 身份冻结裁定。另有 PR 评论补充（6034746708 @09:09）两行审计记录，不是新的真机运行。\n\n**status 改为 review**——DONE+PR 存在，真机证据/数字独立复算与写集核验尚未做。"
         }
       ],
       "result": null,
