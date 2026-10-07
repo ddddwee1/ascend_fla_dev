@@ -2968,6 +2968,10 @@
         {
           "at": "2026-10-01T19:22",
           "summary": "心跳处理（PM 操作判断，不是机械执行）：48h 无 STATUS 的 PING（2026-09-30T19:22，issue #40 评论 5918118674）之后再等 24h（到 2026-10-01T19:22）的窗口已过，匿名核对#40 自 PING 起的全部评论（截至 2026-10-01T19:22:42Z），只有 PING 这一条，没有新STATUS/RISK/BLOCKED。但按协议字面'收回重新放出'在这里不合适：申领人上一条 STATUS（2026-09-28T19:20）已经如实说明'没有新决策点——等的是 PM 转给用户的 kernel-change裁定（批准新建派生 kernel 单元 / 还是先以负资格化收尾）'，这不是申领人失联或懈怠，是 PM 自己转交、尚未拿到用户答复的那个问题。把任务收回 open 对新申领人没有意义——换个人接手会立刻撞上同一个未决问题，只会制造混乱、不解决任何事。改为 in_progress -> blocked（assignee=limjiunnbin、branch=task/A2-13 均保留，不走'收回重新放出'/清空assignee 那条路径——pm_board.py 的 IN_FLIGHT 把 blocked 当持有写集的在飞状态），如实反映现状：等的是 PM/用户的裁定，不是申领人的下一步。这不改变已上报的决策仍未拿到用户答复这件事——本轮汇报里再提一次。"
+        },
+        {
+          "at": "2026-10-07T02:14",
+          "summary": "STATUS（issue #40 评论 6029451321，limjiunnbin，session 01a0b7ce-3daf-7550-a7bf-31c67eb91ca3，与看板记录的 A2-13 session 一致）。恢复工作的检查性汇报，无状态变化：重新核实了远端任务分支/PR #137（仍 draft/open/unmerged）/issue/看板一致，确认看板2026-10-01 记为 blocked 并保留 assignee/branch 一事，未自行改状态或另占任务。仍在等 PM/用户对 NOTE5876783580（新建派生 kda_bwd_stable 单元 vs 负资格化结案）的裁定——这正是 PM 已上报用户、尚未收到回复的那个未决问题。此前真机证据原样保留（独立 fixture 26/26、真实缓存全链 18/18、跨度粗扫 36 点=22 通过/10 超预算/4 非有限、新增 12 次真机种子诊断显示原生 dg 仍超 0.05 预算）；本次恢复**未跑新硬件**，明确不把 9 月 28 日的环境健康状况当作当前healthy的依据。证据归档 v6（142 文件，SHA256 manifest）已提交；未追加 kernel 修改、未动 qualified、未报 DONE。按 D-PM-28 机器/卡归 assignee 自己管理。"
         }
       ],
       "result": null
@@ -5538,7 +5542,7 @@
       "wave": "W0",
       "soc": "a5",
       "priority": "-",
-      "status": "open",
+      "status": "assigned",
       "model": [],
       "kernel": [
         "pgdn_fused_recurrent"
@@ -5565,8 +5569,21 @@
       "spec": "docs/pm/tasks/PK-06.md",
       "issue": 95,
       "pr": null,
-      "assignee": null,
-      "assignee_caps": null,
+      "assignee": "limjiunnbin",
+      "assignee_caps": {
+        "agent": "Codex；恢复 PGDN 开发的新会话（自述），只申领 PK-06、不参与 GDN-2",
+        "socs": [
+          "a5"
+        ],
+        "soc_details": "Docker 内环境，已重新核查设备健康/占用，候选卡 Healthy 且无进程，28 AI cores；CANN/OPP 9.1.0-beta.1（timestamp 20260509_173000235），内置含 ascend950/ascend910b/ascend910_93；实际作业前会再次检查并持共享锁（D-PM-28：机器/卡归assignee 自己管理）。",
+        "ascriptor": "yes library 90cfcdc720bbcd66e8bd4361c4dd4fbc1a2a57b5 / kernels b3b3f9c16df7c4626ed3c081032a1be5a753d0b1",
+        "fla": "yes pin e52dbc0ea19d3a40d7ab7f9eed855d2b473994d2",
+        "python": "host 3.11.15/Torch 2.10.0+cpu；Docker 3.12.14/Torch 2.12.0+cu130/torch_npu 2.12.0/Ascriptor 0.1.0；pytest 可用",
+        "fork": "limjiunnbin/ascend_fla_dev",
+        "availability": "同步在线，持续 loop 等 ASSIGN 并及时 ACK",
+        "session": "dev-20261007T021301Z-pk06-afaf8516",
+        "note": "**同账号 limjiunnbin 同时段也是 A2-13 的 assignee（status: blocked，session 01a0b7ce-3daf-7550-a7bf-31c67eb91ca3）。**按 PROTOCOL.md §3.1 的 session 机制：两次 APPLY 都填了 session 且两个值不同（A2-13=01a0b7ce-...-ca3，本次=dev-2026...-afaf8516），满足并发持有第二个任务的形式条件，PM 按此 ASSIGN，不是破例。规格已冻结，继续有效（不重新讨论 BF16/FP32、naive 归一化、固定常量、双状态语义）；本机独立 checkout 的主机基线 1450 passed/10 skipped（CPU 环境 torch_npu importorskip 弃用提示，非压制），Docker 内 library 204/204 文件逐一核对与选定 pin 一致。此前无 PK-06 实现/PR/真机 workload，本次是全新开始。"
+      },
       "branch": "task/PK-06",
       "timebox_h": 24,
       "reports": [
@@ -5597,6 +5614,10 @@
         {
           "at": "2026-10-01T20:52",
           "summary": "收回（PM 自查发现的流程纠正，不是新事件触发）：ASSIGN 于 2026-09-28T17:05:02Z（issue #95 评论 5874796273，ack_within_h: 24），24h 窗口本应在 2026-09-29T17:05到期。核对 #95 自 ASSIGN 起的全部评论，没有任何 ACK 或其它协议消息——这条 24h-无-ACK 的收回在此之前的若干轮里被漏掉了（本 session 的心跳跟踪只续用了上下文里已有的两个截止时间 GD2-02/A2-13，没有在每轮重新推导全部在飞任务的截止时间，这是本 PM 的流程缺口，如实记录）。现按 PROTOCOL.md §3.3（与 PK-05 的 24h-无-ACK 收回同一先例）处理：assigned -> open，清空 assignee/assignee_caps，分支 task/PK-06 保留。规格docs/pm/tasks/PK-06.md 的完整工作（ABI 冻结表、双 oracle、14-entry prepare 清单、ATK 非零初态量程界等）继续有效，不因收回而重新讨论，下一个申领人直接按现有规格接。"
+        },
+        {
+          "at": "2026-10-07T03:27",
+          "summary": "ASSIGN（PM，对应 limjiunnbin 的三次 APPLY 6029451834/6029714542/6030280407，累计补充同一申请，不是新开 session 或撤销前一条）。PK-06 此前因 24h 未 ACK 被收回（2026-10-01），分支 task/PK-06 与规格 docs/pm/tasks/PK-06.md 原样保留，直接复用。**并发持有判断**：该账号同时是 A2-13 的 assignee（blocked，等用户裁定），但本次 APPLY 填了与 A2-13 不同的 session 值（dev-20261007T021301Z-pk06-afaf8516 vs 01a0b7ce-3daf-7550-a7bf-31c67eb91ca3），满足 PROTOCOL.md §3.1 并发接第二个任务的形式条件（两边都填、且不同），按协议本身的设计走，不是 PM 自定义放宽。"
         }
       ],
       "result": null,
@@ -5605,7 +5626,9 @@
         "issue": 89,
         "by": "limjiunnbin",
         "approved_by_user": true
-      }
+      },
+      "ack_within_h": 24,
+      "report_every_h": 24
     },
     {
       "id": "GDA-05",
