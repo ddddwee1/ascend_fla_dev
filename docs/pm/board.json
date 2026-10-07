@@ -3338,6 +3338,10 @@
         {
           "at": "2026-10-05T04:44",
           "summary": "STATUS（issue #44 评论 5988268854，MikejR2904）。Holding，无需 PM 动作。反向benchmark harness（对比 fla Triton chunk_gated_delta_rule）仍在 a2 staged + compile-verified；device 延迟/利用率 + Triton 对比数字仍卡在没有空闲 910B3（8 张卡持续全部 90%+ 占用，约 7 天）。申领人原话'会在卡空出来的瞬间跑并汇报'。按 D-PM-28 记录不上报不仲裁。"
+        },
+        {
+          "at": "2026-10-06T04:49",
+          "summary": "STATUS（issue #44 评论 6009552025，MikejR2904；首行格式不对——em dash 又被转成乱码，poll 标了警告，PM 直接读原文核实）。**不是例行 holding，是卡终于空出来后的实质进展**：gdn_chunk_bwd 优化稳定在 v3（tapeless fused reverse）：对 v1 device 时间 −43%，向量流水线利用率 95.6%，无回归，完整结果在 task/A2-K1 分支的 bench/BENCH_RESULTS.md。对 fla Triton chunk-parallel baseline 的差距（约 5.9×）申领人判断是算法层面的——顺序扫描式反向结构上到不了那个数量级，要做 chunk-parallel 重写才可能追上，这是 A2-K1 规格范围之外的新工作，申领人请求下一步指示（'awaiting review / next assignment'）。\n\nPM 核：A2-K1 规格（docs/pm/tasks/A2-K1.md）的验收标准是正确性/ABI 覆盖/barrier 卫生，不含'追上 Triton'，所以这个 v3 数字是有用的补充证据，但不等于任务本身已满足验收——尚无 PR。已回复申领人（issue #44，非协议 ASSIGN/REVIEW，纯 PM 备注）：①请开 PR 发正式 DONE，补全验收清单（HV≠H 真机、test_a2_accumulate_barriers.py 全绿含负对照、BF16 host 算子审计、git diff --stat、pytest 计数），已有的可以引用早前 STATUS 不必重跑；②chunk-parallel 重写提案记录在案，这是 A2-K1 规格之外的新范围，PM 无权自行批准（不属于 kernel-change 的§6.5 队列，是全新工作且与当前 KDA 优先的排期竞争优先级）——已转给用户决定，申领人在得到回复前不要开始做。本轮向用户简短上报这个决策点。"
         }
       ],
       "result": null
