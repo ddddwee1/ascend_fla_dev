@@ -2871,7 +2871,7 @@
       "wave": "W-A2",
       "soc": "a2",
       "priority": "P1",
-      "status": "blocked",
+      "status": "in_progress",
       "model": [
         "kimi-linear-48b-a3b"
       ],
@@ -2893,7 +2893,8 @@
         "benchmarks/probe_bwd_span.py",
         "ascend_fla/platform.py",
         "tests/test_platform.py",
-        "benchmarks/a2/evidence/kda_bwd/**"
+        "benchmarks/a2/evidence/kda_bwd/**",
+        "kernels/projects/a2/kda_bwd_stable_fp32gc/**"
       ],
       "needs": {
         "npu": true,
@@ -2972,6 +2973,10 @@
         {
           "at": "2026-10-07T02:14",
           "summary": "STATUS（issue #40 评论 6029451321，limjiunnbin，session 01a0b7ce-3daf-7550-a7bf-31c67eb91ca3，与看板记录的 A2-13 session 一致）。恢复工作的检查性汇报，无状态变化：重新核实了远端任务分支/PR #137（仍 draft/open/unmerged）/issue/看板一致，确认看板2026-10-01 记为 blocked 并保留 assignee/branch 一事，未自行改状态或另占任务。仍在等 PM/用户对 NOTE5876783580（新建派生 kda_bwd_stable 单元 vs 负资格化结案）的裁定——这正是 PM 已上报用户、尚未收到回复的那个未决问题。此前真机证据原样保留（独立 fixture 26/26、真实缓存全链 18/18、跨度粗扫 36 点=22 通过/10 超预算/4 非有限、新增 12 次真机种子诊断显示原生 dg 仍超 0.05 预算）；本次恢复**未跑新硬件**，明确不把 9 月 28 日的环境健康状况当作当前healthy的依据。证据归档 v6（142 文件，SHA256 manifest）已提交；未追加 kernel 修改、未动 qualified、未报 DONE。按 D-PM-28 机器/卡归 assignee 自己管理。"
+        },
+        {
+          "at": "2026-10-07T07:35",
+          "summary": "用户裁定（D-PM-60，直接决定，原话'批了，新建派生单元修这个'）：批准新建 A2 派生的 `kda_bwd_stable_fp32gc` 反向单元，修复 gc2（累积门控）四个消费者（`scan_fused`、`inverse_epilogue`、`finalize_pre`、`finalize_post`）只吃 BF16 导致 dg 梯度超预算的问题（`docs/matrix/gaps.json` 的 `a2-kda-bwd-gcumsum-bf16-precision`）。按申领人 2026-09-28 RISK kernel-change-needed（评论 5876471263）里的方案：保留现有 `kda_bwd_stable`（BF16）单元及其历史资格不动；新建派生单元只改上述四个消费者的 gc2 输入类型（BF16→FP32）与相应载入/转换，其余 5 个反向 kernel 与其余 8 项缓存不动；新 unit.py/reference.py/contract.json（同本仓 unit 协议，§3）；gc 缓存会从 32MiB 增到 64MiB（B1/T4096/HV32，仅字节数，非性能数字）。\n\n写集扩大为新增 `kernels/projects/a2/kda_bwd_stable_fp32gc/**`（现有写集的测试/platform.py/证据目录几项已覆盖新单元的验证路径，不必重复加）。blocked -> in_progress。PM 已回复申领人（issue #40），按此范围继续；验收仍按 A2-13 原规格的 0.05 预算（端到端六梯度对 CPU FP32 完整自动微分），独立 fixture 检查继续单独报数字，不合并陈述；门控跨度（backward）重测仍按原规格方法论，用新单元的真实缓存重扫而不是旧结论。`qualified` 仍留 `False`（PM 审过之后才改，不是 assignee 自行翻）。"
         }
       ],
       "result": null
