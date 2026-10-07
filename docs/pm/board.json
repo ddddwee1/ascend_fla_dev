@@ -2893,7 +2893,8 @@
         "benchmarks/probe_bwd_span.py",
         "ascend_fla/platform.py",
         "tests/test_platform.py",
-        "benchmarks/a2/evidence/kda_bwd/**"
+        "benchmarks/a2/evidence/kda_bwd/**",
+        "kernels/projects/a2/kda_bwd_stable_fp32gc/**"
       ],
       "needs": {
         "npu": true,
@@ -2956,6 +2957,26 @@
         {
           "at": "2026-09-28T19:04",
           "summary": "STATUS（PR #137 评论 5876604634，commit 38c83cf，draft）。补充 pair-replay 只读 CPU 分析：用实际 native finalize_pre 输入重算，span24/qk_right、28/t_beta、32/t_beta 相对 CPU FP32 矩阵乘分别 4.77e-5/1.44e-5/9.29e-5；FP64 诊断分别 0/8.97e-7/2.84e-9（提示 FP32 累加/前级舍入敏感，但明确不替代 golden、原 1e-5 失败保留、不声称硬件已修好）。主机回归不变，104 个新增文件均为文档/证据追加。下一步继续读四个 gc 消费者的存储/载入/同步契约，准备可评审的修复 preflight；kernel 批次/写集裁定仍待定，未改冻结 kernel、未填能力值。"
+        },
+        {
+          "at": "2026-09-28T19:20",
+          "summary": "STATUS（issue #40 评论 5876851036，PR #137 commit 4c7383b，draft）。收到 NOTE，确认 kernel 保持只读，等裁定。补充三个新种子（seed1/2/3，H32/T128，目标 span106.5/128，两 bd 各独立进程）验证 gc 精度假设不是 seed0 偶然：原生 dg 全部失败（0.149~0.259），只替换 g_cumsum 的 CPU 对照六梯度全部回到 0.05 内（0.028~0.032）——三个新种子与之前一致，根因定位进一步加强。另做了额外交叉核实：Torch NPU BF16 对真实 native finalize_pre 输入算的 12 个矩阵积与自定义 kernel 逐位一致（排除 Torch/kernel BF16 舍入不一致这个可能性）；Torch NPU FP32 自动微分对 CPU 参考最大相对 L2=2.34e-7（额外交叉 oracle）；跨 bd 36/36 梯度、54/54 组装缓存逐位一致。如实记录两处细节不过度声称：seed1 在 span106.5/128 有 allclose 失败（明确说'相对 L2 小不能替代 allclose'）；seed0/span128 的逐 head/chunk 切片里，即便 gc 替换后仍有 5/64 片超 0.05（明确说不能把整张量通过解释成普遍安全）。已准备四个 kernel 的 GM/UB/末读者 preflight 设计，明确标注'待批准设计，未实现未编译'。主机1454 passed/6 skipped 不变，写集/AST/隐私扫描仍过。**没有新决策点**——PM 已转给用户的问题（批准新建派生 kernel / 还是先以负资格化收尾）仍待用户答复，这条 STATUS 是对同一根因的进一步交叉验证证据，不改变已上报的裁定请求。"
+        },
+        {
+          "at": "2026-09-30T19:22",
+          "summary": "心跳：距上一次 STATUS（2026-09-28T19:20）满 48h 无更新，按协议发 PING（issue #40 评论 5918118674）。再过 24h（到 2026-10-01T19:22 之后）仍无回应则收回任务重新放出。任务本身未取消——kernel-change 裁定问题仍等用户答复（issue 已上报），这条心跳不改变那个未决问题的状态。"
+        },
+        {
+          "at": "2026-10-01T19:22",
+          "summary": "心跳处理（PM 操作判断，不是机械执行）：48h 无 STATUS 的 PING（2026-09-30T19:22，issue #40 评论 5918118674）之后再等 24h（到 2026-10-01T19:22）的窗口已过，匿名核对#40 自 PING 起的全部评论（截至 2026-10-01T19:22:42Z），只有 PING 这一条，没有新STATUS/RISK/BLOCKED。但按协议字面'收回重新放出'在这里不合适：申领人上一条 STATUS（2026-09-28T19:20）已经如实说明'没有新决策点——等的是 PM 转给用户的 kernel-change裁定（批准新建派生 kernel 单元 / 还是先以负资格化收尾）'，这不是申领人失联或懈怠，是 PM 自己转交、尚未拿到用户答复的那个问题。把任务收回 open 对新申领人没有意义——换个人接手会立刻撞上同一个未决问题，只会制造混乱、不解决任何事。改为 in_progress -> blocked（assignee=limjiunnbin、branch=task/A2-13 均保留，不走'收回重新放出'/清空assignee 那条路径——pm_board.py 的 IN_FLIGHT 把 blocked 当持有写集的在飞状态），如实反映现状：等的是 PM/用户的裁定，不是申领人的下一步。这不改变已上报的决策仍未拿到用户答复这件事——本轮汇报里再提一次。"
+        },
+        {
+          "at": "2026-10-07T02:14",
+          "summary": "STATUS（issue #40 评论 6029451321，limjiunnbin，session 01a0b7ce-3daf-7550-a7bf-31c67eb91ca3，与看板记录的 A2-13 session 一致）。恢复工作的检查性汇报，无状态变化：重新核实了远端任务分支/PR #137（仍 draft/open/unmerged）/issue/看板一致，确认看板2026-10-01 记为 blocked 并保留 assignee/branch 一事，未自行改状态或另占任务。仍在等 PM/用户对 NOTE5876783580（新建派生 kda_bwd_stable 单元 vs 负资格化结案）的裁定——这正是 PM 已上报用户、尚未收到回复的那个未决问题。此前真机证据原样保留（独立 fixture 26/26、真实缓存全链 18/18、跨度粗扫 36 点=22 通过/10 超预算/4 非有限、新增 12 次真机种子诊断显示原生 dg 仍超 0.05 预算）；本次恢复**未跑新硬件**，明确不把 9 月 28 日的环境健康状况当作当前healthy的依据。证据归档 v6（142 文件，SHA256 manifest）已提交；未追加 kernel 修改、未动 qualified、未报 DONE。按 D-PM-28 机器/卡归 assignee 自己管理。"
+        },
+        {
+          "at": "2026-10-07T07:35",
+          "summary": "用户裁定（D-PM-60，直接决定，原话'批了，新建派生单元修这个'）：批准新建 A2 派生的 `kda_bwd_stable_fp32gc` 反向单元，修复 gc2（累积门控）四个消费者（`scan_fused`、`inverse_epilogue`、`finalize_pre`、`finalize_post`）只吃 BF16 导致 dg 梯度超预算的问题（`docs/matrix/gaps.json` 的 `a2-kda-bwd-gcumsum-bf16-precision`）。按申领人 2026-09-28 RISK kernel-change-needed（评论 5876471263）里的方案：保留现有 `kda_bwd_stable`（BF16）单元及其历史资格不动；新建派生单元只改上述四个消费者的 gc2 输入类型（BF16→FP32）与相应载入/转换，其余 5 个反向 kernel 与其余 8 项缓存不动；新 unit.py/reference.py/contract.json（同本仓 unit 协议，§3）；gc 缓存会从 32MiB 增到 64MiB（B1/T4096/HV32，仅字节数，非性能数字）。\n\n写集扩大为新增 `kernels/projects/a2/kda_bwd_stable_fp32gc/**`（现有写集的测试/platform.py/证据目录几项已覆盖新单元的验证路径，不必重复加）。blocked -> in_progress。PM 已回复申领人（issue #40），按此范围继续；验收仍按 A2-13 原规格的 0.05 预算（端到端六梯度对 CPU FP32 完整自动微分），独立 fixture 检查继续单独报数字，不合并陈述；门控跨度（backward）重测仍按原规格方法论，用新单元的真实缓存重扫而不是旧结论。`qualified` 仍留 `False`（PM 审过之后才改，不是 assignee 自行翻）。"
         }
       ],
       "result": null
@@ -3298,6 +3319,42 @@
         {
           "at": "2026-09-28T18:12",
           "summary": "STATUS（issue #44 评论 5875825622，MikejR2904；首行格式不对——em dash 被转成乱码字节，poll 标了'首行格式不对'警告，PM 直接读原文核实，内容仍按数据采信）。前向（prepare/scores/wy/scan/output）全部 a2 向量侧，逐 stage 真机 910B3 board 验证过，整条流水线也在功能 sim 上对双 oracle（grouped_recurrent + block_solve）端到端过，o/final_state ~3e-7（GVA HV=4/H=2）。反向：checkpoints（边界状态）sim ~5e-8、group_reduce（GVA dq/dk 求和）sim 逐位、replay（逐 token d 磁带）sim 通过且 board 能编译运行；reverse（adjoint scan）算法完整但被真实技术问题卡住——单体 kernel 让 sim 的 auto_sync 信用预算死锁，board cce 编译超时(>560s)，申领人已做二分排除（不是 row-build 计数、不是 dg，是某个累积上限），两个信号一致指向同一结论：要把 reverse 拆成几个小 kernel（dq | recurrence+dv | dg | dk），已写进 gdn_chunk_bwd/DESIGN.md。方法说明：8 张 910B3 被其他用户占用（34-64GB HBM，90-160% AICore），board 验证只能见缝插针，sim 验证为主——按 D-PM-28 记录不上报不仲裁。整体是真实进展 + 有据可查的技术阻塞（kernel 复杂度需要拆分），不是空转，不改变超时判断本身，心跳计时按此重置。"
+        },
+        {
+          "at": "2026-09-28T23:35",
+          "summary": "STATUS（issue #44 评论 5880725321，MikejR2904；首行格式不对——em dash 又被转成乱码，poll 标了警告，PM 直接读原文核实）。之前卡住的 reverse kernel 分解已完成：replay -> reverse_rec（递推，产出 dv/dh0/back_tape）-> {dq, dbeta, dg, dk_bz, dk_ddr} -> group_reduce，dh0 与非零 dht 路径都在 recurrence kernel 里。前向+反向现在都在功能 sim 上对双 oracle（正向：grouped_recurrent+block_solve；反向：解析 adjoint ref/reference.py）端到端过：o~3.3e-7/final_state~3.0e-7，dq/dk/dv/dg/dbeta 均 ~1.2e-7~1.7e-7。前向仍是逐 stage 真机 910B3 board 验证过；**反向目前只有 sim 验证，还没有真机 board 端到端**——8 张 910B3 仍被其他用户占用（按 D-PM-28 记录不上报不仲裁）。申领人原话'kernel-level correctness is complete'，剩余工作是给 fwd+bwd 建 unit 脚手架（contract/unit.py/pipeline、算子命名、barrier 位点）并在卡空出来后跑真机 board 双oracle e2e。全部工作在其 fork（MikejR2904/ascend_fla_dev_a2，task/A2-K1）。真实进展，非空转；心跳按此重置。"
+        },
+        {
+          "at": "2026-09-30T02:08",
+          "summary": "STATUS（issue #44 评论 5902664419，MikejR2904，格式正常）。正式确认此前的 sim 端到端结论：前向 5 stage + 反向 8-kernel reverse chain 对解析 adjoint 端到端过（dq/dk/dv/dg/dbeta 相对误差 ~1.3~1.7e-7），前向仍有逐 stage 真机 910B3 验证。新增内容：在 kernels/projects/a2/gdn_chunk_bwd/bench/ 加了一个 fla-Triton 延迟/利用率基准（对比 triton-ascend 上同 NPU 的 chunk_gated_delta_rule，方法论照抄 gdn2 的 BENCHMARK_TRITON——msprof 测 device us、wall 时间、PipeUtilization），已推到 task/A2-K1 分支（未开 PR）。剩余工作全部要真机：board e2e、device 时间/利用率、Triton 对比，卡在 8 张 910B3 全部 90%+ AICore 占用（按 D-PM-28 记录不上报不仲裁）。申领人原话'无需 PM 动作'。"
+        },
+        {
+          "at": "2026-10-01T04:44",
+          "summary": "STATUS（issue #44 评论 5924913227，MikejR2904）。原话'holding, no blockers needing PM action'：反向基准脚手架（对 fla Triton chunk_gated_delta_rule，kernels/projects/a2/gdn_chunk_bwd/bench/）已推到 task/A2-K1 并在卡上就位；8 个反向 stage 全部通过 CCE 编译验证（a2）。延迟/利用率 + Triton 对比数字仍是纯device 工作，卡在 8 张 910B3 持续一天 90%+ 占用（按 D-PM-28 记录不上报不仲裁）。无新决策点，心跳按此重置。"
+        },
+        {
+          "at": "2026-10-02T04:44",
+          "summary": "STATUS（issue #44 评论 5945753932，MikejR2904）。原话'holding, no blockers needing PM action'，内容与上一轮一致：反向基准脚手架已推到 task/A2-K1 并在卡上就位，8 个反向 stage 全部通过 a2 编译验证。延迟/利用率 + Triton 对比数字仍卡在8 张 910B3 持续约 4 天 90%+ 占用（按 D-PM-28 记录不上报不仲裁，不要求/提供占用证据）。无新决策点，心跳按此重置。"
+        },
+        {
+          "at": "2026-10-03T04:44",
+          "summary": "STATUS（issue #44 评论 5965632937，MikejR2904）。原话'holding, no blockers needing PM action'，内容与前两轮一致：反向基准脚手架已在卡上就位并通过 a2 编译验证。延迟/利用率 + Triton 对比数字仍卡在 8 张 910B3 持续约 5 天 90%+ 占用（按 D-PM-28 记录不上报不仲裁）。无新决策点，心跳按此重置。"
+        },
+        {
+          "at": "2026-10-04T04:44",
+          "summary": "STATUS（issue #44 评论 5976669020，MikejR2904）。Holding，无需 PM 动作。反向benchmark harness（对比 fla Triton chunk_gated_delta_rule）已在 a2 staged + compile-verified；device 延迟/利用率 + Triton 对比数字仍卡在没有空闲 910B3（8 张卡全部 90%+ 占用，约 6 天）。申领人原话'会在卡空出来的瞬间跑并汇报'。按 D-PM-28 记录不上报不仲裁。"
+        },
+        {
+          "at": "2026-10-05T04:44",
+          "summary": "STATUS（issue #44 评论 5988268854，MikejR2904）。Holding，无需 PM 动作。反向benchmark harness（对比 fla Triton chunk_gated_delta_rule）仍在 a2 staged + compile-verified；device 延迟/利用率 + Triton 对比数字仍卡在没有空闲 910B3（8 张卡持续全部 90%+ 占用，约 7 天）。申领人原话'会在卡空出来的瞬间跑并汇报'。按 D-PM-28 记录不上报不仲裁。"
+        },
+        {
+          "at": "2026-10-06T04:49",
+          "summary": "STATUS（issue #44 评论 6009552025，MikejR2904；首行格式不对——em dash 又被转成乱码，poll 标了警告，PM 直接读原文核实）。**不是例行 holding，是卡终于空出来后的实质进展**：gdn_chunk_bwd 优化稳定在 v3（tapeless fused reverse）：对 v1 device 时间 −43%，向量流水线利用率 95.6%，无回归，完整结果在 task/A2-K1 分支的 bench/BENCH_RESULTS.md。对 fla Triton chunk-parallel baseline 的差距（约 5.9×）申领人判断是算法层面的——顺序扫描式反向结构上到不了那个数量级，要做 chunk-parallel 重写才可能追上，这是 A2-K1 规格范围之外的新工作，申领人请求下一步指示（'awaiting review / next assignment'）。\n\nPM 核：A2-K1 规格（docs/pm/tasks/A2-K1.md）的验收标准是正确性/ABI 覆盖/barrier 卫生，不含'追上 Triton'，所以这个 v3 数字是有用的补充证据，但不等于任务本身已满足验收——尚无 PR。已回复申领人（issue #44，非协议 ASSIGN/REVIEW，纯 PM 备注）：①请开 PR 发正式 DONE，补全验收清单（HV≠H 真机、test_a2_accumulate_barriers.py 全绿含负对照、BF16 host 算子审计、git diff --stat、pytest 计数），已有的可以引用早前 STATUS 不必重跑；②chunk-parallel 重写提案记录在案，这是 A2-K1 规格之外的新范围，PM 无权自行批准（不属于 kernel-change 的§6.5 队列，是全新工作且与当前 KDA 优先的排期竞争优先级）——已转给用户决定，申领人在得到回复前不要开始做。本轮向用户简短上报这个决策点。"
+        },
+        {
+          "at": "2026-10-07T02:14",
+          "summary": "用户裁定（D-PM-59，直接决定，原话'先排在 KDA/GDN 既定顺序之后，不现在立项'）：上一条 STATUS 里申领人提议的'chunk-parallel 重写'（为了追上 fla Triton baseline 的 ~5.9× 差距）**不现在立项**，排在现有 KDA/GDN 既定顺序之后——不是否决，是暂不排期，AGENTS.md §2 的 A2→A3→A5、KDA 先于 GDN 的排期不变。已写入 docs/handoff.md 顶部（下次有人重提同一提案时先查这条，不必重新问用户）。已回复申领人（issue #44）：按原验收清单开 PR 发 DONE 即可，chunk-parallel 重写不要动手。A2-K1 本身任务状态不变（仍 in_progress，等 PR）。"
         }
       ],
       "result": null
@@ -3986,7 +4043,7 @@
       "wave": "W0",
       "soc": "a5",
       "priority": "P1",
-      "status": "in_progress",
+      "status": "open",
       "model": [
         "gdn2-1.3b-fineweb-edu-100b"
       ],
@@ -4011,19 +4068,8 @@
       "spec": "docs/pm/tasks/GD2-02.md",
       "issue": 63,
       "pr": null,
-      "assignee": "limjiunnbin",
-      "assignee_caps": {
-        "agent": "自述为与 A2-09 同一 agent（APPLY 里写「我手上的 A2-09」，session 值不同）",
-        "socs": [
-          "a5"
-        ],
-        "soc_details": "自述（ACK 15:44Z）：A5 真机，在任务容器内执行；CANN 9.2.0（只读共享安装）、opp 含 ascend950（与 ascend910b、ascend910_93 并存，torch_npu 计算算子可用）、compiler timestamp 2026-05-09T12:45:09+08:00（clang 15.0.5，bisheng 与 ccec 同一份）、Python 3.12.14、torch 2.12.0+cu130、torch_npu 2.12.0、设备 Ascend950PR；与 BF-03 / BF-07 的机器环境不同。机器与卡归 assignee 管理（D-PM-28），结论只对其实际验证的这一套成立",
-        "ascriptor": "library 90cfcdc720bb…、kernels b3b3f9c16df7…（自述，取自 compatibility.json）",
-        "fla": "864a87f6ce5b…（v0.5.2-123-g864a87f6，自述）——与 GD2-01 / PK-02 / PK-03 的 pin e52dbc0e 不同，已要求对齐（见 reports）",
-        "fork": "limjiunnbin/ascend_fla_dev",
-        "session": "gd202-a5-realdevice-1",
-        "note": "APPLY（12:54Z）用 BF-05 的已合入证据证明 agent-a5-access 门真实满足（两台 A5，Ascend950PR/CANN 9.2.0，两台编译器 build 不同已按 machine_specs.md 分开记）；GD2-01 已 done，依赖满足，直接派。"
-      },
+      "assignee": null,
+      "assignee_caps": null,
       "branch": "task/GD2-02",
       "timebox_h": 16,
       "origin": {
@@ -4068,6 +4114,14 @@
         {
           "at": "2026-09-28T13:22",
           "summary": "STATUS（issue #63 评论 5870723778，session gd202-a5-realdevice-1，head d4be06a）。补上了跨后端的 logits 逐元素比对（`torch` 与 `cce` 各自落盘、一后端一进程，避免 CANN 每进程只解析一次算子名的坑）：真实 95B checkpoint/机器 B/FP32/8 token，`logits` 形状 (1,8,32000) 后端间相对 L2=4.094682e-05、max_abs=9.155273e-04，均在 1e-3 预算内（约为预算的 1/24）；8 个 token argmax 全部一致。**明确区分**：这是 torch↔cce 直接比对，不是上次说的各后端自己的 `cache_check`。**未满足验收的两条如实披露**：①落盘脚本里 cache 张量没拿到（'cache absent'），后端间 cache 比对还没有数字，任务预算要求 logits+cache 两者，只报 logits 不算通过；②BF16 那一轮（预算 1e-2）还没跑。在补齐前，95B 端到端**不算通过**，只是 FP32 logits 这一半过了。next：修落盘脚本的 cache 处理并重跑、BF16 一轮、证据出包开 draft PR。心跳正常。"
+        },
+        {
+          "at": "2026-09-30T13:22",
+          "summary": "心跳：距上一次 STATUS（2026-09-28T13:22）满 48h 无更新，按协议发 PING（issue #63 评论 5912202284）。再过 24h（到 2026-09-30T13:22 之后的 2026-10-01T13:22）仍无回应则收回任务重新放出。"
+        },
+        {
+          "at": "2026-10-01T13:26",
+          "summary": "收回：48h 无 STATUS 的 PING（2026-09-30T13:22，issue #63 评论 5912202284）之后再等 24h（到 2026-10-01T13:22）仍无任何回应——匿名核对 #63 自 PING 起的全部评论（截至 2026-10-01T13:26:57Z），只有 PING 这一条，没有 STATUS/RISK/BLOCKED/WITHDRAW。按 PROTOCOL.md §5：'进行中的任务 48 小时没有 STATUS 会收到 PING，再 24 小时没动静就收回，状态回 open，分支留着'。in_progress -> open，清空 assignee/assignee_caps（同 PK-05 24h-无-ACK 收回先例）；分支 task/GD2-02 保留。任务已有的真实进展（GD2-01 契约全集真机通过、bd 跨档位逐位一致、95B FP32 logits 跨后端相对 L2=4.09e-5 在预算内）不因收回而作废——下一个申领人可以在现有分支基础上接续，未完成项是：cache 跨后端比对（落盘脚本未拿到cache 张量）、BF16 轮次（预算 1e-2）、性能三明治出包、draft PR。"
         }
       ],
       "result": null
@@ -5522,17 +5576,18 @@
       "pr": null,
       "assignee": "limjiunnbin",
       "assignee_caps": {
-        "agent": "Codex / GPT-6",
+        "agent": "Codex；恢复 PGDN 开发的新会话（自述），只申领 PK-06、不参与 GDN-2",
         "socs": [
           "a5"
         ],
-        "soc_details": "CANN 9.1.0-beta.1，compiler/opp timestamp 20260509_173000235，OPP 内置含 ascend950/ascend910b/ascend910_93；GDA-04（GDN decode）已交付并合入，环境/源码/产物回执见 PR #136。",
+        "soc_details": "Docker 内环境，已重新核查设备健康/占用，候选卡 Healthy 且无进程，28 AI cores；CANN/OPP 9.1.0-beta.1（timestamp 20260509_173000235），内置含 ascend950/ascend910b/ascend910_93；实际作业前会再次检查并持共享锁（D-PM-28：机器/卡归assignee 自己管理）。",
         "ascriptor": "yes library 90cfcdc720bbcd66e8bd4361c4dd4fbc1a2a57b5 / kernels b3b3f9c16df7c4626ed3c081032a1be5a753d0b1",
-        "fla": "yes pin e52dbc0ea19d3a40d7ab7f9eed855d2b473994d2；已只读核对 literal PGDN naive（sha256 3baa67a5…11e84b5e8）",
-        "python": "host 3.11.15/torch 2.10.0+cpu；Docker 3.12.14/torch 2.12.0+cu130/torch_npu 2.12.0；pytest 可用",
+        "fla": "yes pin e52dbc0ea19d3a40d7ab7f9eed855d2b473994d2",
+        "python": "host 3.11.15/Torch 2.10.0+cpu；Docker 3.12.14/Torch 2.12.0+cu130/torch_npu 2.12.0/Ascriptor 0.1.0；pytest 可用",
         "fork": "limjiunnbin/ascend_fla_dev",
-        "availability": "持续在线，GDA-04 已合入后立即接续",
-        "session": "dev-20260928T020159Z-609dfa8f"
+        "availability": "同步在线，持续 loop 等 ASSIGN 并及时 ACK",
+        "session": "dev-20261007T021301Z-pk06-afaf8516",
+        "note": "**同账号 limjiunnbin 同时段也是 A2-13 的 assignee（status: blocked，session 01a0b7ce-3daf-7550-a7bf-31c67eb91ca3）。**按 PROTOCOL.md §3.1 的 session 机制：两次 APPLY 都填了 session 且两个值不同（A2-13=01a0b7ce-...-ca3，本次=dev-2026...-afaf8516），满足并发持有第二个任务的形式条件，PM 按此 ASSIGN，不是破例。规格已冻结，继续有效（不重新讨论 BF16/FP32、naive 归一化、固定常量、双状态语义）；本机独立 checkout 的主机基线 1450 passed/10 skipped（CPU 环境 torch_npu importorskip 弃用提示，非压制），Docker 内 library 204/204 文件逐一核对与选定 pin 一致。此前无 PK-06 实现/PR/真机 workload，本次是全新开始。"
       },
       "branch": "task/PK-06",
       "timebox_h": 24,
@@ -5560,6 +5615,14 @@
         {
           "at": "2026-09-28T16:52",
           "summary": "PM 补全规格（docs/pm/tasks/PK-06.md 全文重写，格式对齐 GDA-04：ABI 冻结表读自 ascend_fla/ops/pgdn_chunk_fwd.py 与 kernels/projects/a5/pgdn_chunk_fwd/contract.json 源码核实，双 oracle 定 A=naive_recurrent_precond_gated_delta_rule/B=独立 CPU FP32，吸收两轮只读预检的四点发现：14-entry prepare 联合清单、四节点 FP64 lift、非零 ATK 初态的量程界变化 A≤A0+t、chunk 仍 None-only 两个状态都要直传。BF16 显式拒绝的过期骨架条款已按 D-PM-35 更正为原生支持，与 board.json 既有 dtype:[bf16,fp32] 字段一致）。open -> assigned，指派给 issue #95 上的标准 APPLY（评论 5872799023，账号 limjiunnbin/session dev-20260928T020159Z-609dfa8f，GDA-04 合入后已转为对 PK-06 的正式申领）。ASSIGN 协议消息随后发到 issue #95。"
+        },
+        {
+          "at": "2026-10-01T20:52",
+          "summary": "收回（PM 自查发现的流程纠正，不是新事件触发）：ASSIGN 于 2026-09-28T17:05:02Z（issue #95 评论 5874796273，ack_within_h: 24），24h 窗口本应在 2026-09-29T17:05到期。核对 #95 自 ASSIGN 起的全部评论，没有任何 ACK 或其它协议消息——这条 24h-无-ACK 的收回在此之前的若干轮里被漏掉了（本 session 的心跳跟踪只续用了上下文里已有的两个截止时间 GD2-02/A2-13，没有在每轮重新推导全部在飞任务的截止时间，这是本 PM 的流程缺口，如实记录）。现按 PROTOCOL.md §3.3（与 PK-05 的 24h-无-ACK 收回同一先例）处理：assigned -> open，清空 assignee/assignee_caps，分支 task/PK-06 保留。规格docs/pm/tasks/PK-06.md 的完整工作（ABI 冻结表、双 oracle、14-entry prepare 清单、ATK 非零初态量程界等）继续有效，不因收回而重新讨论，下一个申领人直接按现有规格接。"
+        },
+        {
+          "at": "2026-10-07T03:27",
+          "summary": "ASSIGN（PM，对应 limjiunnbin 的三次 APPLY 6029451834/6029714542/6030280407，累计补充同一申请，不是新开 session 或撤销前一条）。PK-06 此前因 24h 未 ACK 被收回（2026-10-01），分支 task/PK-06 与规格 docs/pm/tasks/PK-06.md 原样保留，直接复用。**并发持有判断**：该账号同时是 A2-13 的 assignee（blocked，等用户裁定），但本次 APPLY 填了与 A2-13 不同的 session 值（dev-20261007T021301Z-pk06-afaf8516 vs 01a0b7ce-3daf-7550-a7bf-31c67eb91ca3），满足 PROTOCOL.md §3.1 并发接第二个任务的形式条件（两边都填、且不同），按协议本身的设计走，不是 PM 自定义放宽。"
         }
       ],
       "result": null,
@@ -5568,7 +5631,9 @@
         "issue": 89,
         "by": "limjiunnbin",
         "approved_by_user": true
-      }
+      },
+      "ack_within_h": 24,
+      "report_every_h": 24
     },
     {
       "id": "GDA-05",

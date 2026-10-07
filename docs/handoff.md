@@ -9,6 +9,26 @@
 **这是一次 PM 账号本身的交接，不是算子进度交接。** 下面按"现在手上有什么、有什么坑、
 下一步该干什么"排列，配合 `docs/pm/board.json`（权威）和 `python tools/pm_board.py --render` 看。
 
+> **2026-10-07T07:35Z 更新（D-PM-60，用户直接决定，原话"批了，新建派生单元修这个"）：
+> A2-13（issue #40）用真实前向缓存资格化 KDA 反向时测出 `kda_bwd_stable` 的 `g_cumsum` 四个消费者
+> （`scan_fused`/`inverse_epilogue`/`finalize_pre`/`finalize_post`）只吃 BF16，默认初始化真实会
+> 用到的门控跨度下会让 `dg` 梯度超 0.05 预算——根因已干净定位到这四处的 BF16 narrowing（只换这一项
+> 成真实 FP32 值，其余 8 项缓存不动，六梯度全部回到预算内）。修复需要新建 kernel 代码（派生单元），
+> 这既是 `AGENTS.md` §6.5 的 kernel-change 记账项、又是写集扩大，两者都在"只问用户"清单上，PM 转交
+> 等了约 9 天。**用户批准**：新建 `kernels/projects/a2/kda_bwd_stable_fp32gc`（现有 BF16
+> `kda_bwd_stable` 单元与其历史资格不动），A2-13 写集已扩这一项，状态 blocked → in_progress，
+> 验收仍按原规格 0.05 预算与双轨报数（真实端到端 vs 独立 fixture 分开报）。`docs/matrix/gaps.json`
+> 的 `a2-kda-bwd-gcumsum-bf16-precision` 已记批准；`qualified` 仍留 `False`，PM 审过才改。
+>
+> **2026-10-07T02:14Z 更新（D-PM-59，用户直接决定）：A2-K1（GDN chunk 反向搬 A2）申领人跑完此前因卡占用
+> 被阻塞的真机 device 基准——v3（tapeless fused reverse）对 v1 device 时间 −43%、向量流水线利用率 95.6%、
+> 无回归；对 fla Triton chunk-parallel baseline 仍差约 5.9×，申领人判断是算法结构性的（顺序扫描式反向
+> 到不了那个量级），提议另立"chunk-parallel 重写"任务并请示是否现在做。**用户裁定：排在 KDA/GDN 既定顺序
+> 之后，不现在立项**——不新增任务，不改变现有排期（AGENTS.md §2 的 A2→A3→A5、KDA 先于 GDN 的顺序不变）。
+> A2-K1 本身的验收标准不含"追上 Triton"，这组数字是补充证据，PM 已回复申领人按原验收清单开 PR 发
+> DONE，chunk-parallel 重写先别动手。**这不是否决**，只是暂不排期；下次有人重提同一个提案时先查这条，
+> 不必重新问用户。
+
 ### 正在飞的任务（现在没有；A5K-02、PK-02、PK-03 都已于 2026-09-19 合入）
 
 > **2026-09-28T15:08Z 更新：GDA-04（A5 GDN decode/fused recurrent：从零建 kernel，PR #136）审查 accept 并按 D-PM-33 合入（merge commit `ebdf55eb`）；main 全量（排除 torch_npu）1421 passed / 25 skipped / 14 failed。GDA-04 done。**
