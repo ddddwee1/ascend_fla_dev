@@ -4,9 +4,9 @@ D-PM-60 approved a new FP32 cumulative-gate derived unit on 2026-10-07.
 Its implementation and fresh native results are in [fp32gc-v1](fp32gc-v1/README.md).
 The new unit's real-cache gradients pass the listed cases, while original strict
 checkpoint failures remain recorded. Its actual-cache end-to-end limit is128;
-formal review is pending and public dispatch remains unqualified. One existing
-forward host assertion needs the explicitly requested one-line write-set addition;
-the actual checkout retains that failure and the isolated proposal passes.
+formal review is pending and public dispatch remains unqualified. The one-line
+forward host assertion update was explicitly approved and applied; the final
+assigned-checkout host regression is1454 passed /6 skipped.
 
 The results below belong to the **frozen BF16 predecessor**, measured before
 D-PM-60. Its accuracy-domain failure and CPU-only repair hypothesis remain

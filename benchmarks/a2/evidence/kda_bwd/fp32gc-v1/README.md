@@ -13,24 +13,23 @@ the original task and D-PM-60. Public dispatch remains `qualified=False`.
 This is not a blanket unit or checkpoint qualification. Artifact identities
 are recorded in `candidate-source-manifest.json` and each run's source manifest.
 
-The capability addition exposed one host integration assertion that requires
-the capability dictionary to contain only `forward`. The assigned checkout's
-latest full regression is **1 failed / 1453 passed / 6 skipped**; the failure
-is `tests/test_kda_fwd_a2.py:172`. A one-line proposal checking the measured
-forward key (with the complete dictionary still checked in `test_platform.py`)
-passes **1454 / 6** in an isolated copy. The original test remains untouched
-pending its explicit write-set addition, requested in issue40 comment6034165170.
-The failed run, concrete patch and isolated passing run are retained under
-`host/`. This integration check prevents final DONE until the patch is applied
-and the assigned checkout passes. It does not alter the native results below.
+The capability addition initially exposed a host integration assertion requiring
+the table to contain only `forward` (1 failed / 1453 passed / 6 skipped).
+PM approved the exact one-line fix in issue40 comment6034887577: the forward
+evidence test checks its measured `stable.forward` value, while `test_platform`
+still checks the full dictionary and `qualified=False`. The approved patch was
+applied to the assigned checkout, whose final full regression is **1454 passed /
+6 skipped in174.54s**. The earlier failed run and isolated preview remain under
+`host/` as historical evidence. No kernel or numerical threshold changed.
 
 ## Completed stages
 
 | Experiment | Observed result | Scope |
 |---|---|---|
 | Host before capability addition | 1454 passed / 6 skipped | Host only |
-| Host after capability addition | 1 failed / 1453 passed / 6 skipped | Existing forward dictionary assertion; integration pending |
-| Host with isolated one-line proposal | 1454 passed / 6 skipped | Proposal validated; not yet applied to assigned checkout |
+| Historical host before assertion fix | 1 failed / 1453 passed / 6 skipped | Stale whole-dictionary assertion; resolved by approved one-line fix |
+| Historical host with isolated proposal | 1454 passed / 6 skipped | Proposal validated before its write-set approval |
+| Final host in assigned checkout | 1454 passed / 6 skipped | Approved patch applied; all original cases/budgets retained |
 | Vendor compilation | 5 forward + 9 backward at each bd=1,2 | Compilation only, zero custom launches |
 | CPU ABI checks | FP32 gc accepted; wrong gc/cache dtype and NaN rejected | Other eight fixture caches unchanged bytewise |
 | Independent fixture | 26 executed; 23 cases pass all checks | All 156 final-gradient checks pass; 3 intermediate checks fail |
@@ -57,6 +56,12 @@ H=HV32 at T64/128/512/4096, and H16/HV32 at T192. All 54 gradient, 54 raw-six
 cache and 81 assembled-nine cache cross-bd comparisons are byte-identical.
 Worst six-gradient relative L2 values are dq0.0041884305, dk0.0043337526,
 dv0.0037101211, dbeta0.0037606116, dg0.0049404286, dh00.0024671953.
+
+Cache assembly foundations pass all72 nine-cache checks across eight small
+cases, and all48 direct-forward checks. The reconstructed gc/h/v_new worst
+relative L2 values are2.336253198e-9/0.0021150224/0.0028565161. All108
+six-cache layout round-trip checks across the18 cases are byte-identical;
+`cache-foundations-summary.json` links these summaries to the original receipts.
 
 Six caches are actual forward outputs with the approved test-side layout
 conversion. The other three retain their explicit provenance: cumulative gates

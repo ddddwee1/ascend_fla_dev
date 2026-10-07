@@ -1,0 +1,58 @@
+{
+  "scope": "A2-13 original acceptance plus D-PM-60 FP32-gate unit; independent fixtures explicitly separate",
+  "authorization": {
+    "fp32_gate_unit": "issue40#issuecomment-6033288361",
+    "one_line_forward_assertion": "issue40#issuecomment-6034887577"
+  },
+  "cache_foundations": {
+    "nine_cache_checks": 72,
+    "direct_forward_checks": 48,
+    "six_layout_roundtrip_bitwise_checks": 108,
+    "all_passed": true
+  },
+  "real_shape_actual_cache": {
+    "cases": 18,
+    "all_passed": true,
+    "golden": "CPU FP32 full-chain autograd",
+    "gradient_relative_l2_budget": 0.05,
+    "torch_npu_fp32_reference": "separate fresh reference"
+  },
+  "independent_fixture": {
+    "cases": 26,
+    "all_checks_passed_cases": 23,
+    "final_gradient_checks_passed": 156,
+    "reported_separately": true,
+    "board_contract_status": "failed"
+  },
+  "gate_span": {
+    "backward": 128.0,
+    "unit": "a2.kda_bwd_stable_fp32gc only",
+    "sweep_passed": 44,
+    "sweep_cases": 48,
+    "span192_nonfinite_forward_rejections": 4,
+    "long_boundary_cases_passed": 12,
+    "new_seed_cases_passed": 12,
+    "initialization_seeds": 8,
+    "initialization_max_fp32": 106.38469696044922,
+    "long_worst_dg": 0.03857105213390389
+  },
+  "host": {
+    "passed": 1454,
+    "skipped": 6,
+    "failed": 0,
+    "seconds": 174.54,
+    "scope": "assigned checkout after approved patch",
+    "raw_log_sha256": "ef3686e9a497571704edd86baf92a0f9f4e7f2833d954f1c0e0673de7a30478b"
+  },
+  "source_and_scope": "final-source-audit.json",
+  "qualified": false,
+  "public_dispatch_available": false,
+  "performance_claim": false,
+  "unit_full_model_qualification": "untested; 10 reduced leaf probes per model passed",
+  "retained_limitations": [
+    "Original strict fixture/checkpoint failures remain failures.",
+    "Full unit sim/pipesim qualification is not claimed.",
+    "Measured backward128 must not be applied to the frozen BF16-gate unit.",
+    "Public A2 routing remains blocked and requires separate integration work."
+  ]
+}
