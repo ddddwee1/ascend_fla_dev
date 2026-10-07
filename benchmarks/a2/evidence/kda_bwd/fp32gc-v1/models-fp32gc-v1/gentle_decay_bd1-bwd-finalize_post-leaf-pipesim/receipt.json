@@ -1,0 +1,208 @@
+{
+  "model": "pipesim",
+  "kernel": "bwd.finalize_post",
+  "block_dim": 1,
+  "capture_sha256": "ef95b46e17491593c013027cd2218efbb304a827db59a548b4d23beefe6fcdbe",
+  "source_sha256": "125b715b403a1431fc46ecc9668dde839f14dcc5cf1577b914a260f4339d8dce",
+  "ascriptor": "0.1.0",
+  "comparison_scope": "model actual outputs versus captured native same-input output; CPU golden checks are in native full-chain evidence",
+  "metrics": [
+    {
+      "finite": true,
+      "actual_nonfinite": 0,
+      "expected_nonfinite": 0,
+      "relative_l2": 1.183950691179639e-08,
+      "expected_norm": 0.005182393406002396,
+      "residual_norm": 6.13569825500134e-11,
+      "max_abs": 1.4551915228366852e-11,
+      "nonzero_when_expected": true,
+      "allclose": null,
+      "budget": 0.05,
+      "passed": true
+    },
+    {
+      "finite": true,
+      "actual_nonfinite": 0,
+      "expected_nonfinite": 0,
+      "relative_l2": 9.29830621616446e-09,
+      "expected_norm": 0.03241839173867267,
+      "residual_norm": 3.014361334217547e-10,
+      "max_abs": 1.1641532182693481e-10,
+      "nonzero_when_expected": true,
+      "allclose": null,
+      "budget": 0.05,
+      "passed": true
+    },
+    {
+      "finite": true,
+      "actual_nonfinite": 0,
+      "expected_nonfinite": 0,
+      "relative_l2": 0.0,
+      "expected_norm": 0.002561456953085215,
+      "residual_norm": 0.0,
+      "max_abs": 0.0,
+      "nonzero_when_expected": true,
+      "allclose": null,
+      "budget": 0.05,
+      "passed": true
+    },
+    {
+      "finite": true,
+      "actual_nonfinite": 0,
+      "expected_nonfinite": 0,
+      "relative_l2": 0.0,
+      "expected_norm": 0.009022959995690378,
+      "residual_norm": 0.0,
+      "max_abs": 0.0,
+      "nonzero_when_expected": true,
+      "allclose": null,
+      "budget": 0.05,
+      "passed": true
+    }
+  ],
+  "fresh_cpu_fp32_full_fixture_stage_comparison": {
+    "finalize_post.dq_hv": {
+      "finite": true,
+      "actual_nonfinite": 0,
+      "expected_nonfinite": 0,
+      "relative_l2": 1.2211696010492711e-05,
+      "expected_norm": 0.005182393379256829,
+      "residual_norm": 6.328581255427445e-08,
+      "max_abs": 5.960464477539063e-08,
+      "nonzero_when_expected": true,
+      "allclose": true,
+      "budget": 0.05,
+      "passed": true
+    },
+    "finalize_post.dk_hv": {
+      "finite": true,
+      "actual_nonfinite": 0,
+      "expected_nonfinite": 0,
+      "relative_l2": 0.0,
+      "expected_norm": 0.03241839172929348,
+      "residual_norm": 0.0,
+      "max_abs": 0.0,
+      "nonzero_when_expected": true,
+      "allclose": true,
+      "budget": 0.05,
+      "passed": true
+    },
+    "finalize_post.dbeta": {
+      "finite": true,
+      "actual_nonfinite": 0,
+      "expected_nonfinite": 0,
+      "relative_l2": 0.0,
+      "expected_norm": 0.002561456953085215,
+      "residual_norm": 0.0,
+      "max_abs": 0.0,
+      "nonzero_when_expected": true,
+      "allclose": true,
+      "budget": 0.05,
+      "passed": true
+    },
+    "finalize_post.dg": {
+      "finite": true,
+      "actual_nonfinite": 0,
+      "expected_nonfinite": 0,
+      "relative_l2": 0.0011642565006294476,
+      "expected_norm": 0.009023555380013067,
+      "residual_norm": 1.0505733009970039e-05,
+      "max_abs": 9.5367431640625e-07,
+      "nonzero_when_expected": true,
+      "allclose": true,
+      "budget": 0.05,
+      "passed": true
+    }
+  },
+  "model_output_digests": [
+    {
+      "shape": [
+        1,
+        1,
+        2,
+        64,
+        128
+      ],
+      "dtype": "torch.float32",
+      "sha256": "cdbad9cca265c05b3fc88c3f32dd6ca89d4e0503c63e9c31c0ce630278dafa6a"
+    },
+    {
+      "shape": [
+        1,
+        1,
+        2,
+        64,
+        128
+      ],
+      "dtype": "torch.float32",
+      "sha256": "2475c113afddb27e93f360882b01bebe8e0eae9071b73236f1ac2574255c4db5"
+    },
+    {
+      "shape": [
+        128,
+        1
+      ],
+      "dtype": "torch.bfloat16",
+      "sha256": "bdec82749fd6730e1b8da958cd9e8ebd1bc8506a221075e960108c1c39160faf"
+    },
+    {
+      "shape": [
+        128,
+        128
+      ],
+      "dtype": "torch.bfloat16",
+      "sha256": "dd954af0e9d234bbd8590a0048e7cca4874df1d49a4f560b90e723e549e8d55e"
+    }
+  ],
+  "elapsed_host_s": 15.819058945402503,
+  "hardware_acceptance": false,
+  "event_balance": [],
+  "hazards": [],
+  "report": {
+    "cycles": 101929,
+    "pipes": {
+      "core0/vec0/S": {
+        "busy": 5592,
+        "end": 98456,
+        "tasks": 5452,
+        "utilisation": 0.0549
+      },
+      "core0/vec0/MTE2": {
+        "busy": 35944,
+        "end": 83696,
+        "tasks": 58,
+        "utilisation": 0.3526
+      },
+      "core0/vec0/MTE3": {
+        "busy": 10842,
+        "end": 101929,
+        "tasks": 34,
+        "utilisation": 0.1064
+      },
+      "core0/vec0/V": {
+        "busy": 60030,
+        "end": 101707,
+        "tasks": 5166,
+        "utilisation": 0.5889
+      }
+    },
+    "hazards": [],
+    "deadlock": null,
+    "tasks": 10710,
+    "flag_timeline": {
+      "checked_tokens": 172,
+      "physical_checked_tokens": 172,
+      "physical_bindings_complete": true,
+      "unbound_events": []
+    },
+    "local_mutex": {
+      "slots_per_lane": 32,
+      "sections": 0,
+      "ids_by_lane": {
+        "core0/vec0": []
+      },
+      "timing": "modeled, not silicon calibrated"
+    }
+  },
+  "model_cycles": 101929
+}

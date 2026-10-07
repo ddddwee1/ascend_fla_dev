@@ -1,4 +1,13 @@
-# A2-13 KDA backward qualification — accuracy-domain gap
+# A2-13 KDA backward evidence
+
+D-PM-60 approved a new FP32 cumulative-gate derived unit on 2026-10-07.
+Its implementation and fresh native results are in [fp32gc-v1](fp32gc-v1/README.md).
+The new unit's real-cache gradients pass the listed cases, while original strict
+checkpoint failures remain recorded; qualification and final review are pending.
+
+The results below belong to the **frozen BF16 predecessor**, measured before
+D-PM-60. Its accuracy-domain failure and CPU-only repair hypothesis remain
+historical evidence and are not reused as qualification of the new unit.
 
 This evidence concerns direct A2 units, not public autograd dispatch.
 `CAPABILITIES["a2"]["qualified"]` remains false. No backward gate-span limit has

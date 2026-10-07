@@ -75,7 +75,11 @@ def a2_actual_forward_caches(native, inputs):
         return value.permute(0, 2, 3, 1, 4).contiguous().view(b, t, hv, value.shape[-1])
 
     saved = {name: token_major(raw[name]) for name in direct}
-    saved["g_cumsum"] = token_major((raw["g_cumsum"] * (1.0 / math.log(2))).bfloat16())
+    gc_dtype = getattr(native, "gc_dtype", "bf16")
+    if gc_dtype not in ("bf16", "fp32"):
+        raise ValueError("A2 cumulative-gate cache ABI must be bf16 or fp32")
+    gc_log2 = raw["g_cumsum"] * (1.0 / math.log(2))
+    saved["g_cumsum"] = token_major(gc_log2 if gc_dtype == "fp32" else gc_log2.bfloat16())
     saved["h"], v_new = _scan_states(
         *(raw[n] for n in ("w", "u", "kg", "eg")), x["initial_state"], b=b, hv=hv, c=c)
     saved["v_new"] = token_major(v_new)
@@ -98,7 +102,8 @@ def a2_actual_forward_caches(native, inputs):
                "six_layout_roundtrip_bitwise": roundtrip,
                "provenance": {**{n: "actual A2 forward kernel output, CPU layout only" for n in direct},
                               "qg": "actual A2 wy unscaled qg, CPU layout only",
-                              "g_cumsum": "actual gate FP32 natural-log cumsum * 1/ln(2), then BF16",
+                              "g_cumsum": "actual gate FP32 natural-log cumsum * 1/ln(2), "
+                                          + ("retained FP32 (D-PM-60)" if gc_dtype == "fp32" else "then BF16"),
                               "h": "FP32 _scan_states using actual w/u/kg/eg, stored BF16",
                               "v_new": "FP32 _scan_states using actual w/u/kg/eg, stored BF16"},
                "literal_recurrent_ring_capture": False, "public_runtime_claim": False}

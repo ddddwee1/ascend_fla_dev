@@ -170,20 +170,24 @@ def a2_gradient_metrics(actual, expected, rule):
 
 
 class A2BackwardNative:
-    """Direct frozen A2 units; ALL five forward and nine backward vendors first.
+    """Direct A2 units; ALL five forward and nine backward vendors first.
 
     The common launch binder preserves device intermediates and binds every scalar
     from the compiled signature. Public dispatch and its qualification gate are
     not involved. A worker owns exactly one block_dim for its lifetime.
     """
-    def __init__(self, bd, emit):
+    def __init__(self, bd, emit, gc_dtype="bf16"):
         from benchmarks.verify_decode import _A2Native, _a2_load, _a2_unit
         from ascend_fla.runtime.compile import compile_kernel
         if bd not in (1, 2):
             raise ValueError("A2 backward currently declares block_dim 1 and 2")
+        if gc_dtype not in ("bf16", "fp32"):
+            raise ValueError("gc_dtype must be bf16 or fp32")
         self.bd = bd
+        self.gc_dtype = gc_dtype
         self.forward, self.forward_ref = _a2_unit("kda_fwd_stable")
-        self.backward, self.backward_ref = _a2_unit("kda_bwd_stable")
+        self.backward_name = "kda_bwd_stable_fp32gc" if gc_dtype == "fp32" else "kda_bwd_stable"
+        self.backward, self.backward_ref = _a2_unit(self.backward_name)
         self.contract = json.loads((self.backward.HERE / "contract.json").read_text())
         self.forward_contract = json.loads((self.forward.HERE / "contract.json").read_text())
         plan = [(f"fwd.{name}", kernel) for name, kernel in self.forward._kernels().items()]
@@ -202,7 +206,8 @@ class A2BackwardNative:
         if self.trace:
             raise RuntimeError("custom kernel launched before precompile completed")
         emit({"stage": "precompile_complete", "forward_count": 5,
-              "backward_count": 9, "custom_launches": 0, "block_dim": bd})
+              "backward_count": 9, "custom_launches": 0, "block_dim": bd,
+              "backward_unit": self.backward_name, "gc_dtype": gc_dtype})
         self.runner = _a2_load(self.backward.HERE / "_unit_runner.py", "_a213_runner")
 
     def chain(self, unit, inputs):
@@ -377,7 +382,7 @@ def a2_actual_cases(native, emit, cases=None):
 
 def a2_worker(bd, out, suite, *, lengths=(128,), seeds=(0,),
               spans=(1., 8., 16., 32., 64., 96., 128., 160., 192.),
-              gates=("uniform", "fla_initialization")):
+              gates=("uniform", "fla_initialization"), gc_dtype="bf16"):
     """One process / one block_dim. Caller supplies an isolated output directory."""
     import hashlib
     from benchmarks.verify_decode import _a2_identity
@@ -395,7 +400,10 @@ def a2_worker(bd, out, suite, *, lengths=(128,), seeds=(0,),
                root / "benchmarks/verify_real_shapes.py", root / "ascend_fla/layers/kda.py",
                root / "ascend_fla/ops/kda/chunk.py"]
     sources += [root / "tests" / f"test_kda_{suffix}_npu.py" for suffix in ("bwd", "bwd_deep", "caches")]
-    sources += [p for p in (root / "kernels/projects/a2/kda_bwd_stable").rglob("*")
+    backward_name = "kda_bwd_stable_fp32gc" if gc_dtype == "fp32" else "kda_bwd_stable"
+    identity["backward_unit"] = backward_name
+    identity["gc_dtype"] = gc_dtype
+    sources += [p for p in (root / "kernels/projects/a2" / backward_name).rglob("*")
                 if p.is_file() and (p.suffix == ".py" or p.name == "contract.json")
                 and "evidence" not in p.parts and "__pycache__" not in p.parts]
     identity["backward_qualification_sha256"] = {
@@ -403,7 +411,7 @@ def a2_worker(bd, out, suite, *, lengths=(128,), seeds=(0,),
     (out / "identity.json").write_text(json.dumps(identity, indent=2) + "\n")
     emit({"stage": "identity_verified", "block_dim": bd, "soc": identity["soc"],
           "cann": identity["cann"], "opp_packages": identity["opp_packages"]})
-    native = A2BackwardNative(bd, emit)
+    native = A2BackwardNative(bd, emit, gc_dtype=gc_dtype)
     if suite == "fixture":
         rows = a2_fixture_cases(native, emit)
     elif suite == "actual":
@@ -414,6 +422,7 @@ def a2_worker(bd, out, suite, *, lengths=(128,), seeds=(0,),
     else:
         raise ValueError("unsupported A2 suite")
     receipt = {"block_dim": bd, "suite": suite, "cases": len(rows),
+               "backward_unit": backward_name, "gc_dtype": gc_dtype,
                "passed": all(row["passed"] for row in rows),
                "public_dispatch_qualified": False, "rows": rows}
     (out / "receipt.json").write_text(json.dumps(receipt, indent=2, allow_nan=False) + "\n")
@@ -432,6 +441,8 @@ def main() -> int:
     ap.add_argument("--json-out", type=pathlib.Path)
     ap.add_argument("--soc", choices=("a5", "a2"), default="a5")
     ap.add_argument("--a2-suite", choices=("fixture", "actual", "span"), default="fixture")
+    ap.add_argument("--a2-gc-dtype", choices=("bf16", "fp32"), default="bf16",
+                    help="A2 backward cache ABI: frozen BF16 or D-PM-60 FP32 cumulative gates")
     ap.add_argument("--a2-out", type=pathlib.Path)
     ap.add_argument("--a2-lengths", type=int, nargs="+", default=[128])
     ap.add_argument("--a2-seeds", type=int, nargs="+", default=[0])
@@ -450,7 +461,11 @@ def main() -> int:
         if args.impl not in (None, "stable") or args.mults or args.json_out or args.a2_out is None:
             ap.error("A2 requires --a2-out and its own suite; A5 impl/mults/json-out do not apply")
         return a2_worker(args.block_dim, args.a2_out, args.a2_suite,
-                         lengths=args.a2_lengths, seeds=args.a2_seeds, spans=args.a2_spans, gates=args.a2_gates)
+                         lengths=args.a2_lengths, seeds=args.a2_seeds, spans=args.a2_spans,
+                         gates=args.a2_gates, gc_dtype=args.a2_gc_dtype)
+
+    if args.a2_gc_dtype != "bf16":
+        ap.error("--a2-gc-dtype fp32 applies only to --soc a2")
 
     if args.impl is not None:
         rows = run(args.impl, args.block_dim, args.mults)

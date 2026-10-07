@@ -1,0 +1,436 @@
+{
+  "cases": 14,
+  "whole_gradient_passes": 14,
+  "original_all_stage_passes": 0,
+  "bitwise_comparisons": {
+    "gradients": 42,
+    "stages": 231,
+    "raw_six": 42,
+    "assembled_nine": 63
+  },
+  "scope": "same native source/code and inputs; bd2 uses a separately copied and verified vendor tree",
+  "failures": [
+    {
+      "case": "range_uniform_t128_seed0_span24",
+      "bd": 1,
+      "stages": {
+        "finalize_pre.k_scaled": {
+          "finite": true,
+          "actual_nonfinite": 0,
+          "expected_nonfinite": 0,
+          "relative_l2": 7.919268471757898e-06,
+          "expected_norm": 252548.5790931956,
+          "residual_norm": 2.0,
+          "max_abs": 2.0,
+          "nonzero_when_expected": true,
+          "allclose": false,
+          "budget": 0.05,
+          "passed": false
+        },
+        "finalize_pre.kg": {
+          "finite": true,
+          "actual_nonfinite": 0,
+          "expected_nonfinite": 0,
+          "relative_l2": 7.193898411884003e-07,
+          "expected_norm": 347516.7227648429,
+          "residual_norm": 0.2500000000001137,
+          "max_abs": 0.25,
+          "nonzero_when_expected": true,
+          "allclose": false,
+          "budget": 0.05,
+          "passed": false
+        },
+        "finalize_pair.s_base": {
+          "finite": true,
+          "actual_nonfinite": 0,
+          "expected_nonfinite": 0,
+          "relative_l2": 2.2305929602395302e-05,
+          "expected_norm": 279.86487650242975,
+          "residual_norm": 0.006242646233446253,
+          "max_abs": 0.00390625,
+          "nonzero_when_expected": true,
+          "allclose": true,
+          "budget": 1e-05,
+          "passed": false
+        },
+        "finalize_pair.t_beta": {
+          "finite": true,
+          "actual_nonfinite": 0,
+          "expected_nonfinite": 0,
+          "relative_l2": 6.85586288685394e-05,
+          "expected_norm": 7.184513386044839,
+          "residual_norm": 0.0004925603868349014,
+          "max_abs": 0.000244140625,
+          "nonzero_when_expected": true,
+          "allclose": true,
+          "budget": 1e-05,
+          "passed": false
+        }
+      }
+    },
+    {
+      "case": "range_uniform_t128_seed0_span28",
+      "bd": 1,
+      "stages": {
+        "finalize_pair.qk_right": {
+          "finite": true,
+          "actual_nonfinite": 0,
+          "expected_nonfinite": 0,
+          "relative_l2": 1.9005322938599878e-05,
+          "expected_norm": 942.244632568351,
+          "residual_norm": 0.017907663529123895,
+          "max_abs": 0.015625,
+          "nonzero_when_expected": true,
+          "allclose": true,
+          "budget": 1e-05,
+          "passed": false
+        },
+        "finalize_pair.t_beta": {
+          "finite": true,
+          "actual_nonfinite": 0,
+          "expected_nonfinite": 0,
+          "relative_l2": 4.205112758405679e-05,
+          "expected_norm": 34.001707890837224,
+          "residual_norm": 0.0014298101565934267,
+          "max_abs": 0.0009765625,
+          "nonzero_when_expected": true,
+          "allclose": true,
+          "budget": 1e-05,
+          "passed": false
+        }
+      }
+    },
+    {
+      "case": "range_uniform_t128_seed0_span32",
+      "bd": 1,
+      "stages": {
+        "finalize_pre.kg": {
+          "finite": true,
+          "actual_nonfinite": 0,
+          "expected_nonfinite": 0,
+          "relative_l2": 1.3472400142695599e-06,
+          "expected_norm": 11876131.81803749,
+          "residual_norm": 16.0,
+          "max_abs": 16.0,
+          "nonzero_when_expected": true,
+          "allclose": false,
+          "budget": 0.05,
+          "passed": false
+        },
+        "finalize_pair.t_beta": {
+          "finite": true,
+          "actual_nonfinite": 0,
+          "expected_nonfinite": 0,
+          "relative_l2": 0.00034706300002214336,
+          "expected_norm": 168.32162481496852,
+          "residual_norm": 0.05841820807688462,
+          "max_abs": 0.03125,
+          "nonzero_when_expected": true,
+          "allclose": true,
+          "budget": 1e-05,
+          "passed": false
+        }
+      }
+    },
+    {
+      "case": "range_uniform_t128_seed0_span64",
+      "bd": 1,
+      "stages": {
+        "finalize_pair.t_beta": {
+          "finite": true,
+          "actual_nonfinite": 0,
+          "expected_nonfinite": 0,
+          "relative_l2": 1.2931121034123449e-05,
+          "expected_norm": 158459796.96954122,
+          "residual_norm": 2049.0628136557657,
+          "max_abs": 2048.0,
+          "nonzero_when_expected": true,
+          "allclose": true,
+          "budget": 1e-05,
+          "passed": false
+        }
+      }
+    },
+    {
+      "case": "range_uniform_t128_seed0_span96",
+      "bd": 1,
+      "stages": {
+        "finalize_pre.k_scaled": {
+          "finite": true,
+          "actual_nonfinite": 0,
+          "expected_nonfinite": 0,
+          "relative_l2": 1.4212520976539979e-08,
+          "expected_norm": 7.736218152929508e+19,
+          "residual_norm": 1099511627776.0,
+          "max_abs": 1099511627776.0,
+          "nonzero_when_expected": true,
+          "allclose": false,
+          "budget": 0.05,
+          "passed": false
+        }
+      }
+    },
+    {
+      "case": "range_uniform_t128_seed0_span106.5",
+      "bd": 1,
+      "stages": {
+        "finalize_pre.kg": {
+          "finite": true,
+          "actual_nonfinite": 0,
+          "expected_nonfinite": 0,
+          "relative_l2": 6.909494915048022e-21,
+          "expected_norm": 3.705046506980787e+22,
+          "residual_norm": 256.0000000000018,
+          "max_abs": 256.0,
+          "nonzero_when_expected": true,
+          "allclose": false,
+          "budget": 0.05,
+          "passed": false
+        },
+        "finalize_pair.t_beta": {
+          "finite": true,
+          "actual_nonfinite": 0,
+          "expected_nonfinite": 0,
+          "relative_l2": 2.4727987455583586e-12,
+          "expected_norm": 3.7338647229563784e+16,
+          "residual_norm": 92330.96003011141,
+          "max_abs": 65536.0,
+          "nonzero_when_expected": true,
+          "allclose": false,
+          "budget": 1e-05,
+          "passed": false
+        }
+      }
+    },
+    {
+      "case": "range_uniform_t128_seed0_span128",
+      "bd": 1,
+      "stages": {
+        "finalize_pre.k_scaled": {
+          "finite": true,
+          "actual_nonfinite": 0,
+          "expected_nonfinite": 0,
+          "relative_l2": 2.3959324437601842e-15,
+          "expected_norm": 4.58907608450939e+26,
+          "residual_norm": 1099511627776.0,
+          "max_abs": 1099511627776.0,
+          "nonzero_when_expected": true,
+          "allclose": false,
+          "budget": 0.05,
+          "passed": false
+        }
+      }
+    },
+    {
+      "case": "range_uniform_t128_seed0_span24",
+      "bd": 2,
+      "stages": {
+        "finalize_pre.k_scaled": {
+          "finite": true,
+          "actual_nonfinite": 0,
+          "expected_nonfinite": 0,
+          "relative_l2": 7.919268471757898e-06,
+          "expected_norm": 252548.5790931956,
+          "residual_norm": 2.0,
+          "max_abs": 2.0,
+          "nonzero_when_expected": true,
+          "allclose": false,
+          "budget": 0.05,
+          "passed": false
+        },
+        "finalize_pre.kg": {
+          "finite": true,
+          "actual_nonfinite": 0,
+          "expected_nonfinite": 0,
+          "relative_l2": 7.193898411884003e-07,
+          "expected_norm": 347516.7227648429,
+          "residual_norm": 0.2500000000001137,
+          "max_abs": 0.25,
+          "nonzero_when_expected": true,
+          "allclose": false,
+          "budget": 0.05,
+          "passed": false
+        },
+        "finalize_pair.s_base": {
+          "finite": true,
+          "actual_nonfinite": 0,
+          "expected_nonfinite": 0,
+          "relative_l2": 2.2305929602395302e-05,
+          "expected_norm": 279.86487650242975,
+          "residual_norm": 0.006242646233446253,
+          "max_abs": 0.00390625,
+          "nonzero_when_expected": true,
+          "allclose": true,
+          "budget": 1e-05,
+          "passed": false
+        },
+        "finalize_pair.t_beta": {
+          "finite": true,
+          "actual_nonfinite": 0,
+          "expected_nonfinite": 0,
+          "relative_l2": 6.85586288685394e-05,
+          "expected_norm": 7.184513386044839,
+          "residual_norm": 0.0004925603868349014,
+          "max_abs": 0.000244140625,
+          "nonzero_when_expected": true,
+          "allclose": true,
+          "budget": 1e-05,
+          "passed": false
+        }
+      }
+    },
+    {
+      "case": "range_uniform_t128_seed0_span28",
+      "bd": 2,
+      "stages": {
+        "finalize_pair.qk_right": {
+          "finite": true,
+          "actual_nonfinite": 0,
+          "expected_nonfinite": 0,
+          "relative_l2": 1.9005322938599878e-05,
+          "expected_norm": 942.244632568351,
+          "residual_norm": 0.017907663529123895,
+          "max_abs": 0.015625,
+          "nonzero_when_expected": true,
+          "allclose": true,
+          "budget": 1e-05,
+          "passed": false
+        },
+        "finalize_pair.t_beta": {
+          "finite": true,
+          "actual_nonfinite": 0,
+          "expected_nonfinite": 0,
+          "relative_l2": 4.205112758405679e-05,
+          "expected_norm": 34.001707890837224,
+          "residual_norm": 0.0014298101565934267,
+          "max_abs": 0.0009765625,
+          "nonzero_when_expected": true,
+          "allclose": true,
+          "budget": 1e-05,
+          "passed": false
+        }
+      }
+    },
+    {
+      "case": "range_uniform_t128_seed0_span32",
+      "bd": 2,
+      "stages": {
+        "finalize_pre.kg": {
+          "finite": true,
+          "actual_nonfinite": 0,
+          "expected_nonfinite": 0,
+          "relative_l2": 1.3472400142695599e-06,
+          "expected_norm": 11876131.81803749,
+          "residual_norm": 16.0,
+          "max_abs": 16.0,
+          "nonzero_when_expected": true,
+          "allclose": false,
+          "budget": 0.05,
+          "passed": false
+        },
+        "finalize_pair.t_beta": {
+          "finite": true,
+          "actual_nonfinite": 0,
+          "expected_nonfinite": 0,
+          "relative_l2": 0.00034706300002214336,
+          "expected_norm": 168.32162481496852,
+          "residual_norm": 0.05841820807688462,
+          "max_abs": 0.03125,
+          "nonzero_when_expected": true,
+          "allclose": true,
+          "budget": 1e-05,
+          "passed": false
+        }
+      }
+    },
+    {
+      "case": "range_uniform_t128_seed0_span64",
+      "bd": 2,
+      "stages": {
+        "finalize_pair.t_beta": {
+          "finite": true,
+          "actual_nonfinite": 0,
+          "expected_nonfinite": 0,
+          "relative_l2": 1.2931121034123449e-05,
+          "expected_norm": 158459796.96954122,
+          "residual_norm": 2049.0628136557657,
+          "max_abs": 2048.0,
+          "nonzero_when_expected": true,
+          "allclose": true,
+          "budget": 1e-05,
+          "passed": false
+        }
+      }
+    },
+    {
+      "case": "range_uniform_t128_seed0_span96",
+      "bd": 2,
+      "stages": {
+        "finalize_pre.k_scaled": {
+          "finite": true,
+          "actual_nonfinite": 0,
+          "expected_nonfinite": 0,
+          "relative_l2": 1.4212520976539979e-08,
+          "expected_norm": 7.736218152929508e+19,
+          "residual_norm": 1099511627776.0,
+          "max_abs": 1099511627776.0,
+          "nonzero_when_expected": true,
+          "allclose": false,
+          "budget": 0.05,
+          "passed": false
+        }
+      }
+    },
+    {
+      "case": "range_uniform_t128_seed0_span106.5",
+      "bd": 2,
+      "stages": {
+        "finalize_pre.kg": {
+          "finite": true,
+          "actual_nonfinite": 0,
+          "expected_nonfinite": 0,
+          "relative_l2": 6.909494915048022e-21,
+          "expected_norm": 3.705046506980787e+22,
+          "residual_norm": 256.0000000000018,
+          "max_abs": 256.0,
+          "nonzero_when_expected": true,
+          "allclose": false,
+          "budget": 0.05,
+          "passed": false
+        },
+        "finalize_pair.t_beta": {
+          "finite": true,
+          "actual_nonfinite": 0,
+          "expected_nonfinite": 0,
+          "relative_l2": 2.4727987455583586e-12,
+          "expected_norm": 3.7338647229563784e+16,
+          "residual_norm": 92330.96003011141,
+          "max_abs": 65536.0,
+          "nonzero_when_expected": true,
+          "allclose": false,
+          "budget": 1e-05,
+          "passed": false
+        }
+      }
+    },
+    {
+      "case": "range_uniform_t128_seed0_span128",
+      "bd": 2,
+      "stages": {
+        "finalize_pre.k_scaled": {
+          "finite": true,
+          "actual_nonfinite": 0,
+          "expected_nonfinite": 0,
+          "relative_l2": 2.3959324437601842e-15,
+          "expected_norm": 4.58907608450939e+26,
+          "residual_norm": 1099511627776.0,
+          "max_abs": 1099511627776.0,
+          "nonzero_when_expected": true,
+          "allclose": false,
+          "budget": 0.05,
+          "passed": false
+        }
+      }
+    }
+  ]
+}

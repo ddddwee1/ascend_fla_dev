@@ -1,0 +1,72 @@
+{
+  "stage": "native_independent_fixture",
+  "cases": 26,
+  "passed": 23,
+  "failed": [
+    {
+      "bd": 1,
+      "case": "gentle_decay_bd1",
+      "failed_metrics": {
+        "finalize_pair.qk_left": {
+          "finite": true,
+          "actual_nonfinite": 0,
+          "expected_nonfinite": 0,
+          "relative_l2": 1.6591333747983417e-05,
+          "expected_norm": 0.0017962583864794847,
+          "residual_norm": 2.9802322387695312e-08,
+          "max_abs": 2.9802322387695312e-08,
+          "nonzero_when_expected": true,
+          "allclose": true,
+          "budget": 1e-05,
+          "passed": false
+        }
+      }
+    },
+    {
+      "bd": 1,
+      "case": "grid_c1_hv2_bd1",
+      "failed_metrics": {
+        "finalize_pre.kg": {
+          "finite": true,
+          "actual_nonfinite": 0,
+          "expected_nonfinite": 0,
+          "relative_l2": 4.396917174395553e-13,
+          "expected_norm": 18194566062299.695,
+          "residual_norm": 8.0,
+          "max_abs": 8.0,
+          "nonzero_when_expected": true,
+          "allclose": false,
+          "budget": 0.05,
+          "passed": false
+        }
+      }
+    },
+    {
+      "bd": 2,
+      "case": "gentle_decay_bd2",
+      "failed_metrics": {
+        "finalize_pair.qk_left": {
+          "finite": true,
+          "actual_nonfinite": 0,
+          "expected_nonfinite": 0,
+          "relative_l2": 1.6591333747983417e-05,
+          "expected_norm": 0.0017962583864794847,
+          "residual_norm": 2.9802322387695312e-08,
+          "max_abs": 2.9802322387695312e-08,
+          "nonzero_when_expected": true,
+          "allclose": true,
+          "budget": 1e-05,
+          "passed": false
+        }
+      }
+    }
+  ],
+  "worst_gradients": {
+    "dq": 0.004015303726135755,
+    "dk": 0.003881942217919225,
+    "dv": 0.0038310666655806337,
+    "dbeta": 0.00711400014885978,
+    "dg": 0.023836888644650278,
+    "dh0": 0.0032179031032675536
+  }
+}

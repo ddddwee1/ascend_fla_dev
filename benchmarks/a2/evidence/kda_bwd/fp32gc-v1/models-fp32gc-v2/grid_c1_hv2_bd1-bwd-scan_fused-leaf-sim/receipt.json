@@ -1,0 +1,158 @@
+{
+  "model": "sim",
+  "kernel": "bwd.scan_fused",
+  "block_dim": 1,
+  "capture_sha256": "c1b46e6ebe2e0e24fc6a10a421a9f9e9f4f15d39f1b73c32af5ade18e53aa299",
+  "source_sha256": "eded4c5b535cef05e76a99f08369f1056d57ef2fa421e0ee8fe522a5aaea616a",
+  "ascriptor": "0.1.0",
+  "comparison_scope": "model actual outputs versus captured native same-input output; CPU golden checks are in native full-chain evidence",
+  "metrics": [
+    {
+      "finite": true,
+      "actual_nonfinite": 0,
+      "expected_nonfinite": 0,
+      "relative_l2": 0.0,
+      "expected_norm": 0.004754887315080661,
+      "residual_norm": 0.0,
+      "max_abs": 0.0,
+      "nonzero_when_expected": true,
+      "allclose": null,
+      "budget": 0.05,
+      "passed": true
+    },
+    {
+      "finite": true,
+      "actual_nonfinite": 0,
+      "expected_nonfinite": 0,
+      "relative_l2": 0.0,
+      "expected_norm": 1.8155893952142463,
+      "residual_norm": 0.0,
+      "max_abs": 0.0,
+      "nonzero_when_expected": true,
+      "allclose": null,
+      "budget": 0.05,
+      "passed": true
+    },
+    {
+      "finite": true,
+      "actual_nonfinite": 0,
+      "expected_nonfinite": 0,
+      "relative_l2": 0.0,
+      "expected_norm": 0.10854718686971253,
+      "residual_norm": 0.0,
+      "max_abs": 0.0,
+      "nonzero_when_expected": true,
+      "allclose": null,
+      "budget": 0.05,
+      "passed": true
+    },
+    {
+      "finite": true,
+      "actual_nonfinite": 0,
+      "expected_nonfinite": 0,
+      "relative_l2": 0.0,
+      "expected_norm": 0.0010301013832160802,
+      "residual_norm": 0.0,
+      "max_abs": 0.0,
+      "nonzero_when_expected": true,
+      "allclose": null,
+      "budget": 0.05,
+      "passed": true
+    }
+  ],
+  "fresh_cpu_fp32_full_fixture_stage_comparison": {
+    "scan.dAqk": {
+      "finite": true,
+      "actual_nonfinite": 0,
+      "expected_nonfinite": 0,
+      "relative_l2": 0.0,
+      "expected_norm": 0.004754887315080661,
+      "residual_norm": 0.0,
+      "max_abs": 0.0,
+      "nonzero_when_expected": true,
+      "allclose": true,
+      "budget": 0.05,
+      "passed": true
+    },
+    "scan.dh": {
+      "finite": true,
+      "actual_nonfinite": 0,
+      "expected_nonfinite": 0,
+      "relative_l2": 0.0,
+      "expected_norm": 1.8155893952142463,
+      "residual_norm": 0.0,
+      "max_abs": 0.0,
+      "nonzero_when_expected": true,
+      "allclose": true,
+      "budget": 0.05,
+      "passed": true
+    },
+    "scan.dv": {
+      "finite": true,
+      "actual_nonfinite": 0,
+      "expected_nonfinite": 0,
+      "relative_l2": 0.0,
+      "expected_norm": 0.10854718686971253,
+      "residual_norm": 0.0,
+      "max_abs": 0.0,
+      "nonzero_when_expected": true,
+      "allclose": true,
+      "budget": 0.05,
+      "passed": true
+    },
+    "scan.dh0": {
+      "finite": true,
+      "actual_nonfinite": 0,
+      "expected_nonfinite": 0,
+      "relative_l2": 0.0,
+      "expected_norm": 0.0010301013832160802,
+      "residual_norm": 0.0,
+      "max_abs": 0.0,
+      "nonzero_when_expected": true,
+      "allclose": true,
+      "budget": 0.05,
+      "passed": true
+    }
+  },
+  "model_output_digests": [
+    {
+      "shape": [
+        64,
+        128
+      ],
+      "dtype": "torch.bfloat16",
+      "sha256": "c68df32626abc889a1336cde05c1c1695094979e1938aa776140b3e07e004799"
+    },
+    {
+      "shape": [
+        1,
+        1,
+        2,
+        128,
+        128
+      ],
+      "dtype": "torch.bfloat16",
+      "sha256": "84e6cc2db398d952835230b237a6b6f7c3bd175a02ad13d9e68448c0106fd3c1"
+    },
+    {
+      "shape": [
+        64,
+        256
+      ],
+      "dtype": "torch.bfloat16",
+      "sha256": "d65b558cd80ed4a33635c58eb1e7f98e5d511d802652939472d6acf2d0f8e69a"
+    },
+    {
+      "shape": [
+        1,
+        2,
+        128,
+        128
+      ],
+      "dtype": "torch.bfloat16",
+      "sha256": "f3d77d34a68c95fbc7117ddc774ccee788bd41bd01894be886b7d695e76b4c59"
+    }
+  ],
+  "elapsed_host_s": 0.5484149558469653,
+  "hardware_acceptance": false
+}

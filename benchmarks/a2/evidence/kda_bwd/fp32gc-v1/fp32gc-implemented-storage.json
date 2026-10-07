@@ -1,0 +1,937 @@
+{
+  "stage": "static declaration audit; not compiled allocation",
+  "rows": [
+    {
+      "kernel": "scan_fused",
+      "source_sha256": "eded4c5b535cef05e76a99f08369f1056d57ef2fa421e0ee8fe522a5aaea616a",
+      "declared_UB_bytes": 135424,
+      "matches_approved_preflight": true,
+      "buffers": [
+        {
+          "name": "dstate_ub",
+          "bytes": 32768,
+          "shape": [
+            64,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "state_h_ub",
+          "bytes": 16384,
+          "shape": [
+            64,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "seed_ub",
+          "bytes": 32768,
+          "shape": [
+            64,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "dv_sum_ub",
+          "bytes": 16384,
+          "shape": [
+            32,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "dv_delta_ub",
+          "bytes": 16384,
+          "shape": [
+            32,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "dv_b_ub",
+          "bytes": 8192,
+          "shape": [
+            32,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "daqk_f_ub",
+          "bytes": 8192,
+          "shape": [
+            32,
+            64
+          ],
+          "slots": 1
+        },
+        {
+          "name": "daqk_b_ub",
+          "bytes": 4096,
+          "shape": [
+            32,
+            64
+          ],
+          "slots": 1
+        },
+        {
+          "name": "expg_ub",
+          "bytes": 256,
+          "shape": [
+            1,
+            64
+          ],
+          "slots": 1
+        }
+      ]
+    },
+    {
+      "kernel": "inverse_epilogue",
+      "source_sha256": "9f3130b6b64899684eb241319b3851096ddde02e0a01772694257cc8160028b8",
+      "declared_UB_bytes": 175616,
+      "matches_approved_preflight": true,
+      "buffers": [
+        {
+          "name": "g_f_ub",
+          "bytes": 16384,
+          "shape": [
+            32,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "q_b_ub",
+          "bytes": 8192,
+          "shape": [
+            32,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "k_b_ub",
+          "bytes": 8192,
+          "shape": [
+            32,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "v_b_ub",
+          "bytes": 8192,
+          "shape": [
+            32,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "dqg_b_ub",
+          "bytes": 8192,
+          "shape": [
+            32,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "dkg_b_ub",
+          "bytes": 8192,
+          "shape": [
+            32,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "dvb_b_ub",
+          "bytes": 8192,
+          "shape": [
+            32,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "dkbg_b_ub",
+          "bytes": 8192,
+          "shape": [
+            32,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "dq_out_ub",
+          "bytes": 8192,
+          "shape": [
+            32,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "dk_out_ub",
+          "bytes": 8192,
+          "shape": [
+            32,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "dv_out_ub",
+          "bytes": 8192,
+          "shape": [
+            32,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "kexp_out_ub",
+          "bytes": 8192,
+          "shape": [
+            32,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "dg_f_ub",
+          "bytes": 32768,
+          "shape": [
+            64,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "dg_b_ub",
+          "bytes": 16384,
+          "shape": [
+            64,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "dbeta_f_ub",
+          "bytes": 2048,
+          "shape": [
+            64,
+            8
+          ],
+          "slots": 1
+        },
+        {
+          "name": "beta_b_ub",
+          "bytes": 2048,
+          "shape": [
+            64,
+            16
+          ],
+          "slots": 1
+        },
+        {
+          "name": "beta_f_ub",
+          "bytes": 4096,
+          "shape": [
+            64,
+            16
+          ],
+          "slots": 1
+        },
+        {
+          "name": "glast_ub",
+          "bytes": 512,
+          "shape": [
+            1,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "hrow_b_ub",
+          "bytes": 256,
+          "shape": [
+            1,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "dhrow_b_ub",
+          "bytes": 256,
+          "shape": [
+            1,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "hrow_ub",
+          "bytes": 512,
+          "shape": [
+            1,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "dhrow_ub",
+          "bytes": 512,
+          "shape": [
+            1,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "qrow_ub",
+          "bytes": 512,
+          "shape": [
+            1,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "krow_ub",
+          "bytes": 512,
+          "shape": [
+            1,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "vrow_ub",
+          "bytes": 512,
+          "shape": [
+            1,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "dqgrow_ub",
+          "bytes": 512,
+          "shape": [
+            1,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "dkgrow_ub",
+          "bytes": 512,
+          "shape": [
+            1,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "dvbrow_ub",
+          "bytes": 512,
+          "shape": [
+            1,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "dkbgrow_ub",
+          "bytes": 512,
+          "shape": [
+            1,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "dqrow_ub",
+          "bytes": 512,
+          "shape": [
+            1,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "kexprow_ub",
+          "bytes": 512,
+          "shape": [
+            1,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "expg_ub",
+          "bytes": 512,
+          "shape": [
+            1,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "explmg_ub",
+          "bytes": 512,
+          "shape": [
+            1,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "expgl_ub",
+          "bytes": 512,
+          "shape": [
+            1,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "sh_ub",
+          "bytes": 512,
+          "shape": [
+            1,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "dkkg_ub",
+          "bytes": 512,
+          "shape": [
+            1,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "acc_ub",
+          "bytes": 512,
+          "shape": [
+            1,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "term2_ub",
+          "bytes": 512,
+          "shape": [
+            1,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "dglast_ub",
+          "bytes": 512,
+          "shape": [
+            1,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "tmp_ub",
+          "bytes": 512,
+          "shape": [
+            1,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "dot_ub",
+          "bytes": 256,
+          "shape": [
+            1,
+            64
+          ],
+          "slots": 1
+        },
+        {
+          "name": "dot2_ub",
+          "bytes": 256,
+          "shape": [
+            1,
+            64
+          ],
+          "slots": 1
+        }
+      ]
+    },
+    {
+      "kernel": "finalize_pre",
+      "source_sha256": "7f81bd2903aaf312dc35658707e35927d2c75117f6217cfb6b6213b5efcaaa8f",
+      "declared_UB_bytes": 109600,
+      "matches_approved_preflight": true,
+      "buffers": [
+        {
+          "name": "stage_ub",
+          "bytes": 8192,
+          "shape": [
+            32,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "out_ub",
+          "bytes": 8192,
+          "shape": [
+            32,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "q_f_ub",
+          "bytes": 16384,
+          "shape": [
+            32,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "k_f_ub",
+          "bytes": 16384,
+          "shape": [
+            32,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "rs_ub",
+          "bytes": 16384,
+          "shape": [
+            32,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "cs_ub",
+          "bytes": 16384,
+          "shape": [
+            32,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "gmid_ub",
+          "bytes": 512,
+          "shape": [
+            1,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "stage_l_ub",
+          "bytes": 4096,
+          "shape": [
+            32,
+            64
+          ],
+          "slots": 1
+        },
+        {
+          "name": "a_f_ub",
+          "bytes": 8192,
+          "shape": [
+            32,
+            64
+          ],
+          "slots": 1
+        },
+        {
+          "name": "m_f_ub",
+          "bytes": 8192,
+          "shape": [
+            32,
+            64
+          ],
+          "slots": 1
+        },
+        {
+          "name": "beta_b_ub",
+          "bytes": 2048,
+          "shape": [
+            64,
+            16
+          ],
+          "slots": 1
+        },
+        {
+          "name": "beta_f_ub",
+          "bytes": 4096,
+          "shape": [
+            64,
+            16
+          ],
+          "slots": 1
+        },
+        {
+          "name": "col_ub",
+          "bytes": 256,
+          "shape": [
+            1,
+            64
+          ],
+          "slots": 1
+        },
+        {
+          "name": "zero_ub",
+          "bytes": 256,
+          "shape": [
+            1,
+            64
+          ],
+          "slots": 1
+        },
+        {
+          "name": "pred_ub",
+          "bytes": 32,
+          "shape": [
+            1,
+            32
+          ],
+          "slots": 1
+        }
+      ]
+    },
+    {
+      "kernel": "finalize_post",
+      "source_sha256": "125b715b403a1431fc46ecc9668dde839f14dcc5cf1577b914a260f4339d8dce",
+      "declared_UB_bytes": 167424,
+      "matches_approved_preflight": true,
+      "buffers": [
+        {
+          "name": "g_f_ub",
+          "bytes": 16384,
+          "shape": [
+            32,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "qkl_b_ub",
+          "bytes": 8192,
+          "shape": [
+            32,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "qkr_b_ub",
+          "bytes": 8192,
+          "shape": [
+            32,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "sbase_b_ub",
+          "bytes": 8192,
+          "shape": [
+            32,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "tbeta_b_ub",
+          "bytes": 8192,
+          "shape": [
+            32,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "qhv_b_ub",
+          "bytes": 8192,
+          "shape": [
+            32,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "khv_b_ub",
+          "bytes": 8192,
+          "shape": [
+            32,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "dq_in_b_ub",
+          "bytes": 8192,
+          "shape": [
+            32,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "dk_in_b_ub",
+          "bytes": 8192,
+          "shape": [
+            32,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "dgc_in_b_ub",
+          "bytes": 8192,
+          "shape": [
+            32,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "dq_out_ub",
+          "bytes": 16384,
+          "shape": [
+            32,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "dk_out_ub",
+          "bytes": 16384,
+          "shape": [
+            32,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "dg_f_ub",
+          "bytes": 16384,
+          "shape": [
+            32,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "dg_b_ub",
+          "bytes": 8192,
+          "shape": [
+            32,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "gmid_ub",
+          "bytes": 512,
+          "shape": [
+            1,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "rs_ub",
+          "bytes": 512,
+          "shape": [
+            1,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "cs_ub",
+          "bytes": 512,
+          "shape": [
+            1,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "sh_ub",
+          "bytes": 512,
+          "shape": [
+            1,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "dqp_ub",
+          "bytes": 512,
+          "shape": [
+            1,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "dkp_ub",
+          "bytes": 512,
+          "shape": [
+            1,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "rowc_ub",
+          "bytes": 512,
+          "shape": [
+            1,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "colc_ub",
+          "bytes": 512,
+          "shape": [
+            1,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "qrow_ub",
+          "bytes": 512,
+          "shape": [
+            1,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "krow_ub",
+          "bytes": 512,
+          "shape": [
+            1,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "tmp_ub",
+          "bytes": 512,
+          "shape": [
+            1,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "tmp2_ub",
+          "bytes": 512,
+          "shape": [
+            1,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "acc_ub",
+          "bytes": 512,
+          "shape": [
+            1,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "run_ub",
+          "bytes": 512,
+          "shape": [
+            1,
+            128
+          ],
+          "slots": 1
+        },
+        {
+          "name": "dot_ub",
+          "bytes": 256,
+          "shape": [
+            1,
+            64
+          ],
+          "slots": 1
+        },
+        {
+          "name": "dot2_ub",
+          "bytes": 256,
+          "shape": [
+            1,
+            64
+          ],
+          "slots": 1
+        },
+        {
+          "name": "beta_b_ub",
+          "bytes": 2048,
+          "shape": [
+            64,
+            16
+          ],
+          "slots": 1
+        },
+        {
+          "name": "beta_f_ub",
+          "bytes": 4096,
+          "shape": [
+            64,
+            16
+          ],
+          "slots": 1
+        },
+        {
+          "name": "dbeta_f_ub",
+          "bytes": 4096,
+          "shape": [
+            64,
+            16
+          ],
+          "slots": 1
+        },
+        {
+          "name": "dbeta_b_ub",
+          "bytes": 2048,
+          "shape": [
+            64,
+            16
+          ],
+          "slots": 1
+        }
+      ]
+    }
+  ]
+}
