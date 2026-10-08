@@ -1,0 +1,31 @@
+{
+  "sha256": "8f23bfc5a8fbd34e2c61ac4d53053b9a3e0c611f4acff09a7a4d7f46317c3b1e",
+  "lines": [
+    {"line": 1, "text": "#pragma once"},
+    {"line": 2, "text": "#include \"tensorutils_cce.h\""},
+    {"line": 3, "text": "using namespace ascrip;"},
+    {"line": 4, "text": ""},
+    {"line": 5, "text": "__aicore__ inline void narrow_output(__ubuf__ float* source, __ubuf__ bfloat16_t* out, int32_t steps)"},
+    {"line": 6, "text": "{"},
+    {"line": 7, "text": "    __VEC_SCOPE__"},
+    {"line": 8, "text": "    {"},
+    {"line": 9, "text": "        vector_f32 value;  // #365"},
+    {"line": 10, "text": "        vector_bf16 packed;  // #366"},
+    {"line": 11, "text": "        vector_bool full = pset_b16(PAT_ALL);  // #367"},
+    {"line": 12, "text": "        for (uint16_t t = 0; t < steps; t += 1) {  // #368"},
+    {"line": 13, "text": "            __ubuf__ float* view = (__ubuf__ float*)((__ubuf__ uint8_t*)source + (((t * 128) * 4)));  // #371"},
+    {"line": 14, "text": "            vlds((vector_u32&)value, (__ubuf__ uint32_t*)view, 0, NORM);  // #372"},
+    {"line": 15, "text": "            vcvt(packed, value, pset_b8(PAT_ALL), ROUND_R, RS_DISABLE, PART_EVEN, MODE_ZEROING);  // #373"},
+    {"line": 16, "text": "            __ubuf__ bfloat16_t* view_1 = (__ubuf__ bfloat16_t*)((__ubuf__ uint8_t*)out + (((t * 128) * 2)));  // #376"},
+    {"line": 17, "text": "            vsts((vector_u16&)packed, (__ubuf__ uint16_t*)view_1, 0, PK_B32, full);  // #377"},
+    {"line": 18, "text": "            __ubuf__ float* view_2 = (__ubuf__ float*)((__ubuf__ uint8_t*)source + ((((t * 128) + 64) * 4)));  // #380"},
+    {"line": 19, "text": "            vlds((vector_u32&)value, (__ubuf__ uint32_t*)view_2, 0, NORM);  // #381"},
+    {"line": 20, "text": "            vcvt(packed, value, pset_b8(PAT_ALL), ROUND_R, RS_DISABLE, PART_EVEN, MODE_ZEROING);  // #382"},
+    {"line": 21, "text": "            __ubuf__ bfloat16_t* view_3 = (__ubuf__ bfloat16_t*)((__ubuf__ uint8_t*)out + ((((t * 128) + 64) * 2)));  // #385"},
+    {"line": 22, "text": "            vsts((vector_u16&)packed, (__ubuf__ uint16_t*)view_3, 0, PK_B32, full);  // #386"},
+    {"line": 23, "text": "        }"},
+    {"line": 24, "text": "        mem_bar(VST_VLD);  // #387"},
+    {"line": 25, "text": "    }"},
+    {"line": 26, "text": "}"}
+  ]
+}

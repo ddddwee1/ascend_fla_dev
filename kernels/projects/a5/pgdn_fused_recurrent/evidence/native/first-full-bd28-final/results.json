@@ -1,0 +1,67 @@
+{
+  "stage": "native_inprocess",
+  "block_dim": 28,
+  "cases": 2,
+  "passed": true,
+  "baseline_executed": false,
+  "records": [
+    {
+      "case": {"id": "full_float32", "B": 1, "S": 16, "H": 16, "HV": 32, "state": "random", "atk": "random", "dtype": "float32", "seed": 950000},
+      "block_dim": 28,
+      "input_sha256": {"q": "17576ab38fe6cb35a53ea6b41ad5b12416ac5982c6c4a7d143bce6d4c07d84fc", "k": "68e646851649623a8a9187ecd7c5550c9b66fe1b3ae2b625ae247d7d5f82cfbd", "v": "e064727712f312b041a417157ae4ce4d3c80be5fee05d235761b0044413566fb", "g_atk": "cbdda84c11ae1091114e7296e94bb7cfa07f38979033ee4b29bf8bc8a6a08acd", "g": "af8ad0bffc724296d0d40500e1619525394753fdb677dfa9d15edf481931e385", "beta_atk": "eabf2210290119d8c8d318229910561f773c0bd448c1e9992dfbfa8330fad4aa", "beta": "910abff6e1d9f5bd0907b7ca03a536bfce743861d4895554046acc772b2b6a4d", "initial_state": "970842816f9f1d9888f18fd4505e73cc2954c1ee9f7bee03a61f38e48fe7861e", "initial_A_state": "6dc5cbfd96d9de43fae7cbec1e34f900b94624b611a38ba8c597b14e0bc82a0b"},
+      "output_sha256": {"o": "8992977faa33cbc36f39a92bc0dbf6a00555478fd51b424fb08313d90e136a57", "final_state": "0f6c0cab62d829d8c9363f0a13737b46607130b445cfb2869e754219350eb97e", "final_A_state": "d36c5fd9febd4cf871d10d010cc01a9bacc58d75fde1b3483bada7d4b9ef16c3"},
+      "comparison": {
+        "passed": true,
+        "metrics": {
+          "A": {
+            "o": {"relative_l2": 2.098639484141822e-07, "max_abs": 1.4901161193847656e-08, "finite": true, "reference_norm": 2.3039845956073166, "error_norm": 4.835233043196043e-07},
+            "final_state": {"relative_l2": 1.3426482697464896e-07, "max_abs": 1.1920928955078125e-07, "finite": true, "reference_norm": 64.20075875790693, "error_norm": 8.619903766271553e-06},
+            "final_A_state": {"relative_l2": 1.3769075532297972e-07, "max_abs": 5.21540641784668e-08, "finite": true, "reference_norm": 3.3570972181677994, "error_norm": 4.6224125166219837e-07}
+          },
+          "B": {
+            "o": {"relative_l2": 2.070495288484226e-07, "max_abs": 1.4901161193847656e-08, "finite": true, "reference_norm": 2.3039845977266022, "error_norm": 4.770389254333155e-07},
+            "final_state": {"relative_l2": 1.3244514262792943e-07, "max_abs": 1.341104507446289e-07, "finite": true, "reference_norm": 64.2007587844945, "error_norm": 8.503078654033668e-06},
+            "final_A_state": {"relative_l2": 1.3769075532297972e-07, "max_abs": 5.21540641784668e-08, "finite": true, "reference_norm": 3.3570972181677994, "error_norm": 4.6224125166219837e-07}
+          }
+        }
+      }
+    },
+    {
+      "case": {"id": "full_bfloat16", "B": 1, "S": 16, "H": 16, "HV": 32, "state": "random", "atk": "random", "dtype": "bfloat16", "seed": 950000},
+      "block_dim": 28,
+      "input_sha256": {"q": "ba42af57fcc0967e664ebb659900e193bb6a347dc73b6e223329419cb41f2ed5", "k": "c04cd874dd42b9109cfa045e5e5901aa442bd941453cf81857175e402afa8e8d", "v": "ca5459462e484e4a2d3431479235501450b15cfb63bef73b07e5f960e5628fd7", "g_atk": "cbdda84c11ae1091114e7296e94bb7cfa07f38979033ee4b29bf8bc8a6a08acd", "g": "af8ad0bffc724296d0d40500e1619525394753fdb677dfa9d15edf481931e385", "beta_atk": "eabf2210290119d8c8d318229910561f773c0bd448c1e9992dfbfa8330fad4aa", "beta": "910abff6e1d9f5bd0907b7ca03a536bfce743861d4895554046acc772b2b6a4d", "initial_state": "970842816f9f1d9888f18fd4505e73cc2954c1ee9f7bee03a61f38e48fe7861e", "initial_A_state": "6dc5cbfd96d9de43fae7cbec1e34f900b94624b611a38ba8c597b14e0bc82a0b"},
+      "output_sha256": {"o": "ee28b06c3237da0ccb699d579965f6ef8d482ce56bb56eee77be6223202bd340", "final_state": "aa50b2c4486e2bbc76b62cd56df43d455f4392896c9d6c6947331a883c045f54", "final_A_state": "781d9657c8f87782b2a96653fb76587af354f8d88ee5f4b0e5394d2be73cbaa2"},
+      "comparison": {
+        "passed": true,
+        "metrics": {
+          "A": {
+            "o": {"relative_l2": 0.0016582233157063538, "max_abs": 0.00012102723121643066, "finite": true, "reference_norm": 2.3040012647736865, "error_norm": 0.003820548616664655},
+            "final_state": {"relative_l2": 1.323554549091204e-07, "max_abs": 1.1920928955078125e-07, "finite": true, "reference_norm": 64.20112389560497, "error_norm": 8.497368958879596e-06},
+            "final_A_state": {"relative_l2": 1.396959933238028e-07, "max_abs": 4.470348358154297e-08, "finite": true, "reference_norm": 3.3570667535642613, "error_norm": 4.689687747934734e-07}
+          },
+          "B": {
+            "o": {"relative_l2": 0.0016582234298855483, "max_abs": 0.00012102723121643066, "finite": true, "reference_norm": 2.3040012617207215, "error_norm": 0.003820548874671166},
+            "final_state": {"relative_l2": 1.2968962743727553e-07, "max_abs": 1.1920928955078125e-07, "finite": true, "reference_norm": 64.20112388888084, "error_norm": 8.326219838203327e-06},
+            "final_A_state": {"relative_l2": 1.396959933238028e-07, "max_abs": 4.470348358154297e-08, "finite": true, "reference_norm": 3.3570667535642613, "error_norm": 4.689687747934734e-07}
+          }
+        }
+      },
+      "same_input_fp32_comparison": {
+        "passed": true,
+        "metrics": {
+          "A": {
+            "o": {"relative_l2": 2.0898514815835058e-07, "max_abs": 1.4901161193847656e-08, "finite": true, "reference_norm": 2.3040012647736865, "error_norm": 4.81502045675756e-07},
+            "final_state": {"relative_l2": 1.323554549091204e-07, "max_abs": 1.1920928955078125e-07, "finite": true, "reference_norm": 64.20112389560497, "error_norm": 8.497368958879596e-06},
+            "final_A_state": {"relative_l2": 1.396959933238028e-07, "max_abs": 4.470348358154297e-08, "finite": true, "reference_norm": 3.3570667535642613, "error_norm": 4.689687747934734e-07}
+          },
+          "B": {
+            "o": {"relative_l2": 2.062035576884409e-07, "max_abs": 1.4901161193847656e-08, "finite": true, "reference_norm": 2.3040012617207215, "error_norm": 4.750932570854694e-07},
+            "final_state": {"relative_l2": 1.2968962743727553e-07, "max_abs": 1.1920928955078125e-07, "finite": true, "reference_norm": 64.20112388888084, "error_norm": 8.326219838203327e-06},
+            "final_A_state": {"relative_l2": 1.396959933238028e-07, "max_abs": 4.470348358154297e-08, "finite": true, "reference_norm": 3.3570667535642613, "error_norm": 4.689687747934734e-07}
+          }
+        }
+      },
+      "bf16_storage": {"output_equals_fp32_rne": true, "state_equals_fp32": true, "atk_equals_fp32": true}
+    }
+  ]
+}

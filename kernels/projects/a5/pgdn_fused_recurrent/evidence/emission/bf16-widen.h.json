@@ -1,0 +1,31 @@
+{
+  "sha256": "74b6bf60fcf1875258d8c9c08517b71cd7e74c542d2111e6c4588599a3f32527",
+  "lines": [
+    {"line": 1, "text": "#pragma once"},
+    {"line": 2, "text": "#include \"tensorutils_cce.h\""},
+    {"line": 3, "text": "using namespace ascrip;"},
+    {"line": 4, "text": ""},
+    {"line": 5, "text": "__aicore__ inline void widen(__ubuf__ bfloat16_t* source, __ubuf__ float* dest, int32_t steps)"},
+    {"line": 6, "text": "{"},
+    {"line": 7, "text": "    __VEC_SCOPE__"},
+    {"line": 8, "text": "    {"},
+    {"line": 9, "text": "        vector_f32 value;  // #58"},
+    {"line": 10, "text": "        for (uint16_t t = 0; t < steps; t += 1) {  // #59"},
+    {"line": 11, "text": "            __ubuf__ bfloat16_t* view = (__ubuf__ bfloat16_t*)((__ubuf__ uint8_t*)source + (((t * 128) * 2)));  // #62"},
+    {"line": 12, "text": "            vector_bf16 tmp;  // #63"},
+    {"line": 13, "text": "            vlds((vector_u16&)tmp, (__ubuf__ uint16_t*)view, 0, UNPK_B16);  // #64"},
+    {"line": 14, "text": "            vcvt(value, tmp, pset_b8(PAT_ALL), PART_EVEN, MODE_ZEROING);  // #65"},
+    {"line": 15, "text": "            __ubuf__ float* view_1 = (__ubuf__ float*)((__ubuf__ uint8_t*)dest + (((t * 128) * 4)));  // #68"},
+    {"line": 16, "text": "            vsts((vector_u32&)value, (__ubuf__ uint32_t*)view_1, 0, NORM_B32, pset_b8(PAT_ALL));  // #69"},
+    {"line": 17, "text": "            __ubuf__ bfloat16_t* view_2 = (__ubuf__ bfloat16_t*)((__ubuf__ uint8_t*)source + ((((t * 128) + 64) * 2)));  // #72"},
+    {"line": 18, "text": "            vector_bf16 tmp_1;  // #73"},
+    {"line": 19, "text": "            vlds((vector_u16&)tmp_1, (__ubuf__ uint16_t*)view_2, 0, UNPK_B16);  // #74"},
+    {"line": 20, "text": "            vcvt(value, tmp_1, pset_b8(PAT_ALL), PART_EVEN, MODE_ZEROING);  // #75"},
+    {"line": 21, "text": "            __ubuf__ float* view_3 = (__ubuf__ float*)((__ubuf__ uint8_t*)dest + ((((t * 128) + 64) * 4)));  // #78"},
+    {"line": 22, "text": "            vsts((vector_u32&)value, (__ubuf__ uint32_t*)view_3, 0, NORM_B32, pset_b8(PAT_ALL));  // #79"},
+    {"line": 23, "text": "        }"},
+    {"line": 24, "text": "        mem_bar(VST_VLD);  // #80"},
+    {"line": 25, "text": "    }"},
+    {"line": 26, "text": "}"}
+  ]
+}

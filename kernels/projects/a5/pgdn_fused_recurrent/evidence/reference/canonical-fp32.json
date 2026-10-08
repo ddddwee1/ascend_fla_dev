@@ -1,0 +1,1721 @@
+{
+  "backend": "cce",
+  "cases": [
+    {
+      "block_dim": 1,
+      "id": "full_float32",
+      "parameters": {"B": 1, "H": 16, "HV": 32, "S": 16, "atk": "random", "dtype": "float32", "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "92bb7df6a05e9a80bb3fa269ab51934f25ae467e1c2c8ca35fe14766fbeb8789",
+          "shape": [1, 16, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "3813b6434ca0ab10e4a40c81cea16af62b85deef62d28a048eb6302891e00cc2",
+          "shape": [1, 32, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "62f4edfbd980e5dc31fb4e21a8122b68ebb98616a670a06f78af2703a3bd62c7",
+          "shape": [1, 16, 32, 128]
+        }
+      },
+      "seed": 950000
+    },
+    {
+      "block_dim": 1,
+      "id": "r1_s1_float32",
+      "parameters": {"B": 1, "H": 3, "HV": 3, "S": 1, "atk": "random", "dtype": "float32", "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "942a54a6ac98bdfe35a089ac65f6fc6e7bafa9079531e60d700bb8d4eeccb442",
+          "shape": [1, 3, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "d3d2a38f6de20bb0ffbdd29da36e1dde85b50273fdcba503d9a60315b0521fe0",
+          "shape": [1, 3, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "07fde2b2a1cd9206f504effb749cc979e78879ca51c8ad61d510c54c400a2a7d",
+          "shape": [1, 1, 3, 128]
+        }
+      },
+      "seed": 950001
+    },
+    {
+      "block_dim": 1,
+      "id": "r1_s2_float32",
+      "parameters": {"B": 1, "H": 3, "HV": 3, "S": 2, "atk": "random", "dtype": "float32", "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "c1688e332c10a09baba6238731ed666ce8a7794b712150b6b6028858a013b230",
+          "shape": [1, 3, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "14f4407583c7637e54bb53df6df1b2ffd410dc3a615ebcb81c4fe22f2a5e9ea1",
+          "shape": [1, 3, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "dd37765c923376e725f3f01cec043e0a2faf66c2d01da35c88dd8a2849eac15c",
+          "shape": [1, 2, 3, 128]
+        }
+      },
+      "seed": 950002
+    },
+    {
+      "block_dim": 1,
+      "id": "r1_s3_float32",
+      "parameters": {"B": 1, "H": 3, "HV": 3, "S": 3, "atk": "random", "dtype": "float32", "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "a28a45da1670485d1ef579c3ee18e9347283c7dcbb32d75ba8d3efea233f43fd",
+          "shape": [1, 3, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "56119b602ffcca91828ecfb78e6f3186340b2f2ee6bf7f56da4c811ac9b6f110",
+          "shape": [1, 3, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "bf11c016de1d2c52d22d8efc8293b34b876a29eaba9753d5bc62c198d953c5d7",
+          "shape": [1, 3, 3, 128]
+        }
+      },
+      "seed": 950003
+    },
+    {
+      "block_dim": 1,
+      "id": "r1_s7_float32",
+      "parameters": {"B": 1, "H": 3, "HV": 3, "S": 7, "atk": "random", "dtype": "float32", "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "b5671b296b6705fdc86f85fd81e78b647eac910d31a2c82e9173c195ff92f785",
+          "shape": [1, 3, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "1baecd88eba75a4b6d65d191e03fdfae7df833140f361353933197cb70552b3f",
+          "shape": [1, 3, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "44d543406d40225223da08a19c66513b9d01c2daf8f504ec8839db19ebedb077",
+          "shape": [1, 7, 3, 128]
+        }
+      },
+      "seed": 950004
+    },
+    {
+      "block_dim": 1,
+      "id": "r1_s15_float32",
+      "parameters": {"B": 1, "H": 3, "HV": 3, "S": 15, "atk": "random", "dtype": "float32", "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "fc3748d90d92fe1a2267060db7067b9e0a563b9b9c4b1ee9ea9922f2f9d5211e",
+          "shape": [1, 3, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "5b69c3d637316aeaaae0480a6007f7a496b9bc8cd441b989de9dfcf25a816ef0",
+          "shape": [1, 3, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "461c7e946de9532cb74505261cd4a2e6c18d8bc3501b96b1be850d08751e2146",
+          "shape": [1, 15, 3, 128]
+        }
+      },
+      "seed": 950005
+    },
+    {
+      "block_dim": 1,
+      "id": "r1_s16_float32",
+      "parameters": {"B": 1, "H": 3, "HV": 3, "S": 16, "atk": "random", "dtype": "float32", "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "7ddc2a36d21458cf36bfd90638344b27011296503ed0832e55048700c46e0350",
+          "shape": [1, 3, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "0908fecce103bb2f78072fbbdd5870792972423f071073b9de6fe3ee08460082",
+          "shape": [1, 3, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "db5044d6d8969efb2d6e8c4fc0fa32a0c2e1d35513b143f41c37a1ad8a2164a4",
+          "shape": [1, 16, 3, 128]
+        }
+      },
+      "seed": 950006
+    },
+    {
+      "block_dim": 1,
+      "id": "r2_s1_float32",
+      "parameters": {"B": 1, "H": 3, "HV": 6, "S": 1, "atk": "random", "dtype": "float32", "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "f5e094faf59ffe705c4e07ba260afa6e2579d1fd3f6320d59f8c26034d86af93",
+          "shape": [1, 3, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "d6d44d07b3c396999db980add70d3162b68e8df8868ae0adea2791e0c4cb86c7",
+          "shape": [1, 6, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "4a44e41383dfdc7674042caecbc46b79d8ce548ebc2e93b874de3d5102ced5cc",
+          "shape": [1, 1, 6, 128]
+        }
+      },
+      "seed": 950007
+    },
+    {
+      "block_dim": 1,
+      "id": "r2_s2_float32",
+      "parameters": {"B": 1, "H": 3, "HV": 6, "S": 2, "atk": "random", "dtype": "float32", "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "27538f7c3bc031a9f6151b18ccf08d1aa94d816b44da29d13c6df6aa262d3d9a",
+          "shape": [1, 3, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "db5d00b7a7c078d0608a7a159bd4ea9a38dbe0f593265701764ca1071857e841",
+          "shape": [1, 6, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "e13f4a9398ad7add6f3c91a3fac80e7f85d51095a262b9639c2f7f3a3cd6d4a0",
+          "shape": [1, 2, 6, 128]
+        }
+      },
+      "seed": 950008
+    },
+    {
+      "block_dim": 1,
+      "id": "r2_s3_float32",
+      "parameters": {"B": 1, "H": 3, "HV": 6, "S": 3, "atk": "random", "dtype": "float32", "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "4f95d45d2040921a41189ca5b11dfef710719c21b761d2ad4c96b385a49f07b9",
+          "shape": [1, 3, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "b3cd34058541ae2179ff84161cf499c3a07df8a415af8bf9cfa6975fb69a5c8e",
+          "shape": [1, 6, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "5b9db7c97a2b881c0d4ea6c25cb5b916bcb8e077bd0cc0790e088dd20c15379a",
+          "shape": [1, 3, 6, 128]
+        }
+      },
+      "seed": 950009
+    },
+    {
+      "block_dim": 1,
+      "id": "r2_s7_float32",
+      "parameters": {"B": 1, "H": 3, "HV": 6, "S": 7, "atk": "random", "dtype": "float32", "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "27077b6d2bdbaf07089b3d5f6dc1e0ab01368ea9605eed01be46c1cb56189d04",
+          "shape": [1, 3, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "bddc01a9992aae3d3e329ecc49d18b6b032ece5043d5f65e15059697b9515948",
+          "shape": [1, 6, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "32e17e5e85775e70db43b3a05889431f8e93b6c17fa2f67c902abc00797a77cd",
+          "shape": [1, 7, 6, 128]
+        }
+      },
+      "seed": 950010
+    },
+    {
+      "block_dim": 1,
+      "id": "r2_s15_float32",
+      "parameters": {"B": 1, "H": 3, "HV": 6, "S": 15, "atk": "random", "dtype": "float32", "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "f08f7fe550eb1e7363383de7dd8babc757925ec03e762810e89468c8f73d5c40",
+          "shape": [1, 3, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "b2d0dedc87609cf34c32bfa4579f6734d58050dabee6ea7ed2ffbb925f1425ca",
+          "shape": [1, 6, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "08799d63ad9e569c8a899af2e6ad5faddcee67e7c5e1f102fbaff005bfb5e8b0",
+          "shape": [1, 15, 6, 128]
+        }
+      },
+      "seed": 950011
+    },
+    {
+      "block_dim": 1,
+      "id": "r2_s16_float32",
+      "parameters": {"B": 1, "H": 3, "HV": 6, "S": 16, "atk": "random", "dtype": "float32", "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "9bc42c780771336361860975d9de8f357d6c7fd880dae2f7ee917eb906b83594",
+          "shape": [1, 3, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "343a60c134ec952403d9eb0df9cf9b4096383da6a6b499558bd14a9565393959",
+          "shape": [1, 6, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "f12ca109b350ec11831e1d2d1b8df3b1f80843944f4fdc5c40193ce3efc935cd",
+          "shape": [1, 16, 6, 128]
+        }
+      },
+      "seed": 950012
+    },
+    {
+      "block_dim": 1,
+      "id": "r4_s1_float32",
+      "parameters": {"B": 1, "H": 3, "HV": 12, "S": 1, "atk": "random", "dtype": "float32", "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "5fb84664c4821318b45b3ee659e1831277aeaf713ae719916706115719d46b05",
+          "shape": [1, 3, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "cf8fe5753975004ed5879e767baa73e7c044df88e66901850bdd215214605344",
+          "shape": [1, 12, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "0f698c554b2adb4f210c43359823003da0e690a2134baedafeff11ccaf929e22",
+          "shape": [1, 1, 12, 128]
+        }
+      },
+      "seed": 950013
+    },
+    {
+      "block_dim": 1,
+      "id": "r4_s2_float32",
+      "parameters": {"B": 1, "H": 3, "HV": 12, "S": 2, "atk": "random", "dtype": "float32", "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "574e68bd9da560cb303eec0d8ae076eea792f8863d54c5257535eb93e954e4bd",
+          "shape": [1, 3, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "b411939a6d6dcda022559d52b2d45fde3b15760135d7dd5ed6d66b23b1e8c931",
+          "shape": [1, 12, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "93949f69711d462085a757392096404352d2295eb0505b76ee75cc4ecf3bae06",
+          "shape": [1, 2, 12, 128]
+        }
+      },
+      "seed": 950014
+    },
+    {
+      "block_dim": 1,
+      "id": "r4_s3_float32",
+      "parameters": {"B": 1, "H": 3, "HV": 12, "S": 3, "atk": "random", "dtype": "float32", "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "9105ef5464fef863e1c7d214ed549e228f024bae33f9e2860b4f54cfc55c8d34",
+          "shape": [1, 3, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "7bdab6e561c9debcda72f0dbe60afe3b7cdfca50189838de8ac0344f8ba90d05",
+          "shape": [1, 12, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "92430ada6af7e5f7e813bc6cc9f9f7a46642152b38d8078f9811feaa3deb48b6",
+          "shape": [1, 3, 12, 128]
+        }
+      },
+      "seed": 950015
+    },
+    {
+      "block_dim": 1,
+      "id": "r4_s7_float32",
+      "parameters": {"B": 1, "H": 3, "HV": 12, "S": 7, "atk": "random", "dtype": "float32", "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "c1858b70f38769601cb9a1e5b30c3168e31b10fa7b94b9f900dc18fc0b35bfb9",
+          "shape": [1, 3, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "8e27d77569d4f9b1c611f2ea123ac0d7ff901461b81ae1150506adcb7b9f7e8d",
+          "shape": [1, 12, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "d2d2209ff810433c6d6d5f9159364f735d3cde611522404eb543fa91cdf57eb6",
+          "shape": [1, 7, 12, 128]
+        }
+      },
+      "seed": 950016
+    },
+    {
+      "block_dim": 1,
+      "id": "r4_s15_float32",
+      "parameters": {"B": 1, "H": 3, "HV": 12, "S": 15, "atk": "random", "dtype": "float32", "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "426d5831c6fe47322a38ad3a0b7f144f3c315763d0364621e616b911b5cd84be",
+          "shape": [1, 3, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "368df728606971d426e1f239730973ff3a27f22d00d6c9ad07a580d38b077c8a",
+          "shape": [1, 12, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "5f002372ba64dc40ea6603a27c52abe2babbe3063dc87095f7bb7cafc1047559",
+          "shape": [1, 15, 12, 128]
+        }
+      },
+      "seed": 950017
+    },
+    {
+      "block_dim": 1,
+      "id": "r4_s16_float32",
+      "parameters": {"B": 1, "H": 3, "HV": 12, "S": 16, "atk": "random", "dtype": "float32", "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "250c52c45708e7a18d56b992d4ec1e39a1ba663f1e0a17d0f47fb2f768c2fed7",
+          "shape": [1, 3, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "91900c646d49699a37561fc37dd8c67d8a45a6c93264c93ab27b87a8ec711c6e",
+          "shape": [1, 12, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "501ce03021ab1133848b0f5deaf97270f6728177d9ac1830f8afb3e9833991ab",
+          "shape": [1, 16, 12, 128]
+        }
+      },
+      "seed": 950018
+    },
+    {
+      "block_dim": 1,
+      "id": "r8_s1_float32",
+      "parameters": {"B": 1, "H": 3, "HV": 24, "S": 1, "atk": "random", "dtype": "float32", "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "56c539937cca18d66c105819841328f69c22b0db314ac32fef737b6dd8174ef3",
+          "shape": [1, 3, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "e18d4a53dc3cf702b613a89954b696a7b76be2ca08a6d833771814409d5a6f92",
+          "shape": [1, 24, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "0f95075c451415ff53d77ed4035d27566beceb81e78e137a052ea5a99e25d000",
+          "shape": [1, 1, 24, 128]
+        }
+      },
+      "seed": 950019
+    },
+    {
+      "block_dim": 1,
+      "id": "r8_s2_float32",
+      "parameters": {"B": 1, "H": 3, "HV": 24, "S": 2, "atk": "random", "dtype": "float32", "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "ff904b737d71fd67fb49d6864972401bb99d8188d57a229600456e544e456cff",
+          "shape": [1, 3, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "310dc5c09d5944050b30602841cad69cbfc049e4ad215abc8e8ca463ffc4f46f",
+          "shape": [1, 24, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "d65b54a8017c7894134f7978a673684df90accdd4c7c49ee036de10edb3d5f9a",
+          "shape": [1, 2, 24, 128]
+        }
+      },
+      "seed": 950020
+    },
+    {
+      "block_dim": 1,
+      "id": "r8_s3_float32",
+      "parameters": {"B": 1, "H": 3, "HV": 24, "S": 3, "atk": "random", "dtype": "float32", "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "800242570d06953b82bfe8dae4c1b5adce7bbde5737266abffe5a1fd1d6e3850",
+          "shape": [1, 3, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "a95e8f9351822e1feb4439c9af33eb77667f3b6f37aa18311fbc116a83bbd91a",
+          "shape": [1, 24, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "485b68f481653362d63b2f3d94b5da988d04e0aec304c5b077fbb470c00f4e3c",
+          "shape": [1, 3, 24, 128]
+        }
+      },
+      "seed": 950021
+    },
+    {
+      "block_dim": 1,
+      "id": "r8_s7_float32",
+      "parameters": {"B": 1, "H": 3, "HV": 24, "S": 7, "atk": "random", "dtype": "float32", "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "55b97206d440258294d3aa54b1cf6d4beadf55ab437e9e0425b1ed11f11d3e06",
+          "shape": [1, 3, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "c9340230a87b3a007648fa8756bd8638fcfd4eb121a7601902cc2b3af9e6fbef",
+          "shape": [1, 24, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "ea7832e201986697a35c3fc34d07f41bae7542841cc68be9bde25f5bb8d7e840",
+          "shape": [1, 7, 24, 128]
+        }
+      },
+      "seed": 950022
+    },
+    {
+      "block_dim": 1,
+      "id": "r8_s15_float32",
+      "parameters": {"B": 1, "H": 3, "HV": 24, "S": 15, "atk": "random", "dtype": "float32", "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "b6b6c06e13508bf25ca105b819d007817a1819eaa0c8c7c82b331e712ce533ee",
+          "shape": [1, 3, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "292dd82cbbbc98192bb6efe9a7beeb2add0343d642804743b0a14cc0e04c9459",
+          "shape": [1, 24, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "032f58d140058f391bfefff3a690c07a31b53539f97542cbf47694338aac6485",
+          "shape": [1, 15, 24, 128]
+        }
+      },
+      "seed": 950023
+    },
+    {
+      "block_dim": 1,
+      "id": "r8_s16_float32",
+      "parameters": {"B": 1, "H": 3, "HV": 24, "S": 16, "atk": "random", "dtype": "float32", "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "a45e564a2e263dd5948296adf01a062cb923c4cc6a2ae89345af2f8d130ae90c",
+          "shape": [1, 3, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "c73c901d8f49f814611a3ee25f2e772ec9962d061b7d03e8e8f7c2c1dc0df469",
+          "shape": [1, 24, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "1422c43252055e30850b3f6104e9c736571d82e8718c2066cefc491afa6d6d40",
+          "shape": [1, 16, 24, 128]
+        }
+      },
+      "seed": 950024
+    },
+    {
+      "block_dim": 1,
+      "id": "initial_none_none_float32",
+      "parameters": {"B": 2, "H": 2, "HV": 8, "S": 3, "atk": "none", "dtype": "float32", "state": "none"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "a7be4e7710dfe2eab73f679578d7517cc4b7a0c6531dd763c33587c26a847d27",
+          "shape": [2, 2, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "d9dd5aa2c53ce5ae68aff77296d709b7c2fbccfcb363f0b930743d097fdbc3ea",
+          "shape": [2, 8, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "5f5187471b273ac3ca3b65fb7682f2af16c63b215f73be27ac9b427ede2406a7",
+          "shape": [2, 3, 8, 128]
+        }
+      },
+      "seed": 950025
+    },
+    {
+      "block_dim": 1,
+      "id": "initial_none_zero_float32",
+      "parameters": {"B": 2, "H": 2, "HV": 8, "S": 3, "atk": "zero", "dtype": "float32", "state": "none"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "b2f8a58e7ab246461c472e4d06258969c2820ec7a994347167696818bb34ff46",
+          "shape": [2, 2, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "cd607212374d80f0cb8e8c51c6922c48a63d9ea4388ba954dd2e97f07acd4aa0",
+          "shape": [2, 8, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "f1265960337d17f8bbe26675dbf6382910101e2879aa508b53794501e392bc58",
+          "shape": [2, 3, 8, 128]
+        }
+      },
+      "seed": 950026
+    },
+    {
+      "block_dim": 1,
+      "id": "initial_none_random_float32",
+      "parameters": {"B": 2, "H": 2, "HV": 8, "S": 3, "atk": "random", "dtype": "float32", "state": "none"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "a17158e41de721af2f8d47a66ab472014daf4bd99626375b846d1b96cefcb1a1",
+          "shape": [2, 2, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "780abd2ef9970cb2a169d502dd340948d1c8b998eae069b3fece349b1e1510cd",
+          "shape": [2, 8, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "2ed32170ed1ef09597e98c4cd7f507a59e4fef50bc2f6c5fadbbb8d6aed723fe",
+          "shape": [2, 3, 8, 128]
+        }
+      },
+      "seed": 950027
+    },
+    {
+      "block_dim": 1,
+      "id": "initial_zero_none_float32",
+      "parameters": {"B": 2, "H": 2, "HV": 8, "S": 3, "atk": "none", "dtype": "float32", "state": "zero"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "6864cd4a1e14ef6e0253f90bb1d521faab54767fc6ec2bf37c32b773b76b4e10",
+          "shape": [2, 2, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "b44bebd5cfa150beab0fea2d5ac67655bae433f6b8d7c13224f1804b8bdcd891",
+          "shape": [2, 8, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "88c4237434cdf051475262ad995351db9fed1901049bc4909886aa264fdb7343",
+          "shape": [2, 3, 8, 128]
+        }
+      },
+      "seed": 950028
+    },
+    {
+      "block_dim": 1,
+      "id": "initial_zero_zero_float32",
+      "parameters": {"B": 2, "H": 2, "HV": 8, "S": 3, "atk": "zero", "dtype": "float32", "state": "zero"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "1c85293267471ce4628cb8f1eb5191193d1cb476d3126e23811144ca4f325267",
+          "shape": [2, 2, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "63944c7a4cf794206baa90333444fe1895a2224b7b5b3396025dc68a28d3caa3",
+          "shape": [2, 8, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "b56d4f5160f7b52c9d33b594d8fb93e9689679f0a928f810b37dc4125c15d11f",
+          "shape": [2, 3, 8, 128]
+        }
+      },
+      "seed": 950029
+    },
+    {
+      "block_dim": 1,
+      "id": "initial_zero_random_float32",
+      "parameters": {"B": 2, "H": 2, "HV": 8, "S": 3, "atk": "random", "dtype": "float32", "state": "zero"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "6d595bff3c87b4f91be77002afae450349c66e4ecd2f427d8e7cf0c36e3569e1",
+          "shape": [2, 2, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "b97d02445f0c53f9443c8acc1128255e6e1215e6f3e1346b5394ba4db103af96",
+          "shape": [2, 8, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "12fbdc5cfd1477222a8295f5787d2f99617b8f5cd79154fe63e3e5c2d66e96b7",
+          "shape": [2, 3, 8, 128]
+        }
+      },
+      "seed": 950030
+    },
+    {
+      "block_dim": 1,
+      "id": "initial_random_none_float32",
+      "parameters": {"B": 2, "H": 2, "HV": 8, "S": 3, "atk": "none", "dtype": "float32", "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "dd33950a958217267051bdab914fbd433e7dbf01714599be5f1f292cdfcdf6be",
+          "shape": [2, 2, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "247cc2a978d49fd7af65cb89068e6b73eb2a4480faebe3b9b239788dc3d7efbf",
+          "shape": [2, 8, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "9741df4b7a63b53717b51004f5e98e6aca28eeac3a72ac9692dd1b2a4c662c43",
+          "shape": [2, 3, 8, 128]
+        }
+      },
+      "seed": 950031
+    },
+    {
+      "block_dim": 1,
+      "id": "initial_random_zero_float32",
+      "parameters": {"B": 2, "H": 2, "HV": 8, "S": 3, "atk": "zero", "dtype": "float32", "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "892d94f13cebf0414db60ea18a28a35f6981847cb4dbceb1bc37bd4de5b1de8a",
+          "shape": [2, 2, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "fd15b18de48be0a283d4f8ef07024f657d72ec9cf0617c079ba654fbf1a28321",
+          "shape": [2, 8, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "667207ebafd944d689027941f788558035d1efb35a68fa2632b2ec1121d91b25",
+          "shape": [2, 3, 8, 128]
+        }
+      },
+      "seed": 950032
+    },
+    {
+      "block_dim": 1,
+      "id": "initial_random_random_float32",
+      "parameters": {"B": 2, "H": 2, "HV": 8, "S": 3, "atk": "random", "dtype": "float32", "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "4239242e579fab4741bd56784d7d68fc8e89d75e9b7d4cb1ad9e50c66a90b021",
+          "shape": [2, 2, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "e59826c91fae79ec3af3ab08df1b2f17551c1d300f600dfad2df8af81086b62b",
+          "shape": [2, 8, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "7d30ae8529b0835ed225137ea52351c127edd51b76e7ec03e9f6260632f26b67",
+          "shape": [2, 3, 8, 128]
+        }
+      },
+      "seed": 950033
+    },
+    {
+      "block_dim": 1,
+      "id": "many_heads_float32",
+      "parameters": {"B": 3, "H": 28, "HV": 224, "S": 3, "atk": "random", "dtype": "float32", "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "5890b2398ba6124ead9797fd33d159a5d8d42f00eadc2f3155cbaad4848207b7",
+          "shape": [3, 28, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "3d6fec7edb156be7de475fa7f2bb5f607930a6c41fccd62afe48b14de6c07643",
+          "shape": [3, 224, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "6dd9757e1f33686917e9837c6e77d9c5123420080d28b11ac71b7d4ba887c4d1",
+          "shape": [3, 3, 224, 128]
+        }
+      },
+      "seed": 950034
+    },
+    {
+      "block_dim": 1,
+      "id": "g_zero_float32",
+      "parameters": {"B": 2, "H": 2, "HV": 8, "S": 16, "atk": "random", "dtype": "float32", "g": 0.0, "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "beb8ebef4c4068978c1212b82e4f394c5b5bf18e270800cfde64f663dc5bb67f",
+          "shape": [2, 2, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "781c9f1f5ccd887da7c6eca4da34f59ed11a877727b1b96e79ccaecc2139b8d7",
+          "shape": [2, 8, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "ea054933d17ef19856040566ff98f926c94dbfc8f8ee2c282a696a9b1c452cf0",
+          "shape": [2, 16, 8, 128]
+        }
+      },
+      "seed": 950035
+    },
+    {
+      "block_dim": 1,
+      "id": "g_large_float32",
+      "parameters": {"B": 2, "H": 2, "HV": 8, "S": 16, "atk": "random", "dtype": "float32", "g": -30.0, "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "ccf92af979fbf11536cae1d3bea05f02186e8359d8f7f3f20dbffc4343c3491b",
+          "shape": [2, 2, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "0ff1dec0fcdcb4cdc88fe4e52325f8bec566e5b5e3820df38c1cdccf66417ae9",
+          "shape": [2, 8, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "da855c2b27b35b9fb2a2035c23b23ec84c1a383bb0f5800c2562ed729b84939d",
+          "shape": [2, 16, 8, 128]
+        }
+      },
+      "seed": 950036
+    },
+    {
+      "block_dim": 1,
+      "id": "g_underflow_float32",
+      "parameters": {"B": 2, "H": 2, "HV": 8, "S": 16, "atk": "random", "dtype": "float32", "g": -1000.0, "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "65178d3714e9b1a137937db8dae5ab590d53d1b3cfb9e59218bb3f0bd83c73c2",
+          "shape": [2, 2, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "a908bac9bf8a5787780fdcce115d94c77c198c600c67ace2afe1fdccf9d2ce37",
+          "shape": [2, 8, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "0cf2edd7e947f772e878daccb6faf2b6eb17aaa57580c84a994318a2cf01e8f5",
+          "shape": [2, 16, 8, 128]
+        }
+      },
+      "seed": 950037
+    },
+    {
+      "block_dim": 1,
+      "id": "ga_zero_float32",
+      "parameters": {"B": 2, "H": 2, "HV": 8, "S": 16, "atk": "random", "dtype": "float32", "g_atk": 0.0, "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "59945f1359b3131e1f405cc7cac9555d52f29b8af523a525482e8924b862bdeb",
+          "shape": [2, 2, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "5f008568eec61bf41156bfdbb24739b31311f2f6bb70c56b45c969735b5eeabe",
+          "shape": [2, 8, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "1ae56c9acb56465c766c8920d2dfe52df8b4776b0fdde90c6cdeda963e238c71",
+          "shape": [2, 16, 8, 128]
+        }
+      },
+      "seed": 950038
+    },
+    {
+      "block_dim": 1,
+      "id": "ga_large_float32",
+      "parameters": {"B": 2, "H": 2, "HV": 8, "S": 16, "atk": "random", "dtype": "float32", "g_atk": -30.0, "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "df8a612ac5606cce72b52b769f4f9821eac2e60f38747f9c27802a03f40ef9ca",
+          "shape": [2, 2, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "b971ddbf3954158ac850ed72c41115b31cff53b9cff32048d74feb1aa4c395fc",
+          "shape": [2, 8, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "eed5257eafff9e6dc988c202a73cb00a01ab82d5a1c4cecaa47f120ddeeaf3b8",
+          "shape": [2, 16, 8, 128]
+        }
+      },
+      "seed": 950039
+    },
+    {
+      "block_dim": 1,
+      "id": "ga_underflow_float32",
+      "parameters": {"B": 2, "H": 2, "HV": 8, "S": 16, "atk": "random", "dtype": "float32", "g_atk": -1000.0, "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "5369b6dd1f88ff0f893ab15073c8495d5fea84b1b5ed3c7a9cc8a58b91391005",
+          "shape": [2, 2, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "f93123f0e0bc67b6bdb1723e214a0494855fc9a123d1ca4125a46b806b73c11a",
+          "shape": [2, 8, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "73b888025344def6d497ab1d8624109b98db94c84093c7419a94d81501d2332f",
+          "shape": [2, 16, 8, 128]
+        }
+      },
+      "seed": 950040
+    },
+    {
+      "block_dim": 1,
+      "id": "beta_zero_float32",
+      "parameters": {"B": 2, "H": 2, "HV": 8, "S": 16, "atk": "random", "beta": 0.0, "dtype": "float32", "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "b8bad1a568d002d8be7c3d1b094a9c430cc3e4e612c00f6f8e937225e710578c",
+          "shape": [2, 2, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "9dc17aa2bc6f36715a5bc0c887f6feee8c791f92b3ae9195066bfe18c3c6b9b3",
+          "shape": [2, 8, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "56e6e28b2bc99d77db4c26db72ab06a28f102720b4a715e01346e26e70a157ef",
+          "shape": [2, 16, 8, 128]
+        }
+      },
+      "seed": 950041
+    },
+    {
+      "block_dim": 1,
+      "id": "beta_one_float32",
+      "parameters": {"B": 2, "H": 2, "HV": 8, "S": 16, "atk": "random", "beta": 1.0, "dtype": "float32", "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "226c4a981f9511e71350719b13c60fc962459442fc2d94fce2a50d8cc84a7d18",
+          "shape": [2, 2, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "1e05f6281fdf0abaa726615caf5848f0fc56805fd657134bad811c54bbfe1e88",
+          "shape": [2, 8, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "90a5922e1dd007118c41eab272370d59668195842f2203a511d939d3aab1a34a",
+          "shape": [2, 16, 8, 128]
+        }
+      },
+      "seed": 950042
+    },
+    {
+      "block_dim": 1,
+      "id": "ba_zero_float32",
+      "parameters": {"B": 2, "H": 2, "HV": 8, "S": 16, "atk": "random", "beta_atk": 0.0, "dtype": "float32", "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "78a22f0cfbd1d4df9b58bb3a4011fb1255e76d1876502ad945fe534110a17b1b",
+          "shape": [2, 2, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "80ab4129406d1f6114e510b2d00c8f1b42c9bb4a2910c666b13fcb410922f677",
+          "shape": [2, 8, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "d457c8a0831aa67d51648aa4116887135c03fc021beb5b5c7805f1176b2bb231",
+          "shape": [2, 16, 8, 128]
+        }
+      },
+      "seed": 950043
+    },
+    {
+      "block_dim": 1,
+      "id": "ba_one_float32",
+      "parameters": {"B": 2, "H": 2, "HV": 8, "S": 16, "atk": "random", "beta_atk": 1.0, "dtype": "float32", "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "507e21758c3d0414ff4a3e8ff5d0d5c64a1f4a0d5e2ab89e4c639b96fb784f04",
+          "shape": [2, 2, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "305094d220c1e71d0229077ae90c9ddf30d2bff56ec10008c114d6d93e28f374",
+          "shape": [2, 8, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "d3cfee9fb9f6a7696570fa739effbbbb23fa3de70fa11cfb9dcdf7f44cc9154f",
+          "shape": [2, 16, 8, 128]
+        }
+      },
+      "seed": 950044
+    },
+    {
+      "block_dim": 1,
+      "id": "zero_q_float32",
+      "parameters": {"B": 2, "H": 2, "HV": 8, "S": 16, "atk": "random", "dtype": "float32", "state": "random", "zero_q": true},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "088481e11f472a118c0dcdb40eeb776cdce60a234c3c88254b00c8e908dcfd09",
+          "shape": [2, 2, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "b716de8d944b9964e03bd7c636422b4fe61681f93377241dc537bcb3eaaf1611",
+          "shape": [2, 8, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "fa43239bcee7b97ca62f007cc68487560a39e19f74f3dde7486db3f98df8e471",
+          "shape": [2, 16, 8, 128]
+        }
+      },
+      "seed": 950045
+    },
+    {
+      "block_dim": 1,
+      "id": "zero_k_float32",
+      "parameters": {"B": 2, "H": 2, "HV": 8, "S": 16, "atk": "random", "dtype": "float32", "state": "random", "zero_k": true},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "7556c2917514f81ef4be73f0796c7e4fec1cd9766a9680bf7ee34e4193fa5e5f",
+          "shape": [2, 2, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "2eecd4bc012b6b17ca0b2c50dff12bd72706e8fe2e3a71ac3add025d922674d2",
+          "shape": [2, 8, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "060acc7a6f2a4d42d49362295db401cbd678e05fd98dd6a0fd36fad525ad7b02",
+          "shape": [2, 16, 8, 128]
+        }
+      },
+      "seed": 950046
+    },
+    {
+      "block_dim": 1,
+      "id": "all_zero_float32",
+      "parameters": {"B": 2, "H": 2, "HV": 8, "S": 16, "all_zero": true, "atk": "random", "dtype": "float32", "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "e5a00aa9991ac8a5ee3109844d84a55583bd20572ad3ffcd42792f3c36b183ad",
+          "shape": [2, 2, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "30e14955ebf1352266dc2ff8067e68104607e750abb9d3b36582b8af909fcb58",
+          "shape": [2, 8, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "fa43239bcee7b97ca62f007cc68487560a39e19f74f3dde7486db3f98df8e471",
+          "shape": [2, 16, 8, 128]
+        }
+      },
+      "seed": 950047
+    },
+    {
+      "block_dim": 1,
+      "id": "norm_below_clamp_float32",
+      "parameters": {"B": 2, "H": 2, "HV": 8, "S": 16, "atk": "random", "dtype": "float32", "qk_scale": 1e-14, "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "3880c1ed50ca6bc84cc4b352327afc85a33a5d9bee101dd6f530d829c49da3d4",
+          "shape": [2, 2, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "c20ada41f50a7965c6e4039758e2fb810878d0a599497ae140353941d61e9cde",
+          "shape": [2, 8, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "084d570c9d1b30ff7281a088be6608defa0a3d87ace17df3b6539b366db48246",
+          "shape": [2, 16, 8, 128]
+        }
+      },
+      "seed": 950048
+    },
+    {
+      "block_dim": 1,
+      "id": "norm_above_clamp_float32",
+      "parameters": {"B": 2, "H": 2, "HV": 8, "S": 16, "atk": "random", "dtype": "float32", "qk_scale": 1e-11, "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "ed7fcc0cad40de692e6de39c55f8676433875e884abf8eeda2ab04d35c8bd7e5",
+          "shape": [2, 2, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "b2096ae28e15812abbbfab75625bc3656802917de9cc219bd7b6967e6d373be6",
+          "shape": [2, 8, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "2c2fc5cbd074b61150d6a6c9e354928061126708478ad97f66c2c5c43951c998",
+          "shape": [2, 16, 8, 128]
+        }
+      },
+      "seed": 950049
+    },
+    {
+      "block_dim": 1,
+      "id": "state_large_float32",
+      "parameters": {"B": 2, "H": 2, "HV": 8, "S": 16, "atk": "random", "dtype": "float32", "state": "random", "state_scale": 16.0},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "916f6f828c365096e0c7eb56b07111ea9603de8602334e6714ec0a0313551790",
+          "shape": [2, 2, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "270efa00c90974809f5435b2826dd9bc9c32d2d1e725eeb133c67a02e3726b80",
+          "shape": [2, 8, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "149e293eb14af56e612b7036275922db4fc48736b1e54eb6de5b05f291735ad5",
+          "shape": [2, 16, 8, 128]
+        }
+      },
+      "seed": 950050
+    },
+    {
+      "block_dim": 1,
+      "id": "state_small_float32",
+      "parameters": {"B": 2, "H": 2, "HV": 8, "S": 16, "atk": "random", "dtype": "float32", "state": "random", "state_scale": 1e-06},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "6562bc5a3c9f27cb9426c9290bf52df0ecf7c6dcbcb33882655738a2031433ae",
+          "shape": [2, 2, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "fc5fd616f2ea3f4b789624df15af8351b1a8e022a570bcd4d6bce007f4cd6ee2",
+          "shape": [2, 8, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "7acbb690a0888051aef22090040b87207190f3f2c1ad727afec24bb805866a36",
+          "shape": [2, 16, 8, 128]
+        }
+      },
+      "seed": 950051
+    },
+    {
+      "block_dim": 1,
+      "id": "atk_large_float32",
+      "parameters": {"B": 2, "H": 2, "HV": 8, "S": 16, "atk": "random", "atk_scale": 1e+30, "dtype": "float32", "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "82dc8b9d68511653d28a688ea316652adcb362b087000bde27ace2da49a2a114",
+          "shape": [2, 2, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "76aeff9942ee97eb3df960342c578e93427afb75ed3871d33542682884393a0d",
+          "shape": [2, 8, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "f5277468219f7db19af8cc34b852447f97106f03fb1520bf65b422d226d4498b",
+          "shape": [2, 16, 8, 128]
+        }
+      },
+      "seed": 950052
+    },
+    {
+      "block_dim": 1,
+      "id": "atk_small_float32",
+      "parameters": {"B": 2, "H": 2, "HV": 8, "S": 16, "atk": "random", "atk_scale": 1e-30, "dtype": "float32", "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "3e4b0f971fdb6e1ffaf7fe3c5ea49375b9f5b4c1da7105e10b1c233c8d43fc54",
+          "shape": [2, 2, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "6e7ac6d3891d5a0ed19ad524a7f3c220e30dd6258d702db638eb0b61b74fee4a",
+          "shape": [2, 8, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "d4f1804d5b551a2762ab728f8680ab8b2558965aa5fe53ec3012c4ddcfa67811",
+          "shape": [2, 16, 8, 128]
+        }
+      },
+      "seed": 950053
+    },
+    {
+      "block_dim": 1,
+      "id": "atk_tiny_decay_large_initial_float32",
+      "parameters": {"B": 2, "H": 2, "HV": 8, "S": 1, "atk": "random", "atk_scale": 1e+30, "beta_atk": 0.0, "dtype": "float32", "g_atk": -100.0, "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "809bc223144936ad1fcbbc0dc8784b555fb117b40056602533589b4a2d629520",
+          "shape": [2, 2, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "1b1cbed122c7fd04a042e64df2606eb89652ec98e7612b4b9e90029174b3fd8a",
+          "shape": [2, 8, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "dad634209d361bbd29e1e2ebac71d4658dd0eb7a2265babc6037600af0fd7dd9",
+          "shape": [2, 1, 8, 128]
+        }
+      },
+      "seed": 950054
+    },
+    {
+      "block_dim": 1,
+      "id": "signed_spikes_float32",
+      "parameters": {"B": 2, "H": 2, "HV": 8, "S": 16, "atk": "random", "dtype": "float32", "spikes": true, "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "bc8f6f552eb6c0ab6e547dff74b72b4f0d03cb619c4d909ce080d49ffbe64a64",
+          "shape": [2, 2, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "7289b4c0e7b024e82dd9bbb59c1d3be2a6c7eae35d6945c0405aa027c3750310",
+          "shape": [2, 8, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "acfa1f1e3dd522969cf2e9e361c5cfff29a11f111b2785ca24af6c044342e78a",
+          "shape": [2, 16, 8, 128]
+        }
+      },
+      "seed": 950055
+    },
+    {
+      "block_dim": 1,
+      "id": "atk_decay_87.3_float32",
+      "parameters": {"B": 2, "H": 2, "HV": 8, "S": 1, "atk": "random", "atk_scale": 1e+30, "beta_atk": 0.0, "dtype": "float32", "g_atk": -87.3, "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "3ce960a6a5d972129dde50b9dc4a50c89b557eb998d30a2a36a713ac851d6073",
+          "shape": [2, 2, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "aed6e9a94d8cc0f5851ea4be5f73a2af3acdcaa3848393129c8449d3eb29ea7f",
+          "shape": [2, 8, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "ee6a88e93a0dc3ce61fcafadf43606140160a5d4364abb0c2159680514aa6e5c",
+          "shape": [2, 1, 8, 128]
+        }
+      },
+      "seed": 950056
+    },
+    {
+      "block_dim": 1,
+      "id": "atk_decay_87.34_float32",
+      "parameters": {"B": 2, "H": 2, "HV": 8, "S": 1, "atk": "random", "atk_scale": 1e+30, "beta_atk": 0.0, "dtype": "float32", "g_atk": -87.34, "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "717ac0049f881d449d5d2be68700f36b9ae696648defef8ba9e95b806788a560",
+          "shape": [2, 2, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "d4845cff2b1d58f514b44a17311cf7e7439e7e30cd8e91f50f2a51f55b84b53d",
+          "shape": [2, 8, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "2a4360a42944a30ebf73106aa55436a8986790fedf26537df3b30b83e20038e1",
+          "shape": [2, 1, 8, 128]
+        }
+      },
+      "seed": 950057
+    },
+    {
+      "block_dim": 1,
+      "id": "atk_decay_88_float32",
+      "parameters": {"B": 2, "H": 2, "HV": 8, "S": 1, "atk": "random", "atk_scale": 1e+30, "beta_atk": 0.0, "dtype": "float32", "g_atk": -88.0, "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "7bdedf93b2343250ea1bebf0cba44edf5a86143295211487ebdda31fc504e20c",
+          "shape": [2, 2, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "aada1f4ac1e2d71d89b59f01e6b1c22622e1e439aee3c76a5efec77f79b09459",
+          "shape": [2, 8, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "4b39185cc096b5aeb3c5ee7615e3e9c3b08782068bcf12977c314b3ad93a18ab",
+          "shape": [2, 1, 8, 128]
+        }
+      },
+      "seed": 950058
+    },
+    {
+      "block_dim": 1,
+      "id": "atk_decay_90_float32",
+      "parameters": {"B": 2, "H": 2, "HV": 8, "S": 1, "atk": "random", "atk_scale": 1e+30, "beta_atk": 0.0, "dtype": "float32", "g_atk": -90.0, "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "e60f18e39c43546d7f682516d3415e137b4086e213959a6def86cc1f62a72f0a",
+          "shape": [2, 2, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "9f68f2f8269968c9156bb678c7a9531bbc43392bbfc2b0a67da285d80e42daab",
+          "shape": [2, 8, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "b5b9f2fbdbe70a11ea61acece962d743dac9120000907ab9b190f47e4b80ddb1",
+          "shape": [2, 1, 8, 128]
+        }
+      },
+      "seed": 950059
+    },
+    {
+      "block_dim": 1,
+      "id": "atk_decay_95_float32",
+      "parameters": {"B": 2, "H": 2, "HV": 8, "S": 1, "atk": "random", "atk_scale": 1e+30, "beta_atk": 0.0, "dtype": "float32", "g_atk": -95.0, "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "15cf2262bf25e3980bdac72720d78bd2eb7807ea581ad437b04eb9dcdc666c2f",
+          "shape": [2, 2, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "3f8e1c96120dc6e172e4fe64fa9b72f7d88828270043d420be160d19ac87a347",
+          "shape": [2, 8, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "d1633bfce1d589beec2017507fb23be0596618a1e83c48bea256a33e95bfc066",
+          "shape": [2, 1, 8, 128]
+        }
+      },
+      "seed": 950060
+    },
+    {
+      "block_dim": 1,
+      "id": "atk_decay_103_float32",
+      "parameters": {"B": 2, "H": 2, "HV": 8, "S": 1, "atk": "random", "atk_scale": 1e+30, "beta_atk": 0.0, "dtype": "float32", "g_atk": -103.0, "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "f2383e7f1736f6a58712d3848d47ef90b7f12ce232f4ad3511a787c231414a58",
+          "shape": [2, 2, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "bc13b28d715f696f16675cdb3569149f0dec3a9ec0824147f02c2ded9dc05a05",
+          "shape": [2, 8, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "99a83f923fa2254c1e44b5e4b5d3ccf02d7abeaae1deaf6399e2d65fb7694e6d",
+          "shape": [2, 1, 8, 128]
+        }
+      },
+      "seed": 950061
+    },
+    {
+      "block_dim": 1,
+      "id": "atk_decay_104_float32",
+      "parameters": {"B": 2, "H": 2, "HV": 8, "S": 1, "atk": "random", "atk_scale": 1e+30, "beta_atk": 0.0, "dtype": "float32", "g_atk": -104.0, "state": "random"},
+      "passed": true,
+      "reference": {
+        "final_A_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "e5a00aa9991ac8a5ee3109844d84a55583bd20572ad3ffcd42792f3c36b183ad",
+          "shape": [2, 2, 128]
+        },
+        "final_state": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "23632971056b5da19a760039b3e498607ca27e94a050494e654eb66f1c5211bd",
+          "shape": [2, 8, 128, 128]
+        },
+        "o": {
+          "comparison": {"atol": 2e-05, "max_relative_l2": 0.0001, "mode": "allclose", "reason": "Fixed FP32 relative-L2<=1e-4 against literal A and independent B; additional elementwise guard frozen before device execution.", "rtol": 0.0002},
+          "dtype": "float32",
+          "sha256": "b2314e00ecba83d771fad779168909a1becb6af54d739c90b3302368436bac76",
+          "shape": [2, 1, 8, 128]
+        }
+      },
+      "seed": 950062
+    }
+  ],
+  "command": "reference",
+  "contract_sha256": "808b4a7a49774e9282448b6e4f7c51526ccceae2df9b82016e73ce919587ed5f",
+  "device": "a5",
+  "dsl_imported": false,
+  "imports": {"ref": "<repo>/kernels/projects/a5/pgdn_fused_recurrent/ref/__init__.py", "unit": "<repo>/kernels/projects/a5/pgdn_fused_recurrent/unit.py"},
+  "kernel_imported": false,
+  "launcher": null,
+  "passed": true,
+  "runner_sha256": "8e91d95ed0294ddbfc204957b8bf77606a79123655fc096963b94658b633566b",
+  "schema": "ascriptor.unit-result/1",
+  "simulator_imported": false,
+  "stage": "reference",
+  "started_at": "2026-10-07T08:01:29.125092+00:00",
+  "unit": "a5.pgdn_fused_recurrent",
+  "versions": {"ascriptor": null, "numpy": "1.26.4", "python": "3.11.15", "torch": "2.10.0+cpu"}
+}
