@@ -2986,6 +2986,10 @@
         {
           "at": "2026-10-08T06:10",
           "summary": "DONE（issue #40 评论 6035062969 @09:28:40Z，PR #137，head 8f4e1341693c576737cf1549dd0a1d5fa0550c1b）：六项验收全部 [x]（真实缓存组装 correctness、真实形状+(C,HV)边界六梯度 <=0.05、独立 fixture 单独报不混端到端、backward 门控跨度=128.0 有实测依据、写集边界干净+主机计数不减、真机回执含 SoC/CANN/算子包身份+原始日志）。STATUS（6036472821 @10:58）确认无后续代码变更。\n\n两轮独立复核均 accept-with-minor-notes/pass，无阻塞项：(1) embedded REVIEW（6048977913 @23:33，同账号另一进程，承认未能重跑全量 host pytest）；(2) 本 PM 另开 worktree 隔离 subagent 复核——write-set 334 文件全部核对、新单元 4 个 gc2 消费者与预告一致（5 个未改 kernel 逐字节 diff 相同）、platform.py/测试改动各一行且范围吻合批准、原始日志行/sha256/48 点闸重扫 identity 逐项独立核对、独立 fixture 2 项失败如实保留（未被端到端掩盖）、qualified 从未声称 True、无红旗；唯一缺口是该 subagent 自己沙箱缺空闲 A2 卡+ascriptor 库 checkout 版本不对，没能亲自重跑真机（不是对数字本身有疑问，是没法重复测），已如实披露不作为阻塞。\n\n用户批准合入（\"A2-13 合\"）。head sha 合入前复核仍为 8f4e1341693c576737cf1549dd0a1d5fa0550c1b，与两轮评审核对的版本一致。`gh pr merge 137 --squash --match-head-commit 8f4e1341693c576737cf1549dd0a1d5fa0550c1b` 成功，merge commit d89bc72d660b198cf4ee844a8098189ea2f754ed。合入后 main 全量 host pytest 复跑结果另行记录（本机 PM 沙箱，无 NPU/torch_npu，用于确认无新增失败，不替代真机结论）。"
+        },
+        {
+          "at": "2026-10-08T06:15",
+          "summary": "合入后 main 全量复跑（本机 PM 沙箱，无 NPU/torch_npu）：20 failed/1461 passed/111 skipped。20 个失败文件/用例集合与 PK-06 合入前后两次复跑完全相同（test_gdn_chunk_bwd*/test_kda_decode_bf16/test_pgdn_chunk_*/test_pkda_chunk_*，均为既有 sandbox-only 缺口，文件均不在 A2-13 写集内），零新增失败——非本次合入回归。"
         }
       ],
       "result": {
