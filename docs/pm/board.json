@@ -3364,6 +3364,10 @@
         {
           "at": "2026-10-07T07:36",
           "summary": "DONE（issue #44 评论 6032766686，MikejR2904，07:01:53Z）：声称 A2-K1 全部验收项在真机 910B3 通过（1.1 GVA/GQA、1.2 token-major、1.3 非零 initial_state、1.4 dh0+接受 dht、1.7 scale+no-tail-path、分段 chaining 逐位一致、barrier 负对照、写集范围、host pytest 计数）。1.5（final_state fp32 vs bf16 / BF16 host 审计）因 chunk 单元全程 fp32、没有 bf16-state 分支而标 N/A。**首次 DONE 没有 PR**——另一个共享 `limjiunnbin` 账号的 PM 进程（下面有说明）在 07:28:43Z 指出按协议 §3.7 DONE 必须先开 PR 才算数；MikejR2904 在 07:36:45Z 补开 **PR #138**（`MikejR2904:task/A2-K1` → `main`，30 commits/27 files/+3287 行，diff 范围确认只在写集内，无 KDA/A5/保留路径）。\n\n**status 改为 review——尚未做过独立审查，不能合入**：assigned->in_progress->done 的链路里，DONE+PR 只到 review 这一步，真机证据/数字需要 PM 独立复算、写集边界需要 PM 自己核验diff，这些都还没做（本轮只记录事件，审查是下一步）。"
+        },
+        {
+          "at": "2026-10-08T02:32",
+          "summary": "本 PM 另开 worktree-isolated 只读 subagent 独立复核 PR #138（head 600d2ea），在两条 embedded REVIEW（08:31、11:42、14:29 三轮）已核实的六项之外，发现一条此前三轮都没捉到的新阻塞项，并独立复核确认了 embedded 第三轮正在等待的那条泄露问题仍未解决。\n\n**用户已批准 force-push**（\"A2-K1批\"，针对 bb7e1c6 的历史改写，仅限申领人自己 fork 上的 task/A2-K1 分支）——已在 #44 与 #138（申领人实际在跟的线程）各发一条 REVIEW，verdict=rework，内容：(1) 转达批准，请申领人执行 squash/rebase 清理 bb7e1c6 并报告新 sha；(2) **新发现的独立阻塞项**——任务验收清单声称的 barrier 负对照（删 barrier -> 测试变红）经直接复现是假的：`scan.py` 的两处 matmul 都没带 `is_init=False`，删掉 line115 的 barrier 后 `test_a2_accumulate_barriers.py` 仍 6 passed/0 failed，静态守卫对本 PR 的 kernel 实际覆盖为零；(3) 任务开篇动机案例——inverse 阶段的 M10-081 类 FP32 累加链——并未被按『改成 cube+barrier』方式修复，而是被 wy.py 的逐行标量求解整条绕开，这件事没有像 Deviation 1/2 一样在 a2_gdn_abi.md §7 里被点名披露；(4) 三条不独立阻塞的小项（双 oracle 未用 fla.naive、T%64 检查只在测试 harness 里不在 kernel 入口、\"bit-exact\"措辞与实际 1e-4 容差不符），建议与 1-3 一并处理，避免再跑一轮。\n\nstatus 维持 review（仍在返工，不是合入前的最后一轮）。合入与 force-push 仍待申领人完成上述四项、PM 做第三轮独立复核确认。"
         }
       ],
       "result": null
@@ -5556,7 +5560,7 @@
       "wave": "W0",
       "soc": "a5",
       "priority": "-",
-      "status": "review",
+      "status": "done",
       "model": [],
       "kernel": [
         "pgdn_fused_recurrent"
@@ -5636,9 +5640,24 @@
         {
           "at": "2026-10-07T09:09",
           "summary": "ACK（issue #95 评论 6033224718，07:34:28Z，session dev-20261007T021301Z-pk06-afaf8516）：冻结短 S/双状态/原生 ABI/固定常量/naive 归一化，计划 literal A+独立 B+FP64 lift 校准 -> 单 launch 前向 -> 真机扫分组/bd/状态/量程 -> 双状态 prefill/decode 续接 -> 同卡三轮 baseline/candidate/baseline，eta_h=24。assigned -> in_progress（随 ACK）。\n\n**STATUS**（6033424329 @07:46）：vendor compile 阶段，112 组 CPU 校准完成（host A/B max relL2=1.506502e-7，FP64 lift max=2.663938e-16），两个独立环境分别复算一致。\n\n**RISK silent-wrong-result**（6033506362 @07:51，已记入不隐藏）：新单元未资格化候选在小 ATK 衰减×大非零初态时，独立 ATK 输出超预算（final_A_state 相对 L2=1.0），o/主状态仍通过；申领人**自己拦下，未提交为合格实现**，提议在任务既有写集内定位修复，不缩域、不删 case、不改 host/共享路径。按协议该类 RISK 应立即上报用户——这里是自我拦截，未产生实际静默错误结果，PM 本轮向用户汇报但不升级处理。\n\n**STATUS**（6033618980 @07:59）：定位到根因——g_atk∈[-87.34,-100] 附近 native exp 输出为 0，literal CPU FP32 是正的 subnormal，在 exp 边界本身丢失（不是主状态/分组同步问题）；已写候选修复（FP32 subnormal mantissa 的 RNE 整数表示 + 两个 normal 幂因子相乘）。\n\n**STATUS**（6033810952 @08:11）：v2 修复验证通过——bd1 完整 126 case（原 112 + 7 门控×2 dtype）全部通过，之前失败的 g_atk=-100/A0 1e30 case 现在 literal A 与独立 B 逐位一致；host-work audit 8 组仅见分配类算子，无 host 算术/转换。\n\n**RISK numeric-reference-boundary**（6033824586 @08:12，另一个共享账号 PM 进程 08:20:43Z 已裁定，本次补记）：同一 pin/hash 的 literal CPU FP32 naive 在两套环境（验收一直用的 Docker Torch2.12.0+cu130 vs 主机 Torch2.10.0）在 subnormal exp 处 1 ulp 舍入不同，两个新边界点在 Docker oracle 过、在主机 oracle 超 1e-4。**裁定**：冻结 Docker CPU 环境（Python 3.12.14/Torch 2.12.0+cu130，torch_git7661cd9c6b841b62b7f411aa52ec51f05457263b）为本任务 literal CPU FP32 oracle 身份，与 ascriptor/fla pin 同等写入证据包；主机 Torch2.10 的两个边界点记为'已知跨环境边界'，不算这两点失败，不要求同时满足两套环境——是浮点环境本身差异，不是预算放宽或量程扩大，不需要再问用户（PM 判断：合理，不复核）。\n\n**DONE**（6034704784 @09:07，**PR #139**，commits b6f2613/b76de80）：六项验收全部 [x]，126 case×6 bd=756，三输出对 A/B 独立 FP32 预算全部 ≤1e-4（o=2.35e-7/主state=1.94e-7/ATK state=2.42e-7），BF16 companion 378 组逐位一致；prefill→decode 14 组/56 条续接链/150 段对照逐位一致；同卡三轮 baseline/candidate/baseline 真实执行（4 组×2 warmup/50 samples）；8 组 host-work audit 仅分配无算术；写集检查 126 文件全在 4 条授权路径内。host 1582 passed/10 skipped。device=a5 cann=9.1.0-beta.1。handoff_notes 里明确记录了上面那条 oracle 身份冻结裁定。另有 PR 评论补充（6034746708 @09:09）两行审计记录，不是新的真机运行。\n\n**status 改为 review**——DONE+PR 存在，真机证据/数字独立复算与写集核验尚未做。"
+        },
+        {
+          "at": "2026-10-08T02:35",
+          "summary": "三轮独立评审（两条 embedded REVIEW + 本 PM 另开 worktree 的独立 subagent 复核，均为 accept/accept-with-minor-notes，无阻塞项）后，用户直接批准合入（\"pk-06 合\"）。head sha 合入前复核仍为 d7cd434e77b3fe7e52abba70ee806447d2d26886，与三份评审核对的版本一致。`GH_TOKEN=$(gh auth token -u ascend-fla-pm-bot) gh pr merge 139 --squash --match-head-commit d7cd434e77b3fe7e52abba70ee806447d2d26886` 成功，merge commit cf2475d08f4c7cdec005dddeedf19b5411d5fcf9。\n\n合入后 `git pull --ff-only` 到 cf2475d，在 main 上复跑全量 host pytest（本机 PM 沙箱，无 NPU/torch_npu）：20 failed/1461 passed/111 skipped。20 个失败逐一核对，文件与用例集合同合入前一次独立 subagent 在裸 main 上复现的那组 sandbox-only 失败（conftest.py 的 session 级夹具在本沙箱缺 torch_npu 时的已知交互，与 PK-06 改动无关，并非本次合入引入的回归）——该subagent 已经在合入前通过直接在裸 main 上复现同一失败集合排除了回归可能性。真机侧的权威数字仍是申领人在真实 NPU checkout 上的 1582 passed/10 skipped（DONE 原始声明），本沙箱复跑只用于确认没有引入新的失败，不替代真机结论。\n\nstatus 改为 done。GDA-05 的依赖（PK-06『完成』）现已满足——按另一位共享账号 PM 进程（2026-10-07T11:31~19:20Z 多轮 NO_TASK）已正确说明的规则，PM 需要在 ASSIGN 之前先补全 GDA-05 profile 阶段的范围/写集/基线/工作负载/交付判据，尚未做，留给下一轮。"
         }
       ],
-      "result": null,
+      "result": {
+        "commits": [
+          "cf2475d0"
+        ],
+        "evidence": [
+          "PR #139",
+          "kernels/projects/a5/pgdn_fused_recurrent/evidence/",
+          "tests/test_pgdn_fused_recurrent.py",
+          "docs/research/pgdn_fused_recurrent_gate_range.md"
+        ],
+        "numbers": "A5，126 case x 6 bd = 756，三输出（o/主state/ATK state）对独立 A/B FP32 参考相对 L2 全部 <=1e-4（最坏 o=2.35e-07, 主state=1.94e-07, ATK state=2.42e-07）；BF16 companion 378 组逐位一致；prefill->decode 14 组/56 条续接链/150 段对照逐位一致；同卡三轮 baseline/candidate/baseline 真实执行；8 组 host-work audit 仅见分配类算子、无算术/转换；申领人原始 NPU checkout host 测试 1582 passed/10 skipped。真实发现并自我拦下的 silent-wrong-result：g_atk 在 [-100,-87.34] 附近 native exp 输出 0 而 literal CPU FP32 为正常 subnormal，候选在 ATK 独立输出超预算（final_A_state 相对 L2=1.0）、o/主状态仍通过；根因定位到 exp 边界本身丢失，修复为 FP32 subnormal mantissa 的 RNE 整数表示+两个 normal 幂因子相乘，v2 修复后 bd1 完整 126 case 全部通过，literal A 与独立 B 逐位一致。另有跨环境 oracle 边界裁定：冻结 Docker CPU （Python3.12.14/Torch2.12.0+cu130）为本任务 literal CPU FP32 oracle 身份，主机 Torch2.10 的两个边界点记为已知跨环境边界，不算失败（浮点环境差异，非预算放宽）。三轮独立评审（两条 embedded REVIEW + 本 PM 另开 worktree 的独立 subagent 复核）均为 accept/accept-with-minor-notes，无阻塞项，用户批准后合入。合入后 main 全量复跑（本机 PM 沙箱，无 NPU/torch_npu）：20 failed/1461 passed/111 skipped，失败集合与独立 subagent 合入前在裸 main 上复现的既有 sandbox-only 缺口一致，非本次回归。"
+      },
       "origin": {
         "kind": "request",
         "issue": 89,
