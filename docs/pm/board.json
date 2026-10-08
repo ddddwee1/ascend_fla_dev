@@ -2871,7 +2871,7 @@
       "wave": "W-A2",
       "soc": "a2",
       "priority": "P1",
-      "status": "in_progress",
+      "status": "done",
       "model": [
         "kimi-linear-48b-a3b"
       ],
@@ -2982,9 +2982,24 @@
         {
           "at": "2026-10-07T09:10",
           "summary": "D-PM-60 实现进展的 STATUS/RISK 链（issue #40，session 01a0b7ce-...，07:59~09:02Z，本轮一次性记录）：\n1. 新单元 `kda_bwd_stable_fp32gc` 建好，只改四个 gc2 消费者为 FP32 输入，其余五个 kernel/八项缓存字节不变（6033616471 @07:59，6034626111 @09:02 的 manifest 核对均确认）。真实缓存完整链 18/18 通过（H32 T64/128/512/4096、GQA、奇数 chunk、B2）。\n2. 门控跨度（backward）48 点重扫：44 有限有效，4 个 span192 前向非有限（按契约正确拒绝）。新 uniform dg 在各 span 全面优于旧 BF16 路径（span32: 0.014 vs 旧 0.063）；span160=0.0495 贴近预算边缘；8 seed 初始化下界仍 106.38。候选 backward=128（留 ~20% 余量，超过初始化下界）——**申领人一度在 RISK 6034035125（@08:26）问是否需要先消除全部独立 fixture 的严格中间检查失败才能填值，随后自己在 STATUS 6034120124（@08:31）更正：原规格本来就把'独立 fixture 单独报、不与端到端结论合并'写清楚了，不需要再问**——已直接填 `max_gate_span.stable.backward=128.0`。原 fixture 的严格中间检查失败（gentle_decay qk_left relL2=1.659e-5>1e-5、grid_c1_hv2 kg 2032 vs 2040 的 allclose 失败）如实保留，已定位到 finalize_pre.py 里 FP32 exp→乘法→BF16 materialization 正好落在舍入边界两侧，不算入端到端结论。\n3. **RISK write-set-expansion**（6034165170 @08:34）：填 backward 键后，全量测试暴露 A2-12 遗留的精确字典断言 `tests/test_kda_fwd_a2.py:172` 要求 `max_gate_span` 只能有 forward 键——同 A2-14 当年踩过的'给 CAPABILITIES 加键必然打破精确断言'那一类坑。申领人只请求把这一行改成只断言 forward 子键（不改 A5 断言、不改前向实测边界/数值阈值），补丁已在隔离副本验证（1454 passed/6 skipped）。**PM 批准**（本轮，不需要问用户——范围极窄、机制与 A2-14 先例一致，属于 PROTOCOL.md RISK 表里'write-set-expansion: PM 查过冲突再批'这条，已核实无其它在飞任务的 write_set 命中这个文件）：`tests/test_kda_fwd_a2.py` 加入写集，仅限按申领人方案收紧断言为 forward 子键这一行。\n4. 仍 `in_progress`，未报 DONE，`qualified` 仍 `False`，公共入口未改。"
+        },
+        {
+          "at": "2026-10-08T06:10",
+          "summary": "DONE（issue #40 评论 6035062969 @09:28:40Z，PR #137，head 8f4e1341693c576737cf1549dd0a1d5fa0550c1b）：六项验收全部 [x]（真实缓存组装 correctness、真实形状+(C,HV)边界六梯度 <=0.05、独立 fixture 单独报不混端到端、backward 门控跨度=128.0 有实测依据、写集边界干净+主机计数不减、真机回执含 SoC/CANN/算子包身份+原始日志）。STATUS（6036472821 @10:58）确认无后续代码变更。\n\n两轮独立复核均 accept-with-minor-notes/pass，无阻塞项：(1) embedded REVIEW（6048977913 @23:33，同账号另一进程，承认未能重跑全量 host pytest）；(2) 本 PM 另开 worktree 隔离 subagent 复核——write-set 334 文件全部核对、新单元 4 个 gc2 消费者与预告一致（5 个未改 kernel 逐字节 diff 相同）、platform.py/测试改动各一行且范围吻合批准、原始日志行/sha256/48 点闸重扫 identity 逐项独立核对、独立 fixture 2 项失败如实保留（未被端到端掩盖）、qualified 从未声称 True、无红旗；唯一缺口是该 subagent 自己沙箱缺空闲 A2 卡+ascriptor 库 checkout 版本不对，没能亲自重跑真机（不是对数字本身有疑问，是没法重复测），已如实披露不作为阻塞。\n\n用户批准合入（\"A2-13 合\"）。head sha 合入前复核仍为 8f4e1341693c576737cf1549dd0a1d5fa0550c1b，与两轮评审核对的版本一致。`gh pr merge 137 --squash --match-head-commit 8f4e1341693c576737cf1549dd0a1d5fa0550c1b` 成功，merge commit d89bc72d660b198cf4ee844a8098189ea2f754ed。合入后 main 全量 host pytest 复跑结果另行记录（本机 PM 沙箱，无 NPU/torch_npu，用于确认无新增失败，不替代真机结论）。"
         }
       ],
-      "result": null
+      "result": {
+        "commits": [
+          "d89bc72d"
+        ],
+        "evidence": [
+          "PR #137",
+          "kernels/projects/a2/kda_bwd_stable_fp32gc/**",
+          "benchmarks/a2/evidence/kda_bwd/fp32gc-v1/",
+          "ascend_fla/platform.py"
+        ],
+        "numbers": "A2（Ascend910B3，CANN9.0.0），新 FP32-gc KDA backward 派生单元（仅 4 个 gc2 消费者改 FP32 输入，其余 5 kernel/8 缓存不变）。真实缓存 18/18 通过，六梯度最坏相对 L2：dq=0.004188430477, dk=0.004333752587, dv=0.003710121072, dbeta=0.003760611610, dg=0.004940428570, dh0=0.002467195314（CPU FP32 完整自动微分 golden）。backward 门控跨度重扫 48 点=44 有限有效+4 个 span192 正确拒绝，取 128.0（留~20% 余量，高于 8 seed 初始化下界 106.38）。独立 fixture 26 例 23 通过，3 项严格中间检查失败如实保留（contract.json board 状态仍 failed）。host 测试原始 checkout 1454 passed/6 skipped。两轮独立复核（embedded REVIEW + 本 PM worktree 隔离 subagent）均 accept，无阻塞项；subagent 自身沙箱因缺空闲卡/库版本不对未能亲自重跑真机，已披露为未闭环的旁证缺口（非对数字本身的疑问）。用户批准后合入 main（d89bc72d）。"
+      }
     },
     {
       "id": "A2-14",
