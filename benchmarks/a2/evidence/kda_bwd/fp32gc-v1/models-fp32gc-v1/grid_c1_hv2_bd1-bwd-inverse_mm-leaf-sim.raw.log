@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "<WORKSPACE>/tmp/a213-native-01a0b7ce/fp32gc_leaf_model.py", line 32, in <module>
+    metrics=[a2_gradient_metrics(g,e,{'max_relative_l2':.05}) for g,e in zip(result,cap['actual_outputs'])]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>/tmp/a213-native-01a0b7ce/fp32gc_leaf_model.py", line 32, in <listcomp>
+    metrics=[a2_gradient_metrics(g,e,{'max_relative_l2':.05}) for g,e in zip(result,cap['actual_outputs'])]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>/tmp/a213-native-01a0b7ce/repo/benchmarks/probe_bwd_span.py", line 150, in a2_gradient_metrics
+    actual, expected = actual.detach().cpu(), expected.detach().cpu()
+                       ^^^^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'detach'

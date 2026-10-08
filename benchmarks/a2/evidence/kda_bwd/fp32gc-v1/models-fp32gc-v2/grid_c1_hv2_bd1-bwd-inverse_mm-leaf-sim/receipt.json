@@ -1,0 +1,202 @@
+{
+  "model": "sim",
+  "kernel": "bwd.inverse_mm",
+  "block_dim": 1,
+  "capture_sha256": "4fd832aafe321f5737e35f017f204beb042dec33b50c48cb8f0e9b8a22999e47",
+  "source_sha256": "fa00a49d3c38e9fb71948d909ff812e6461f31ac52083383e57435e800f25c5c",
+  "ascriptor": "0.1.0",
+  "comparison_scope": "model actual outputs versus captured native same-input output; CPU golden checks are in native full-chain evidence",
+  "metrics": [
+    {
+      "finite": true,
+      "actual_nonfinite": 0,
+      "expected_nonfinite": 0,
+      "relative_l2": 0.0,
+      "expected_norm": 0.1459170741481496,
+      "residual_norm": 0.0,
+      "max_abs": 0.0,
+      "nonzero_when_expected": true,
+      "allclose": null,
+      "budget": 0.05,
+      "passed": true
+    },
+    {
+      "finite": true,
+      "actual_nonfinite": 0,
+      "expected_nonfinite": 0,
+      "relative_l2": 0.0,
+      "expected_norm": 0.07597104781279684,
+      "residual_norm": 0.0,
+      "max_abs": 0.0,
+      "nonzero_when_expected": true,
+      "allclose": null,
+      "budget": 0.05,
+      "passed": true
+    },
+    {
+      "finite": true,
+      "actual_nonfinite": 0,
+      "expected_nonfinite": 0,
+      "relative_l2": 0.0,
+      "expected_norm": 0.01238211306466115,
+      "residual_norm": 0.0,
+      "max_abs": 0.0,
+      "nonzero_when_expected": true,
+      "allclose": null,
+      "budget": 0.05,
+      "passed": true
+    },
+    {
+      "finite": true,
+      "actual_nonfinite": 0,
+      "expected_nonfinite": 0,
+      "relative_l2": 3.43376244272941e-08,
+      "expected_norm": 0.10849004148058582,
+      "residual_norm": 3.725290298461914e-09,
+      "max_abs": 3.725290298461914e-09,
+      "nonzero_when_expected": true,
+      "allclose": null,
+      "budget": 0.05,
+      "passed": true
+    },
+    {
+      "finite": true,
+      "actual_nonfinite": 0,
+      "expected_nonfinite": 0,
+      "relative_l2": 0.0,
+      "expected_norm": 0.01237064951419159,
+      "residual_norm": 0.0,
+      "max_abs": 0.0,
+      "nonzero_when_expected": true,
+      "allclose": null,
+      "budget": 0.05,
+      "passed": true
+    }
+  ],
+  "fresh_cpu_fp32_full_fixture_stage_comparison": {
+    "inverse_mm.d_qg": {
+      "finite": true,
+      "actual_nonfinite": 0,
+      "expected_nonfinite": 0,
+      "relative_l2": 0.0,
+      "expected_norm": 0.1459170741481496,
+      "residual_norm": 0.0,
+      "max_abs": 0.0,
+      "nonzero_when_expected": true,
+      "allclose": true,
+      "budget": 0.05,
+      "passed": true
+    },
+    "inverse_mm.d_kg": {
+      "finite": true,
+      "actual_nonfinite": 0,
+      "expected_nonfinite": 0,
+      "relative_l2": 0.0,
+      "expected_norm": 0.07597104781279684,
+      "residual_norm": 0.0,
+      "max_abs": 0.0,
+      "nonzero_when_expected": true,
+      "allclose": true,
+      "budget": 0.05,
+      "passed": true
+    },
+    "inverse_mm.d_w": {
+      "finite": true,
+      "actual_nonfinite": 0,
+      "expected_nonfinite": 0,
+      "relative_l2": 0.0,
+      "expected_norm": 0.01238211306466115,
+      "residual_norm": 0.0,
+      "max_abs": 0.0,
+      "nonzero_when_expected": true,
+      "allclose": true,
+      "budget": 0.05,
+      "passed": true
+    },
+    "inverse_mm.d_v_beta": {
+      "finite": true,
+      "actual_nonfinite": 0,
+      "expected_nonfinite": 0,
+      "relative_l2": 0.0,
+      "expected_norm": 0.10849004148056439,
+      "residual_norm": 0.0,
+      "max_abs": 0.0,
+      "nonzero_when_expected": true,
+      "allclose": true,
+      "budget": 0.05,
+      "passed": true
+    },
+    "inverse_mm.d_k_beta_g": {
+      "finite": true,
+      "actual_nonfinite": 0,
+      "expected_nonfinite": 0,
+      "relative_l2": 0.0,
+      "expected_norm": 0.01237064951419159,
+      "residual_norm": 0.0,
+      "max_abs": 0.0,
+      "nonzero_when_expected": true,
+      "allclose": true,
+      "budget": 0.05,
+      "passed": true
+    }
+  },
+  "model_output_digests": [
+    {
+      "shape": [
+        1,
+        2,
+        1,
+        64,
+        128
+      ],
+      "dtype": "torch.bfloat16",
+      "sha256": "8b42e7275759c3aa1291fd46a9b5997945d3b01453528fc34c821e1b02a10798"
+    },
+    {
+      "shape": [
+        1,
+        2,
+        1,
+        64,
+        128
+      ],
+      "dtype": "torch.bfloat16",
+      "sha256": "04dbaf6c2ebfe65cc3500d29fbbb1da34eb4ca97a4d36ac3c1758497b76b00fb"
+    },
+    {
+      "shape": [
+        1,
+        2,
+        1,
+        64,
+        128
+      ],
+      "dtype": "torch.bfloat16",
+      "sha256": "4fc3ccefb955e804e675ce271d4a476510480fe081ac3c6504e02a1c92fdc211"
+    },
+    {
+      "shape": [
+        1,
+        2,
+        1,
+        64,
+        128
+      ],
+      "dtype": "torch.bfloat16",
+      "sha256": "cdde4cc22d332d22f82424a2f802cc6fe8e387d0e962db597fed069f3198d70b"
+    },
+    {
+      "shape": [
+        1,
+        2,
+        1,
+        64,
+        128
+      ],
+      "dtype": "torch.bfloat16",
+      "sha256": "68fe984c9fc2ca91d40f8bce19e284a117f336a4b91808b2d38f9025aaa75e13"
+    }
+  ],
+  "elapsed_host_s": 0.2891168799251318,
+  "hardware_acceptance": false
+}

@@ -37,6 +37,7 @@ import pathlib
 import subprocess
 import sys
 import tempfile
+import time
 
 import torch
 
@@ -139,6 +140,296 @@ def compare(rows: list[dict]) -> None:
         print(f"{st['span']:>8.2f} " + " ".join(f"{e:>10.3e}" for e in errs))
 
 
+def a2_gradient_metrics(actual, expected, rule):
+    """Whole-output readback; no denominator floor, NaN masking or zero-gradient pass.
+
+    The FP32 oracle's tensor values are unchanged. FP64 is used only to accumulate
+    error norms, as in the unit contract runner. Fixture allclose and relative-L2
+    requirements are conjunctive; end-to-end uses the separately specified .05.
+    """
+    actual, expected = actual.detach().cpu(), expected.detach().cpu()
+    if actual.shape != expected.shape:
+        raise ValueError(f"shape mismatch: {actual.shape} != {expected.shape}")
+    a, e = actual.double(), expected.double()
+    finite = bool(a.isfinite().all() and e.isfinite().all())
+    residual = float((a - e).norm()) if finite else None
+    norm = float(e.norm()) if bool(e.isfinite().all()) else None
+    relative = (residual / norm if norm else (0.0 if residual == 0 else None)) if finite else None
+    nonzero = bool(a.count_nonzero()) or not bool(e.count_nonzero())
+    close = None
+    if "rtol" in rule:
+        close = bool(torch.allclose(a, e, rtol=rule["rtol"], atol=rule["atol"]))
+    return {"finite": finite, "actual_nonfinite": int((~a.isfinite()).sum()),
+            "expected_nonfinite": int((~e.isfinite()).sum()),
+            "relative_l2": relative, "expected_norm": norm, "residual_norm": residual,
+            "max_abs": float((a - e).abs().max()) if finite else None,
+            "nonzero_when_expected": nonzero, "allclose": close,
+            "budget": rule["max_relative_l2"],
+            "passed": finite and nonzero and close is not False and relative is not None
+                      and relative <= rule["max_relative_l2"]}
+
+
+class A2BackwardNative:
+    """Direct A2 units; ALL five forward and nine backward vendors first.
+
+    The common launch binder preserves device intermediates and binds every scalar
+    from the compiled signature. Public dispatch and its qualification gate are
+    not involved. A worker owns exactly one block_dim for its lifetime.
+    """
+    def __init__(self, bd, emit, gc_dtype="bf16"):
+        from benchmarks.verify_decode import _A2Native, _a2_load, _a2_unit
+        from ascend_fla.runtime.compile import compile_kernel
+        if bd not in (1, 2):
+            raise ValueError("A2 backward currently declares block_dim 1 and 2")
+        if gc_dtype not in ("bf16", "fp32"):
+            raise ValueError("gc_dtype must be bf16 or fp32")
+        self.bd = bd
+        self.gc_dtype = gc_dtype
+        self.forward, self.forward_ref = _a2_unit("kda_fwd_stable")
+        self.backward_name = "kda_bwd_stable_fp32gc" if gc_dtype == "fp32" else "kda_bwd_stable"
+        self.backward, self.backward_ref = _a2_unit(self.backward_name)
+        self.contract = json.loads((self.backward.HERE / "contract.json").read_text())
+        self.forward_contract = json.loads((self.forward.HERE / "contract.json").read_text())
+        plan = [(f"fwd.{name}", kernel) for name, kernel in self.forward._kernels().items()]
+        plan += [(f"bwd.{name}", kernel) for name, kernel in self.backward._kernels().items()]
+        if len(plan) != 14 or sum(n.startswith("bwd.") for n, _ in plan) != 9:
+            raise RuntimeError("incomplete forward/backward precompile plan")
+        self.names = {id(kernel): name for name, kernel in plan}
+        self.compiled, self.trace = {}, []
+        self.launch = _A2Native.launch.__get__(self, type(self))
+        for name, kernel in plan:
+            emit({"stage": "compile_start", "kernel": name, "block_dim": bd})
+            obj = compile_kernel(kernel, device="a2", block_dim=bd, backend="cce")
+            self.compiled[name] = obj
+            emit({"stage": "vendor_compiled", "kernel": name, "signature": obj.signature,
+                  "scalar_names": obj.scalar_names, "block_dim": bd})
+        if self.trace:
+            raise RuntimeError("custom kernel launched before precompile completed")
+        emit({"stage": "precompile_complete", "forward_count": 5,
+              "backward_count": 9, "custom_launches": 0, "block_dim": bd,
+              "backward_unit": self.backward_name, "gc_dtype": gc_dtype})
+        self.runner = _a2_load(self.backward.HERE / "_unit_runner.py", "_a213_runner")
+
+    def chain(self, unit, inputs):
+        previous = sys.modules.get("_unit_runner")
+        self.runner.launch_kernel = self.launch
+        try:
+            sys.modules["_unit_runner"] = self.runner
+            result = unit._execute_chain(
+                inputs, {"device": "a2", "backend": "cce", "block_dim": self.bd})
+            torch.npu.synchronize()
+            return result
+        finally:
+            if previous is None:
+                sys.modules.pop("_unit_runner", None)
+            else:
+                sys.modules["_unit_runner"] = previous
+
+    def backward_call(self, inputs):
+        outputs, stages = self.chain(self.backward, inputs)
+        b, t, h, _ = inputs["q"].shape
+        dims = {"B": b, "C": t // 64, "H": h, "HV": inputs["v"].shape[2]}
+        # Exactly the contract's metadata-only views, from the same nine launches.
+        def extent(value):
+            if isinstance(value, int):
+                return value
+            result = 1
+            for factor in value.split("*"):
+                result *= int(factor) if factor.isdecimal() else dims[factor]
+            return result
+        if set(stages) != set(self.contract["stages"]):
+            raise RuntimeError("missing or unexpected backward stage outputs")
+        return outputs, {name: value.view(*(extent(d) for d in self.contract["stages"][name]["shape"]))
+                         for name, value in stages.items()}
+
+
+def a2_fixture_cases(native, emit):
+    """Existing independent mathematical fixtures, NOT actual-cache qualification."""
+    from benchmarks.verify_decode import _a2_digest
+    comparison = native.contract["comparison"]
+    rows = []
+    for case in native.contract["cases"]:
+        if case["block_dim"] != native.bd:
+            continue
+        emit({"stage": "fixture_start", "case": case["id"], "block_dim": native.bd})
+        inputs = native.backward.make_inputs(case)
+        started = time.monotonic()
+        trace_start = len(native.trace)
+        actual, stages = native.backward_call(inputs)
+        device_s = time.monotonic() - started
+        # References are independently generated at run time, after the full chain.
+        expected = native.backward.reference(inputs)
+        expected_stages = native.backward.reference_stages(inputs)
+        if set(actual) != set(expected) or set(stages) != set(expected_stages):
+            raise RuntimeError("incomplete fixture output comparison")
+        metrics = {name: a2_gradient_metrics(value, expected[name],
+                   {**comparison["default"], **comparison.get("outputs", {}).get(name, {})})
+                   for name, value in actual.items()}
+        stage_metrics = {name: a2_gradient_metrics(value, expected_stages[name],
+                         {**comparison["default"], **comparison.get("stage_outputs", {}).get(name, {})})
+                         for name, value in stages.items()}
+        row = {"stage": "independent_fixture", "case": case["id"], "block_dim": native.bd,
+               "parameters": case["parameters"], "seed": case["seed"],
+               "oracle": "CPU FP32 fixture autograd, declared BF16 outputs",
+               "end_to_end_actual_cache_acceptance": False,
+               "gradients": metrics, "checkpoints": stage_metrics,
+               "output_digests": {n: _a2_digest(v) for n, v in actual.items()},
+               "saved_input_digests": {n: _a2_digest(v) for n, v in inputs["saved"].items()},
+               "launches": native.trace[trace_start:], "chain_wall_s": device_s,
+               "passed": all(m["passed"] for m in (*metrics.values(), *stage_metrics.values()))}
+        rows.append(row)
+        emit(row)
+    return rows
+
+
+def a2_test_helpers():
+    from benchmarks.verify_decode import _a2_load
+    root = pathlib.Path(__file__).resolve().parents[1] / "tests"
+    return tuple(_a2_load(root / f"test_kda_{suffix}_npu.py", f"_a213_test_{suffix}")
+                 for suffix in ("bwd", "bwd_deep", "caches"))
+
+
+def a2_actual_cases(native, emit, cases=None):
+    """Actual forward outputs -> declared test assembly -> all nine backward kernels."""
+    from benchmarks.verify_decode import _a2_digest
+    fixtures, oracle, caches = a2_test_helpers()
+    oracle.test_a2_segmented_oracle_matches_full_autograd()
+    emit({"stage": "segmented_cpu_oracle_crosscheck", "passed": True})
+    rows = []
+    for case in (fixtures.a2_qualification_cases() if cases is None else cases):
+        emit({"stage": "actual_cache_start", "case": case["id"], "block_dim": native.bd})
+        inputs, distribution = fixtures.a2_qualification_inputs(case)
+        trace_start = len(native.trace)
+        assembled, forward, assembly = caches.a2_actual_forward_caches(native, inputs)
+        nonfinite = {**{f"forward.{n}": int((~v.isfinite()).sum()) for n, v in forward.items()},
+                     **{f"saved.{n}": int((~v.isfinite()).sum()) for n, v in assembled["saved"].items()}}
+        if any(nonfinite.values()):
+            # The unit contract requires finite saved inputs. Preserve this
+            # forward failure; never upload invalid caches to manufacture a bwd run.
+            row = {"stage": "actual_cache_pre_backward_failure", "case": case["id"],
+                   "block_dim": native.bd, "parameters": case, "distribution": distribution,
+                   "assembly": assembly, "nonfinite_counts": nonfinite,
+                   "input_digests": {n: _a2_digest(v) for n, v in inputs.items()},
+                   "launches": native.trace[trace_start:], "native_backward_executed": False,
+                   "reason": "forward produced nonfinite outputs/caches; backward input contract rejects them",
+                   "passed": False}
+            rows.append(row)
+            emit(row)
+            continue
+        cache_metrics, direct_metrics = {}, {}
+        if case.get("check_cache_foundation", case["HV"] <= 4):
+            # Small-shape foundation check; the independent builder is not used as
+            # backward input or as the end-to-end gradient oracle.
+            independent = native.backward_ref.build_saved_forward(
+                *(inputs[n] for n in ("q", "k", "v", "g", "beta", "initial_state")))
+            cache_metrics = {n: a2_gradient_metrics(v, independent[n], {"max_relative_l2": caches.BUDGET})
+                             for n, v in assembled["saved"].items()}
+            fx = {n: inputs[n] for n in ("q", "k", "v")}
+            fx.update(g_raw=inputs["g"].float(), beta=inputs["beta"].float(),
+                      initial_state=inputs["initial_state"].float())
+            direct_reference = native.forward.reference_stages(fx)
+            direct_metrics = {n: a2_gradient_metrics(forward[n], direct_reference[n],
+                              native.forward_contract["comparison"]["default"])
+                              for n in ("Aqk", "Akk", "w", "u", "qg", "kg")}
+            emit({"stage": "cache_foundation", "case": case["id"],
+                  "assembled_nine": cache_metrics, "direct_six": direct_metrics})
+        started = time.monotonic()
+        actual, stages = native.backward_call(assembled)
+        backward_s = time.monotonic() - started
+        # Device acceptance of the complete workload happens before oracle/model diagnostics.
+        actual = {n: v.detach().cpu() for n, v in actual.items()}
+        stage_finite = {n: bool(v.detach().cpu().isfinite().all()) for n, v in stages.items()}
+        del stages
+        emit({"stage": "full_native_chain_complete", "case": case["id"],
+              "launch_count": len(native.trace) - trace_start, "backward_wall_s": backward_s,
+              "stage_finite": stage_finite})
+        started = time.monotonic()
+        emit({"stage": "cpu_fp32_oracle_start", "case": case["id"]})
+        golden_fwd, golden = oracle.a2_fp32_end_to_end(inputs)
+        cpu_s = time.monotonic() - started
+        metrics = {n: a2_gradient_metrics(actual[n], golden[n], {"max_relative_l2": .05}) for n in GRADS}
+        fwd_metrics = {n: a2_gradient_metrics(forward[n], golden_fwd[n],
+                       native.forward_contract["comparison"]["default"]) for n in ("o", "final_state")}
+        emit({"stage": "cpu_fp32_comparison", "case": case["id"], "gradients": metrics,
+              "forward": fwd_metrics, "oracle_wall_s": cpu_s})
+        emit({"stage": "torch_npu_fp32_oracle_start", "case": case["id"]})
+        started = time.monotonic()
+        npu_fwd, npu_grads = oracle.a2_fp32_end_to_end(inputs, device="npu")
+        torch.npu.synchronize()
+        npu_s = time.monotonic() - started
+        npu_metrics = {n: a2_gradient_metrics(npu_grads[n], golden[n], {"max_relative_l2": .05}) for n in GRADS}
+        npu_fwd_metrics = {n: a2_gradient_metrics(npu_fwd[n], golden_fwd[n],
+                           native.forward_contract["comparison"]["default"]) for n in ("o", "final_state")}
+        del npu_fwd, npu_grads
+        row = {"stage": "actual_cache_end_to_end", "case": case["id"], "block_dim": native.bd,
+               "parameters": case, "distribution": distribution, "assembly": assembly,
+               "input_digests": {n: _a2_digest(v) for n, v in inputs.items()},
+               "output_digests": {n: _a2_digest(v) for n, v in actual.items()},
+               "gradients": metrics, "forward": fwd_metrics, "backward_stage_finite": stage_finite,
+               "cache_foundation": cache_metrics, "direct_forward_foundation": direct_metrics,
+               "torch_npu_fp32_vs_cpu_gradients": npu_metrics, "torch_npu_fp32_vs_cpu_forward": npu_fwd_metrics,
+               "backward_chain_wall_s": backward_s, "cpu_oracle_wall_s": cpu_s,
+               "torch_npu_oracle_wall_s": npu_s, "timings_are_performance_qualification": False,
+               "launches": native.trace[trace_start:],
+               "passed": all(m["passed"] for m in (*metrics.values(), *fwd_metrics.values(),
+                                                    *cache_metrics.values(), *direct_metrics.values(),
+                                                    *npu_metrics.values(), *npu_fwd_metrics.values()))
+                         and all(stage_finite.values())}
+        rows.append(row)
+        emit(row)
+    return rows
+
+
+def a2_worker(bd, out, suite, *, lengths=(128,), seeds=(0,),
+              spans=(1., 8., 16., 32., 64., 96., 128., 160., 192.),
+              gates=("uniform", "fla_initialization"), gc_dtype="bf16"):
+    """One process / one block_dim. Caller supplies an isolated output directory."""
+    import hashlib
+    from benchmarks.verify_decode import _a2_identity
+    out.mkdir(parents=True, exist_ok=False)
+    def emit(row):
+        import datetime
+        line = json.dumps({"at_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(), **row},
+                          ensure_ascii=False, allow_nan=False)
+        with (out / "events.jsonl").open("a") as stream:
+            stream.write(line + "\n")
+        print(line, flush=True)
+    identity = _a2_identity()
+    root = pathlib.Path(__file__).resolve().parents[1]
+    sources = [pathlib.Path(__file__).resolve(), root / "ascend_fla/reference/kda.py",
+               root / "benchmarks/verify_real_shapes.py", root / "ascend_fla/layers/kda.py",
+               root / "ascend_fla/ops/kda/chunk.py"]
+    sources += [root / "tests" / f"test_kda_{suffix}_npu.py" for suffix in ("bwd", "bwd_deep", "caches")]
+    backward_name = "kda_bwd_stable_fp32gc" if gc_dtype == "fp32" else "kda_bwd_stable"
+    identity["backward_unit"] = backward_name
+    identity["gc_dtype"] = gc_dtype
+    sources += [p for p in (root / "kernels/projects/a2" / backward_name).rglob("*")
+                if p.is_file() and (p.suffix == ".py" or p.name == "contract.json")
+                and "evidence" not in p.parts and "__pycache__" not in p.parts]
+    identity["backward_qualification_sha256"] = {
+        str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
+    (out / "identity.json").write_text(json.dumps(identity, indent=2) + "\n")
+    emit({"stage": "identity_verified", "block_dim": bd, "soc": identity["soc"],
+          "cann": identity["cann"], "opp_packages": identity["opp_packages"]})
+    native = A2BackwardNative(bd, emit, gc_dtype=gc_dtype)
+    if suite == "fixture":
+        rows = a2_fixture_cases(native, emit)
+    elif suite == "actual":
+        rows = a2_actual_cases(native, emit)
+    elif suite == "span":
+        fixtures, _, _ = a2_test_helpers()
+        rows = a2_actual_cases(native, emit, fixtures.a2_span_cases(lengths, seeds, spans, gates))
+    else:
+        raise ValueError("unsupported A2 suite")
+    receipt = {"block_dim": bd, "suite": suite, "cases": len(rows),
+               "backward_unit": backward_name, "gc_dtype": gc_dtype,
+               "passed": all(row["passed"] for row in rows),
+               "public_dispatch_qualified": False, "rows": rows}
+    (out / "receipt.json").write_text(json.dumps(receipt, indent=2, allow_nan=False) + "\n")
+    emit({key: value for key, value in receipt.items() if key != "rows"})
+    return 0 if receipt["passed"] else 1
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -148,6 +439,16 @@ def main() -> int:
     ap.add_argument("--mults", type=float, nargs="+", default=None,
                     help="门控倍数列表，默认 MULTS。本脚本的输入分布下跨度 ≈ 1.117 × 倍数")
     ap.add_argument("--json-out", type=pathlib.Path)
+    ap.add_argument("--soc", choices=("a5", "a2"), default="a5")
+    ap.add_argument("--a2-suite", choices=("fixture", "actual", "span"), default="fixture")
+    ap.add_argument("--a2-gc-dtype", choices=("bf16", "fp32"), default="bf16",
+                    help="A2 backward cache ABI: frozen BF16 or D-PM-60 FP32 cumulative gates")
+    ap.add_argument("--a2-out", type=pathlib.Path)
+    ap.add_argument("--a2-lengths", type=int, nargs="+", default=[128])
+    ap.add_argument("--a2-seeds", type=int, nargs="+", default=[0])
+    ap.add_argument("--a2-spans", type=float, nargs="+", default=[1., 8., 16., 32., 64., 96., 128., 160., 192.])
+    ap.add_argument("--a2-gates", nargs="+", choices=("uniform", "fla_initialization"),
+                    default=["uniform", "fla_initialization"])
     args = ap.parse_args()
 
     try:
@@ -155,6 +456,16 @@ def main() -> int:
     except ImportError:
         print("本脚本只在 NPU 上有意义", file=sys.stderr)
         return 2
+
+    if args.soc == "a2":
+        if args.impl not in (None, "stable") or args.mults or args.json_out or args.a2_out is None:
+            ap.error("A2 requires --a2-out and its own suite; A5 impl/mults/json-out do not apply")
+        return a2_worker(args.block_dim, args.a2_out, args.a2_suite,
+                         lengths=args.a2_lengths, seeds=args.a2_seeds, spans=args.a2_spans,
+                         gates=args.a2_gates, gc_dtype=args.a2_gc_dtype)
+
+    if args.a2_gc_dtype != "bf16":
+        ap.error("--a2-gc-dtype fp32 applies only to --soc a2")
 
     if args.impl is not None:
         rows = run(args.impl, args.block_dim, args.mults)

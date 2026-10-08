@@ -54,7 +54,7 @@ def test_unqualified_socs_raise_on_use(soc):
     assert cap["qualified"] is False
     if soc == "a2":
         assert cap["supported_block_dim"] == {"chunk": (1, 2), "decode": (1, 2)}
-        assert cap["max_gate_span"] == {"stable": {"forward": 158.0}}
+        assert cap["max_gate_span"] == {"stable": {"forward": 158.0, "backward": 128.0}}
     else:
         assert cap["supported_block_dim"] == {}
         assert cap["max_gate_span"] == {}

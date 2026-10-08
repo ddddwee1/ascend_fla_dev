@@ -1,0 +1,278 @@
+{
+  "stage": "static_source_emission_inspection",
+  "native_or_model_acceptance": false,
+  "rows": [
+    {
+      "bd": 1,
+      "kernel": "scan_fused",
+      "gm_parameter": {
+        "name": "g_cumsum",
+        "ir_name": "g_cumsum",
+        "kind": "tensor",
+        "dtype": "f32",
+        "dims": [
+          "BT",
+          "HVK"
+        ],
+        "output": false
+      },
+      "manifest_sha256": "63d94ad44eb524b2dc223d5ea5317ba155d078f31269b8f3b4b04594e15f5e31",
+      "vec_sha256": "078c260c3966552b80364212a08c35ef5b23c606f48f405c9278001ac3bcf8db",
+      "gate_event_declarations": [
+        {
+          "line": 20,
+          "text": "SEvent<PIPE_MTE2, PIPE_V, 0, 3> ev_mte2_v_ready_2;  // guards daqk_f_ub, dstate_ub, dv_delta_ub, expg_ub #630"
+        },
+        {
+          "line": 23,
+          "text": "SEvent<PIPE_V, PIPE_S, 0, 0> ev_v_s_ready_1;  // guards expg_ub #641"
+        },
+        {
+          "line": 30,
+          "text": "SEvent<PIPE_V, PIPE_MTE2, 1, 1> ev_v_mte2_ready_2;  // guards expg_ub #648"
+        }
+      ]
+    },
+    {
+      "bd": 1,
+      "kernel": "inverse_epilogue",
+      "gm_parameter": {
+        "name": "g_cumsum",
+        "ir_name": "g_cumsum",
+        "kind": "tensor",
+        "dtype": "f32",
+        "dims": [
+          "BT",
+          "HVK"
+        ],
+        "output": false
+      },
+      "manifest_sha256": "7b88777c4d292a5f81d2d1bf73b337cefa1370a84df6eaa24d7275a315e32f83",
+      "vec_sha256": "bfb13d04131a25e7b4048eb70a1b5802df35df2388fe6ddad9d9f59d6f9453b5",
+      "gate_event_declarations": [
+        {
+          "line": 24,
+          "text": "DEvent<PIPE_MTE2, PIPE_V, 0, 0, 1> ev_mte2_v_ready_1;  // guards beta_b_ub, glast_ub #496"
+        },
+        {
+          "line": 33,
+          "text": "SEvent<PIPE_V, PIPE_MTE2, 1, 1> ev_v_mte2_valid_2;  // guards glast_ub #505"
+        },
+        {
+          "line": 34,
+          "text": "SEvent<PIPE_V, PIPE_MTE2, 1, 2> ev_v_mte2_valid_3;  // guards g_f_ub, hrow_b_ub #506"
+        },
+        {
+          "line": 38,
+          "text": "SEvent<PIPE_V, PIPE_S, 1, 2> ev_v_s_valid_1;  // guards dglast_ub #510"
+        }
+      ]
+    },
+    {
+      "bd": 1,
+      "kernel": "finalize_pre",
+      "gm_parameter": {
+        "name": "g_cumsum",
+        "ir_name": "g_cumsum",
+        "kind": "tensor",
+        "dtype": "f32",
+        "dims": [
+          "BT",
+          "HVK"
+        ],
+        "output": false
+      },
+      "manifest_sha256": "cc197ce61263acbc8a927eb6cdbf55c62ce9773d7d98790b19b2f0fcf3eafc79",
+      "vec_sha256": "c166d56dcaf9265c485d43eaf0d6a75d65f69c8cba0e3d85b1fd47ed95ff9eea",
+      "gate_event_declarations": [
+        {
+          "line": 19,
+          "text": "DEvent<PIPE_MTE2, PIPE_V, 0, 2, 3> ev_mte2_v_ready_1;  // guards beta_b_ub, gmid_ub #321"
+        },
+        {
+          "line": 20,
+          "text": "TEvent<PIPE_MTE2, PIPE_V, 0, 4, 5, 6> ev_mte2_v_ready_2;  // guards cs_ub, stage_l_ub, stage_ub #322"
+        },
+        {
+          "line": 25,
+          "text": "SEvent<PIPE_V, PIPE_MTE2, 1, 2> ev_v_mte2_valid_3;  // guards gmid_ub #327"
+        },
+        {
+          "line": 26,
+          "text": "SEvent<PIPE_V, PIPE_MTE2, 1, 3> ev_v_mte2_valid_4;  // guards cs_ub #328"
+        }
+      ]
+    },
+    {
+      "bd": 1,
+      "kernel": "finalize_post",
+      "gm_parameter": {
+        "name": "g_cumsum",
+        "ir_name": "g_cumsum",
+        "kind": "tensor",
+        "dtype": "f32",
+        "dims": [
+          "BT",
+          "HVK"
+        ],
+        "output": false
+      },
+      "manifest_sha256": "a6a69de933b740e50efe79a7eafe824e843b25f7175062ad2ffbf9113ea7be45",
+      "vec_sha256": "7e38b436cf071cc9a393bbab8977e7cb16795a454298dade7044ac872c9b0b8c",
+      "gate_event_declarations": [
+        {
+          "line": 23,
+          "text": "DEvent<PIPE_MTE2, PIPE_V, 0, 0, 1> ev_mte2_v_ready_1;  // guards beta_b_ub, gmid_ub #453"
+        },
+        {
+          "line": 24,
+          "text": "SEvent<PIPE_MTE2, PIPE_V, 0, 2> ev_mte2_v_ready_2;  // guards dgc_in_b_ub, dk_in_b_ub, dq_in_b_ub, g_f_ub, khv_b_ub, qhv_b_ub, qkl_b_ub, qkr_b_ub, sbase_b_ub, tbeta_b_ub #454"
+        },
+        {
+          "line": 28,
+          "text": "SEvent<PIPE_V, PIPE_MTE2, 1, 0> ev_v_mte2_valid_1;  // guards beta_b_ub, gmid_ub #458"
+        },
+        {
+          "line": 29,
+          "text": "SEvent<PIPE_V, PIPE_MTE2, 1, 1> ev_v_mte2_valid_2;  // guards dgc_in_b_ub, dk_in_b_ub, dq_in_b_ub, g_f_ub, khv_b_ub, qhv_b_ub, qkl_b_ub, qkr_b_ub, sbase_b_ub, tbeta_b_ub #459"
+        }
+      ]
+    },
+    {
+      "bd": 2,
+      "kernel": "scan_fused",
+      "gm_parameter": {
+        "name": "g_cumsum",
+        "ir_name": "g_cumsum",
+        "kind": "tensor",
+        "dtype": "f32",
+        "dims": [
+          "BT",
+          "HVK"
+        ],
+        "output": false
+      },
+      "manifest_sha256": "15063825d4da53901c1ba3b3e8cfeab8ac78bad5a4398b6d53517727f624ab16",
+      "vec_sha256": "078c260c3966552b80364212a08c35ef5b23c606f48f405c9278001ac3bcf8db",
+      "gate_event_declarations": [
+        {
+          "line": 20,
+          "text": "SEvent<PIPE_MTE2, PIPE_V, 0, 3> ev_mte2_v_ready_2;  // guards daqk_f_ub, dstate_ub, dv_delta_ub, expg_ub #630"
+        },
+        {
+          "line": 23,
+          "text": "SEvent<PIPE_V, PIPE_S, 0, 0> ev_v_s_ready_1;  // guards expg_ub #641"
+        },
+        {
+          "line": 30,
+          "text": "SEvent<PIPE_V, PIPE_MTE2, 1, 1> ev_v_mte2_ready_2;  // guards expg_ub #648"
+        }
+      ]
+    },
+    {
+      "bd": 2,
+      "kernel": "inverse_epilogue",
+      "gm_parameter": {
+        "name": "g_cumsum",
+        "ir_name": "g_cumsum",
+        "kind": "tensor",
+        "dtype": "f32",
+        "dims": [
+          "BT",
+          "HVK"
+        ],
+        "output": false
+      },
+      "manifest_sha256": "a8c6a59b2f39d73433cf4f54f3689111414639e7daee4b58a8fee68c8acf5d8d",
+      "vec_sha256": "bfb13d04131a25e7b4048eb70a1b5802df35df2388fe6ddad9d9f59d6f9453b5",
+      "gate_event_declarations": [
+        {
+          "line": 24,
+          "text": "DEvent<PIPE_MTE2, PIPE_V, 0, 0, 1> ev_mte2_v_ready_1;  // guards beta_b_ub, glast_ub #496"
+        },
+        {
+          "line": 33,
+          "text": "SEvent<PIPE_V, PIPE_MTE2, 1, 1> ev_v_mte2_valid_2;  // guards glast_ub #505"
+        },
+        {
+          "line": 34,
+          "text": "SEvent<PIPE_V, PIPE_MTE2, 1, 2> ev_v_mte2_valid_3;  // guards g_f_ub, hrow_b_ub #506"
+        },
+        {
+          "line": 38,
+          "text": "SEvent<PIPE_V, PIPE_S, 1, 2> ev_v_s_valid_1;  // guards dglast_ub #510"
+        }
+      ]
+    },
+    {
+      "bd": 2,
+      "kernel": "finalize_pre",
+      "gm_parameter": {
+        "name": "g_cumsum",
+        "ir_name": "g_cumsum",
+        "kind": "tensor",
+        "dtype": "f32",
+        "dims": [
+          "BT",
+          "HVK"
+        ],
+        "output": false
+      },
+      "manifest_sha256": "b86b0b6e79ae0fdeeba8aa08a44463d16f04fb38a4102aa2c0ea389e3048cd0f",
+      "vec_sha256": "c166d56dcaf9265c485d43eaf0d6a75d65f69c8cba0e3d85b1fd47ed95ff9eea",
+      "gate_event_declarations": [
+        {
+          "line": 19,
+          "text": "DEvent<PIPE_MTE2, PIPE_V, 0, 2, 3> ev_mte2_v_ready_1;  // guards beta_b_ub, gmid_ub #321"
+        },
+        {
+          "line": 20,
+          "text": "TEvent<PIPE_MTE2, PIPE_V, 0, 4, 5, 6> ev_mte2_v_ready_2;  // guards cs_ub, stage_l_ub, stage_ub #322"
+        },
+        {
+          "line": 25,
+          "text": "SEvent<PIPE_V, PIPE_MTE2, 1, 2> ev_v_mte2_valid_3;  // guards gmid_ub #327"
+        },
+        {
+          "line": 26,
+          "text": "SEvent<PIPE_V, PIPE_MTE2, 1, 3> ev_v_mte2_valid_4;  // guards cs_ub #328"
+        }
+      ]
+    },
+    {
+      "bd": 2,
+      "kernel": "finalize_post",
+      "gm_parameter": {
+        "name": "g_cumsum",
+        "ir_name": "g_cumsum",
+        "kind": "tensor",
+        "dtype": "f32",
+        "dims": [
+          "BT",
+          "HVK"
+        ],
+        "output": false
+      },
+      "manifest_sha256": "b51bfac1470eacd25b67e7a59956bddf6d5552e55afbc16f4dc191476e3ec67f",
+      "vec_sha256": "7e38b436cf071cc9a393bbab8977e7cb16795a454298dade7044ac872c9b0b8c",
+      "gate_event_declarations": [
+        {
+          "line": 23,
+          "text": "DEvent<PIPE_MTE2, PIPE_V, 0, 0, 1> ev_mte2_v_ready_1;  // guards beta_b_ub, gmid_ub #453"
+        },
+        {
+          "line": 24,
+          "text": "SEvent<PIPE_MTE2, PIPE_V, 0, 2> ev_mte2_v_ready_2;  // guards dgc_in_b_ub, dk_in_b_ub, dq_in_b_ub, g_f_ub, khv_b_ub, qhv_b_ub, qkl_b_ub, qkr_b_ub, sbase_b_ub, tbeta_b_ub #454"
+        },
+        {
+          "line": 28,
+          "text": "SEvent<PIPE_V, PIPE_MTE2, 1, 0> ev_v_mte2_valid_1;  // guards beta_b_ub, gmid_ub #458"
+        },
+        {
+          "line": 29,
+          "text": "SEvent<PIPE_V, PIPE_MTE2, 1, 1> ev_v_mte2_valid_2;  // guards dgc_in_b_ub, dk_in_b_ub, dq_in_b_ub, g_f_ub, khv_b_ub, qhv_b_ub, qkl_b_ub, qkr_b_ub, sbase_b_ub, tbeta_b_ub #459"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,374 @@
+{
+  "stage": "vendor_compilation_only",
+  "block_dim": 2,
+  "vendors": [
+    {
+      "name": "fwd.gate",
+      "signature": "863ac7afe523cb19",
+      "scalar_names": [
+        "B",
+        "HV",
+        "C",
+        "BT",
+        "HVK"
+      ],
+      "inputs": [
+        "g_raw"
+      ],
+      "outputs": [
+        "g_cumsum",
+        "eg"
+      ],
+      "elapsed_s": 38.4914757553488
+    },
+    {
+      "name": "fwd.intra",
+      "signature": "40e5e9e67016d7c7",
+      "scalar_names": [
+        "B",
+        "H",
+        "HV",
+        "C",
+        "scale",
+        "BT",
+        "HK",
+        "HVB"
+      ],
+      "inputs": [
+        "q",
+        "k",
+        "g_cumsum",
+        "beta"
+      ],
+      "outputs": [
+        "Aqk",
+        "strict"
+      ],
+      "elapsed_s": 41.88548425026238
+    },
+    {
+      "name": "fwd.triangular_inverse",
+      "signature": "2bb971b6d5eefb5a",
+      "scalar_names": [
+        "B",
+        "HV",
+        "C"
+      ],
+      "inputs": [
+        "a"
+      ],
+      "outputs": [
+        "inv"
+      ],
+      "elapsed_s": 53.934580620378256
+    },
+    {
+      "name": "fwd.wy",
+      "signature": "b9309649d2a115bf",
+      "scalar_names": [
+        "B",
+        "H",
+        "HV",
+        "C",
+        "BT",
+        "HK",
+        "HVV",
+        "HVB"
+      ],
+      "inputs": [
+        "q",
+        "k",
+        "v",
+        "beta",
+        "Akk",
+        "g_cumsum"
+      ],
+      "outputs": [
+        "w",
+        "u",
+        "qg",
+        "kg"
+      ],
+      "elapsed_s": 41.61429230030626
+    },
+    {
+      "name": "fwd.recurrent",
+      "signature": "c5f3eaadccbae8e1",
+      "scalar_names": [
+        "B",
+        "H",
+        "HV",
+        "C",
+        "scale",
+        "BT",
+        "HK",
+        "HVV"
+      ],
+      "inputs": [
+        "q",
+        "Aqk",
+        "kg",
+        "w",
+        "u",
+        "eg",
+        "initial_state"
+      ],
+      "outputs": [
+        "o",
+        "final_state"
+      ],
+      "elapsed_s": 47.30649822950363
+    },
+    {
+      "name": "bwd.scan_fused",
+      "signature": "fe2c1e59c75a3216",
+      "scalar_names": [
+        "B",
+        "HV",
+        "C",
+        "BT",
+        "HVK",
+        "HVL"
+      ],
+      "inputs": [
+        "kg",
+        "qg",
+        "w",
+        "g_cumsum",
+        "grad_out",
+        "Aqk",
+        "v_new",
+        "dht"
+      ],
+      "outputs": [
+        "dAqk",
+        "dh",
+        "dv",
+        "dh0"
+      ],
+      "elapsed_s": 52.394319233484566
+    },
+    {
+      "name": "bwd.inverse_mm",
+      "signature": "c18bd682f3059d7c",
+      "scalar_names": [
+        "B",
+        "HV",
+        "C",
+        "BT",
+        "HVK",
+        "HVL"
+      ],
+      "inputs": [
+        "grad_out",
+        "vnew",
+        "dv",
+        "h",
+        "dh",
+        "Akk"
+      ],
+      "outputs": [
+        "d_qg",
+        "d_kg",
+        "d_w",
+        "d_v_beta",
+        "d_k_beta_g"
+      ],
+      "elapsed_s": 42.15386170055717
+    },
+    {
+      "name": "bwd.inverse_epilogue",
+      "signature": "ed4aa3180d856b5a",
+      "scalar_names": [
+        "B",
+        "Hq",
+        "HV",
+        "C",
+        "BT",
+        "HK",
+        "HVK",
+        "HVB"
+      ],
+      "inputs": [
+        "d_qg",
+        "d_kg",
+        "d_v_beta",
+        "d_k_beta_g",
+        "q",
+        "k",
+        "v",
+        "g_cumsum",
+        "beta",
+        "h",
+        "dh"
+      ],
+      "outputs": [
+        "dq_hv",
+        "dk_hv",
+        "dv",
+        "dbeta",
+        "dg_core",
+        "k_exp"
+      ],
+      "elapsed_s": 62.59543280117214
+    },
+    {
+      "name": "bwd.inverse_dainv",
+      "signature": "8da3b40e81f344bb",
+      "scalar_names": [
+        "B",
+        "HV",
+        "C",
+        "BT",
+        "HVK",
+        "HVB"
+      ],
+      "inputs": [
+        "dv",
+        "v",
+        "d_w",
+        "k_exp",
+        "beta"
+      ],
+      "outputs": [
+        "dtri"
+      ],
+      "elapsed_s": 41.641606411896646
+    },
+    {
+      "name": "bwd.inverse_dakk_fused",
+      "signature": "db8cc2b93903da62",
+      "scalar_names": [
+        "B",
+        "HV",
+        "C",
+        "BT",
+        "HVL"
+      ],
+      "inputs": [
+        "Akk",
+        "dtri"
+      ],
+      "outputs": [
+        "dAkk"
+      ],
+      "elapsed_s": 40.83205063641071
+    },
+    {
+      "name": "bwd.finalize_pre",
+      "signature": "9859e8244479aad9",
+      "scalar_names": [
+        "B",
+        "H",
+        "HV",
+        "C",
+        "BT",
+        "HK",
+        "HVK",
+        "HVB",
+        "HVL"
+      ],
+      "inputs": [
+        "q",
+        "k",
+        "g_cumsum",
+        "beta",
+        "dAqk",
+        "dAkk"
+      ],
+      "outputs": [
+        "q_scaled",
+        "k_scaled",
+        "kg",
+        "m_qk",
+        "m_base",
+        "m_beta"
+      ],
+      "elapsed_s": 42.17745483573526
+    },
+    {
+      "name": "bwd.finalize_pair",
+      "signature": "5495d2db71d0474c",
+      "scalar_names": [
+        "B",
+        "HV",
+        "T"
+      ],
+      "inputs": [
+        "Mqk",
+        "Mbase",
+        "Mbeta",
+        "q_hv",
+        "k_hv",
+        "kg"
+      ],
+      "outputs": [
+        "dq_pair",
+        "dk_pair",
+        "s_base",
+        "t_beta"
+      ],
+      "elapsed_s": 40.73948039859533
+    },
+    {
+      "name": "bwd.finalize_post",
+      "signature": "e79262a90fd1b07a",
+      "scalar_names": [
+        "B",
+        "H",
+        "HV",
+        "C",
+        "BT",
+        "HVK",
+        "HK",
+        "HVB"
+      ],
+      "inputs": [
+        "g_cumsum",
+        "qk_left",
+        "qk_right",
+        "s_base",
+        "t_beta",
+        "q",
+        "k",
+        "beta",
+        "dq_hv_in",
+        "dk_hv_in",
+        "dbeta_in",
+        "dg_core_in"
+      ],
+      "outputs": [
+        "dq_hv_out",
+        "dk_hv_out",
+        "dbeta_out",
+        "dg_out"
+      ],
+      "elapsed_s": 51.284419861622155
+    },
+    {
+      "name": "bwd.finalize_reduce",
+      "signature": "2fd0499d04fe83c1",
+      "scalar_names": [
+        "B",
+        "HV",
+        "H",
+        "C",
+        "BT",
+        "HK"
+      ],
+      "inputs": [
+        "dq_hv",
+        "dk_hv"
+      ],
+      "outputs": [
+        "dq_out",
+        "dk_out"
+      ],
+      "elapsed_s": 38.82697515189648
+    }
+  ],
+  "forward_count": 5,
+  "backward_count": 9,
+  "custom_launches": 0,
+  "hardware_acceptance": false
+}

@@ -1,0 +1,263 @@
+{
+  "model": "pipesim",
+  "kernel": "bwd.scan_fused",
+  "block_dim": 1,
+  "capture_sha256": "c1b46e6ebe2e0e24fc6a10a421a9f9e9f4f15d39f1b73c32af5ade18e53aa299",
+  "source_sha256": "eded4c5b535cef05e76a99f08369f1056d57ef2fa421e0ee8fe522a5aaea616a",
+  "ascriptor": "0.1.0",
+  "comparison_scope": "model actual outputs versus captured native same-input output; CPU golden checks are in native full-chain evidence",
+  "metrics": [
+    {
+      "finite": true,
+      "actual_nonfinite": 0,
+      "expected_nonfinite": 0,
+      "relative_l2": 0.0,
+      "expected_norm": 0.004754887315080661,
+      "residual_norm": 0.0,
+      "max_abs": 0.0,
+      "nonzero_when_expected": true,
+      "allclose": null,
+      "budget": 0.05,
+      "passed": true
+    },
+    {
+      "finite": true,
+      "actual_nonfinite": 0,
+      "expected_nonfinite": 0,
+      "relative_l2": 0.0,
+      "expected_norm": 1.8155893952142463,
+      "residual_norm": 0.0,
+      "max_abs": 0.0,
+      "nonzero_when_expected": true,
+      "allclose": null,
+      "budget": 0.05,
+      "passed": true
+    },
+    {
+      "finite": true,
+      "actual_nonfinite": 0,
+      "expected_nonfinite": 0,
+      "relative_l2": 0.0,
+      "expected_norm": 0.10854718686971253,
+      "residual_norm": 0.0,
+      "max_abs": 0.0,
+      "nonzero_when_expected": true,
+      "allclose": null,
+      "budget": 0.05,
+      "passed": true
+    },
+    {
+      "finite": true,
+      "actual_nonfinite": 0,
+      "expected_nonfinite": 0,
+      "relative_l2": 0.0,
+      "expected_norm": 0.0010301013832160802,
+      "residual_norm": 0.0,
+      "max_abs": 0.0,
+      "nonzero_when_expected": true,
+      "allclose": null,
+      "budget": 0.05,
+      "passed": true
+    }
+  ],
+  "fresh_cpu_fp32_full_fixture_stage_comparison": {
+    "scan.dAqk": {
+      "finite": true,
+      "actual_nonfinite": 0,
+      "expected_nonfinite": 0,
+      "relative_l2": 0.0,
+      "expected_norm": 0.004754887315080661,
+      "residual_norm": 0.0,
+      "max_abs": 0.0,
+      "nonzero_when_expected": true,
+      "allclose": true,
+      "budget": 0.05,
+      "passed": true
+    },
+    "scan.dh": {
+      "finite": true,
+      "actual_nonfinite": 0,
+      "expected_nonfinite": 0,
+      "relative_l2": 0.0,
+      "expected_norm": 1.8155893952142463,
+      "residual_norm": 0.0,
+      "max_abs": 0.0,
+      "nonzero_when_expected": true,
+      "allclose": true,
+      "budget": 0.05,
+      "passed": true
+    },
+    "scan.dv": {
+      "finite": true,
+      "actual_nonfinite": 0,
+      "expected_nonfinite": 0,
+      "relative_l2": 0.0,
+      "expected_norm": 0.10854718686971253,
+      "residual_norm": 0.0,
+      "max_abs": 0.0,
+      "nonzero_when_expected": true,
+      "allclose": true,
+      "budget": 0.05,
+      "passed": true
+    },
+    "scan.dh0": {
+      "finite": true,
+      "actual_nonfinite": 0,
+      "expected_nonfinite": 0,
+      "relative_l2": 0.0,
+      "expected_norm": 0.0010301013832160802,
+      "residual_norm": 0.0,
+      "max_abs": 0.0,
+      "nonzero_when_expected": true,
+      "allclose": true,
+      "budget": 0.05,
+      "passed": true
+    }
+  },
+  "model_output_digests": [
+    {
+      "shape": [
+        64,
+        128
+      ],
+      "dtype": "torch.bfloat16",
+      "sha256": "c68df32626abc889a1336cde05c1c1695094979e1938aa776140b3e07e004799"
+    },
+    {
+      "shape": [
+        1,
+        1,
+        2,
+        128,
+        128
+      ],
+      "dtype": "torch.bfloat16",
+      "sha256": "84e6cc2db398d952835230b237a6b6f7c3bd175a02ad13d9e68448c0106fd3c1"
+    },
+    {
+      "shape": [
+        64,
+        256
+      ],
+      "dtype": "torch.bfloat16",
+      "sha256": "d65b558cd80ed4a33635c58eb1e7f98e5d511d802652939472d6acf2d0f8e69a"
+    },
+    {
+      "shape": [
+        1,
+        2,
+        128,
+        128
+      ],
+      "dtype": "torch.bfloat16",
+      "sha256": "f3d77d34a68c95fbc7117ddc774ccee788bd41bd01894be886b7d695e76b4c59"
+    }
+  ],
+  "elapsed_host_s": 11.344254857860506,
+  "hardware_acceptance": false,
+  "event_balance": [],
+  "hazards": [],
+  "report": {
+    "cycles": 49719,
+    "pipes": {
+      "core0/cube/S": {
+        "busy": 717,
+        "end": 41823,
+        "tasks": 437,
+        "utilisation": 0.0144
+      },
+      "core0/cube/MTE1": {
+        "busy": 3038,
+        "end": 43069,
+        "tasks": 98,
+        "utilisation": 0.0611
+      },
+      "core0/cube/MTE2": {
+        "busy": 17026,
+        "end": 43070,
+        "tasks": 42,
+        "utilisation": 0.3424
+      },
+      "core0/cube/M": {
+        "busy": 4542,
+        "end": 43348,
+        "tasks": 86,
+        "utilisation": 0.0914
+      },
+      "core0/cube/FIX": {
+        "busy": 13330,
+        "end": 45253,
+        "tasks": 32,
+        "utilisation": 0.2681
+      },
+      "core0/vec0/S": {
+        "busy": 1113,
+        "end": 46307,
+        "tasks": 863,
+        "utilisation": 0.0224
+      },
+      "core0/vec0/MTE2": {
+        "busy": 18754,
+        "end": 48442,
+        "tasks": 50,
+        "utilisation": 0.3772
+      },
+      "core0/vec0/MTE3": {
+        "busy": 9236,
+        "end": 49719,
+        "tasks": 38,
+        "utilisation": 0.1858
+      },
+      "core0/vec0/V": {
+        "busy": 3466,
+        "end": 48722,
+        "tasks": 192,
+        "utilisation": 0.0697
+      },
+      "core0/vec1/S": {
+        "busy": 1113,
+        "end": 46307,
+        "tasks": 863,
+        "utilisation": 0.0224
+      },
+      "core0/vec1/MTE2": {
+        "busy": 18754,
+        "end": 48442,
+        "tasks": 50,
+        "utilisation": 0.3772
+      },
+      "core0/vec1/MTE3": {
+        "busy": 9236,
+        "end": 49719,
+        "tasks": 38,
+        "utilisation": 0.1858
+      },
+      "core0/vec1/V": {
+        "busy": 3466,
+        "end": 48722,
+        "tasks": 192,
+        "utilisation": 0.0697
+      }
+    },
+    "hazards": [],
+    "deadlock": null,
+    "tasks": 2981,
+    "flag_timeline": {
+      "checked_tokens": 213,
+      "physical_checked_tokens": 213,
+      "physical_bindings_complete": true,
+      "unbound_events": []
+    },
+    "local_mutex": {
+      "slots_per_lane": 32,
+      "sections": 0,
+      "ids_by_lane": {
+        "core0/cube": [],
+        "core0/vec0": [],
+        "core0/vec1": []
+      },
+      "timing": "modeled, not silicon calibrated"
+    }
+  },
+  "model_cycles": 49719
+}

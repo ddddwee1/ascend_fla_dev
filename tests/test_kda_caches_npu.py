@@ -43,6 +43,73 @@ CASES = [
 BUDGET = 2e-2
 
 
+def a2_actual_forward_caches(native, inputs):
+    """A2-13 test fixture, PM issue #40 comment 5875827454.
+
+    Six actual NPU outputs are read back whole before CPU layout conversion.
+    The other three caches use the permitted FP32 reconstruction; h/v_new are
+    NOT literal captures of the BF16 recurrent ring. This is D2H/CPU/H2D fixture
+    assembly, not a public runtime or a zero-copy training path.
+    """
+    import math
+    import time
+    from ascend_fla.ops.kda.chunk import _scan_states
+    from benchmarks.verify_decode import _a2_digest
+
+    x = {n: inputs[n] for n in ("q", "k", "v")}
+    x.update(g_raw=inputs["g"].float(), beta=inputs["beta"].float(),
+             initial_state=inputs["initial_state"].float())
+    start = time.monotonic()
+    actual = native.chain(native.forward, x)
+    forward_s = time.monotonic() - start
+    start = time.monotonic()
+    raw = {name: value.detach().cpu() for name, value in actual.items()}
+    direct = ("Aqk", "Akk", "w", "u", "qg", "kg")
+    raw_hashes = {name: _a2_digest(raw[name]) for name in direct}
+    b, t, _, _ = inputs["q"].shape
+    hv, c = inputs["v"].shape[2], t // 64
+
+    def token_major(value):
+        if value.device.type != "cpu" or value.shape[:4] != (b, hv, c, 64):
+            raise ValueError("A2 fixture expects complete CPU BHCLD readback")
+        return value.permute(0, 2, 3, 1, 4).contiguous().view(b, t, hv, value.shape[-1])
+
+    saved = {name: token_major(raw[name]) for name in direct}
+    gc_dtype = getattr(native, "gc_dtype", "bf16")
+    if gc_dtype not in ("bf16", "fp32"):
+        raise ValueError("A2 cumulative-gate cache ABI must be bf16 or fp32")
+    gc_log2 = raw["g_cumsum"] * (1.0 / math.log(2))
+    saved["g_cumsum"] = token_major(gc_log2 if gc_dtype == "fp32" else gc_log2.bfloat16())
+    saved["h"], v_new = _scan_states(
+        *(raw[n] for n in ("w", "u", "kg", "eg")), x["initial_state"], b=b, hv=hv, c=c)
+    saved["v_new"] = token_major(v_new)
+    if set(saved) != set(BWD_CACHE_NAMES):
+        raise RuntimeError("A2 fixture did not assemble all nine caches")
+    # Undo the layout mapping, proving no hidden arithmetic touched the six values.
+    roundtrip = {name: torch.equal(
+        saved[name].view(b, c, 64, hv, -1).permute(0, 3, 1, 2, 4).contiguous().view(torch.uint8),
+        raw[name].contiguous().view(torch.uint8))
+        for name in direct}
+    if not all(roundtrip.values()):
+        raise RuntimeError("A2 fixture layout conversion changed tensor values")
+    receipt = {"route": "whole D2H -> CPU permute/contiguous -> backward unit H2D",
+               "forward_chain_wall_s": forward_s,
+               "fixture_assembly_readback_cpu_s": time.monotonic() - start,
+               "backward_upload_cost": "included in subsequent backward chain wall time",
+               "raw_six": raw_hashes,
+               "gate_source": _a2_digest(raw["g_cumsum"]),
+               "assembled_nine": {n: _a2_digest(v) for n, v in saved.items()},
+               "six_layout_roundtrip_bitwise": roundtrip,
+               "provenance": {**{n: "actual A2 forward kernel output, CPU layout only" for n in direct},
+                              "qg": "actual A2 wy unscaled qg, CPU layout only",
+                              "g_cumsum": "actual gate FP32 natural-log cumsum * 1/ln(2), "
+                                          + ("retained FP32 (D-PM-60)" if gc_dtype == "fp32" else "then BF16"),
+                              "h": "FP32 _scan_states using actual w/u/kg/eg, stored BF16",
+                              "v_new": "FP32 _scan_states using actual w/u/kg/eg, stored BF16"},
+               "literal_recurrent_ring_capture": False, "public_runtime_claim": False}
+    return {**inputs, "saved": saved}, raw, receipt
+
+
 def _bwd_unit_root() -> pathlib.Path:
     """kda_bwd 单元的位置。与 fwd 同级，只读引用（AGENTS.md §3）。"""
     direct = os.environ.get("ASCRIPTOR_KDA_BWD")
