@@ -1,0 +1,69 @@
+{
+  "schema": "ascriptor.kernel-unit/1",
+  "id": "a2.gdn_chunk_fwd",
+  "kind": "project",
+  "description": "A2 (c220) GDN chunk forward (GDR, scalar per-head gate): prepare -> scores -> wy -> scan -> output. Public inputs/outputs are token-major fp32; the GQA/GVA head map, scale and layout are in-kernel. Derived from a5.gdn_chunk_fwd, re-authored for the A2 facade (tile-vector UB ops instead of @vf, GM workspace rings instead of UB->L1 / L0C->UB). The scan's two matrix contractions run on the cube (matmul + L0C->GM->UB GMBuff ring); see docs/research/a2_gdn_abi.md §7 Deviation 1.",
+  "inputs": {
+    "q": {"dtype": "float32", "shape": ["B", "T", "H", 128]},
+    "k": {"dtype": "float32", "shape": ["B", "T", "H", 128]},
+    "v": {"dtype": "float32", "shape": ["B", "T", "HV", 128]},
+    "g": {"dtype": "float32", "shape": ["B", "T", "HV"], "note": "GDR per-(token,value-head) scalar gate (log space, g<=0)."},
+    "beta": {"dtype": "float32", "shape": ["B", "T", "HV"], "note": "beta in [0,1]."},
+    "initial_state": {"dtype": "float32", "shape": ["B", "HV", 128, 128], "note": "Optional nonzero carry-in state (§1.3); zero state is the default."}
+  },
+  "outputs": {
+    "o": {"dtype": "float32", "shape": ["B", "T", "HV", 128]},
+    "final_state": {"dtype": "float32", "shape": ["B", "HV", 128, 128], "note": "fp32 key-major state after the last chunk (§1.5 shipped default; no bf16-state shipping option)."}
+  },
+  "comparison": {
+    "default": {
+      "mode": "relative_l2",
+      "max_relative_l2": 1e-4,
+      "reason": "fp32 dual-oracle (block-solve + head-local grouped recurrence). Measured o/final_state rel-L2 2.8e-7..4.2e-7 across zero and nonzero initial_state; judged in fp32, never bitwise, never bf16-elementwise (AGENTS.md §6)."
+    }
+  },
+  "domain": {
+    "B": "positive",
+    "H_HV": "positive; HV % H == 0 (GQA/GVA, §1.1)",
+    "K": 128,
+    "V": 128,
+    "T": "positive; T == 64*N (no tail path, §1.7); T % 64 != 0 is rejected with the nearest legal T",
+    "scale": "128 ** -0.5 (absorbed at q's read, §1.7)",
+    "dtype": "all fp32 (no bf16-state variant; §1.5 bf16-state is reported as divergence evidence only, §4 bf16-host-audit N/A)",
+    "block_dim": [40],
+    "block_dim_note": "Validated at block_dim=40 (the a2 core count used throughout bring-up). A bd1-vs-bd40 comparison is unavailable: bd=1 faulted with a vector-core exception on the shared, contended 910B3. Correctness is block-dim-independent by construction (per-(b,hv) split, no cross-core reduction), but bd1 is recorded as unverified rather than asserted (AGENTS.md §2). See evidence/blockdim_sweep.log.",
+    "gate_span": {"recommended_limit": null, "status": "untested on A2 (Batch B)", "note": "Kernel tests use a small, safe span (<=10, far from the 88.7 line). Span calibration is a separate batch; no number is asserted."},
+    "accumulate_settle": "The scan carries its two contractions on the cube (matmul); every L0C-accumulate chain that is not is_init carries an explicit barrier(Pipe.M) (A2-01). The FP32/BF16 M<64 splitk form is not used."
+  },
+  "own_kernels": [
+    "gdn_chunk_prepare_a2_kernel",
+    "gdn_chunk_scores_a2_kernel",
+    "gdn_chunk_wy_a2_kernel",
+    "gdn_chunk_scan_a2_kernel",
+    "gdn_chunk_output_a2_kernel"
+  ],
+  "dependencies": {
+    "python": ">=3.10",
+    "host": ["torch", "numpy"],
+    "derived_from": "a5.gdn_chunk_fwd (this repository); re-authored for the A2 facade."
+  },
+  "support": [
+    {
+      "device": "a2",
+      "backend": "cce",
+      "stage": "board",
+      "status": "passed",
+      "scope": "910B3, CANN 9.2.0-beta.1, opp 9.2.0-beta.1 (ts 20260805_224858134), npu-smi 25.5.1, block_dim=40. End-to-end prepare->scores->wy->scan->output validated by tests/test_a2_gdn_chunk.py against a dual fp32 CPU oracle (block-solve + head-local grouped recurrence): o/final_state rel-L2 2.8e-7..4.2e-7 at HV!=H (H=2,HV=4), zero and nonzero initial_state; two-segment chaining bit-exact; T%64!=0 rejected. Raw numbers in evidence/acceptance_numbers.log; env in evidence/env.json.",
+      "note": "The runnable unit.py / run.py / _unit_runner.py harness (one-op-per-process board launch, AGENTS.md §3) is not yet ported; the committed pytest is the validation of record. This contract is the declarative half. The runner port is DEFERRED to a follow-up task with PM approval (PR #138 REVIEW, 2026-10-07); until it lands this unit is NOT marked qualified in the full repo unit-protocol sense.",
+      "qualified": false
+    }
+  ],
+  "provenance": {
+    "derived_from": {"unit": "a5.gdn_chunk_fwd", "repository": "this repository"},
+    "deviations": [
+      "scan's wy@S (contract D) and knd^T@delta (contract C) run on the cube (matmul + L0C->GM->UB GMBuff ring) instead of the planned pure-vector matvec, which faults on b3 for a kernel-context reason (docs/research/a2_gdn_abi.md §7 Deviation 1). ABI and numerics unchanged.",
+      "prepare/scores/output needed explicit count= on their vector ops for b3 (sim did not model b3's vector UB-address bounds)."
+    ]
+  },
+  "saved_state": {"final_state": "fp32 key-major state [B, HV, 128, 128]."}
+}

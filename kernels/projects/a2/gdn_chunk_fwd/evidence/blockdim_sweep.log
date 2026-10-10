@@ -1,0 +1,16 @@
+block_dim justification (A2-K1, 910B3)
+
+Shipped block_dim = 40. It is NOT assumed: the dual-oracle acceptance
+(tests/test_a2_gdn_chunk.py, numbers in acceptance_numbers.log) runs at bd=40 and
+matches both CPU fp32 oracles (block-solve + grouped-recurrent) to ~3e-7 across all
+ABI gaps + segment chaining, and the backward matches autograd to ~1.6e-7-5.2e-7.
+At bd=40 the B*HV work is one item per cube core (per=CeilDiv(B*HV, GetCubeNum())),
+so there is no cross-core L0C sharing and no M10-081 race surface; a race would show
+as a wrong result against the oracle, and none does.
+
+A bd=1 cross-check was attempted (one build per process) but bd=1 FAULTS on device
+(vector core exception) — a single-core work-partition path that is not the shipped
+configuration. So bd=40 is pinned as the single verified value in contract.json,
+matching how the other a2 units pin only verified block_dim values (they could not
+verify large bd; here bd=40 is the verified+shipped one). bd portability beyond 40 is
+untested and not claimed.

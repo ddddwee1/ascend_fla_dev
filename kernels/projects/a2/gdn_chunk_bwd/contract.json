@@ -1,0 +1,77 @@
+{
+  "schema": "ascriptor.kernel-unit/1",
+  "id": "a2.gdn_chunk_bwd",
+  "kind": "project",
+  "description": "A2 (c220) GDN chunk backward (GDR, scalar per-head gate): the shipped 8-kernel v1 chain replay -> reverse_rec -> reverse_dq/dbeta/dg/dk_bz/dk_ddr -> group_reduce. Public inputs/outputs are token-major fp32. Emits dh0 (§1.4). It is a pure-vector sequential per-token recurrence — zero matmul, zero barrier(Pipe.M) — a structural deviation from the §2-planned cube finalize/wu; see docs/research/a2_gdn_abi.md §7 Deviation 2 for the deviation and its ~10x perf gap vs fla's chunk-parallel Triton backward.",
+  "inputs": {
+    "q": {"dtype": "float32", "shape": ["B", "T", "H", 128]},
+    "k": {"dtype": "float32", "shape": ["B", "T", "H", 128]},
+    "v": {"dtype": "float32", "shape": ["B", "T", "HV", 128]},
+    "g": {"dtype": "float32", "shape": ["B", "T", "HV"], "note": "GDR per-(token,value-head) scalar gate (log space, g<=0)."},
+    "beta": {"dtype": "float32", "shape": ["B", "T", "HV"], "note": "beta in [0,1]."},
+    "do": {"dtype": "float32", "shape": ["B", "T", "HV", 128], "note": "output cotangent."},
+    "dht": {"dtype": "float32", "shape": ["B", "HV", 128, 128], "note": "optional final-state cotangent; zero when absent (§1.4). At least one of do/dht must be present."},
+    "initial_state": {"dtype": "float32", "shape": ["B", "HV", 128, 128], "note": "optional nonzero carry-in state (§1.3)."}
+  },
+  "outputs": {
+    "dq": {"dtype": "float32", "shape": ["B", "T", "H", 128], "note": "GVA-reduced into the qk-head H."},
+    "dk": {"dtype": "float32", "shape": ["B", "T", "H", 128], "note": "GVA-reduced into the qk-head H."},
+    "dv": {"dtype": "float32", "shape": ["B", "T", "HV", 128]},
+    "dbeta": {"dtype": "float32", "shape": ["B", "T", "HV"]},
+    "dg": {"dtype": "float32", "shape": ["B", "T", "HV"]},
+    "dh0": {"dtype": "float32", "shape": ["B", "HV", 128, 128], "note": "cotangent w.r.t. the initial state (§1.4)."}
+  },
+  "comparison": {
+    "default": {
+      "mode": "relative_l2",
+      "max_relative_l2": 1e-4,
+      "reason": "fp32 vs autograd and the analytical adjoint. Measured dq/dk/dv/dbeta/dg/dh0 rel-L2 1.56e-7..5.15e-7 across zero and nonzero dht; judged in fp32 (AGENTS.md §6)."
+    }
+  },
+  "domain": {
+    "B": "positive",
+    "H_HV": "positive; HV % H == 0 (GQA/GVA, §1.1)",
+    "K": 128,
+    "V": 128,
+    "T": "positive; T == 64*N (no tail path, §1.7)",
+    "scale": "128 ** -0.5",
+    "dtype": "all fp32",
+    "block_dim": [40],
+    "block_dim_note": "Validated at block_dim=40; see the forward contract for the bd1 fault note. Correctness is block-dim-independent (per-(b,hv) split, no cross-core reduction).",
+    "accumulate_settle": "The shipped chain carries no L0C accumulate (pure vector, zero matmul); there are therefore no barrier(Pipe.M) sites. This is Deviation 2 vs the §2 plan (which sited barriers after a cube finalize/wu)."
+  },
+  "own_kernels": [
+    "gdn_chunk_bwd_replay_a2_kernel",
+    "gdn_chunk_bwd_reverse_rec_a2_kernel",
+    "gdn_chunk_bwd_reverse_dq_a2_kernel",
+    "gdn_chunk_bwd_reverse_dbeta_a2_kernel",
+    "gdn_chunk_bwd_reverse_dg_a2_kernel",
+    "gdn_chunk_bwd_reverse_dk_bz_a2_kernel",
+    "gdn_chunk_bwd_reverse_dk_ddr_a2_kernel",
+    "gdn_chunk_bwd_group_reduce_a2_kernel"
+  ],
+  "dependencies": {
+    "python": ">=3.10",
+    "host": ["torch", "numpy"],
+    "derived_from": "a5.gdn_chunk_bwd (this repository); re-authored for the A2 facade."
+  },
+  "support": [
+    {
+      "device": "a2",
+      "backend": "cce",
+      "stage": "board",
+      "status": "passed",
+      "scope": "910B3, CANN 9.2.0-beta.1, opp 9.2.0-beta.1, npu-smi 25.5.1, block_dim=40. The 8-kernel chain is validated end-to-end by tests/test_a2_gdn_chunk.py against autograd: dq/dk/dv/dbeta/dg/dh0 rel-L2 1.56e-7..5.15e-7 at HV!=H (H=2,HV=4), zero and nonzero dht. Raw numbers in ../gdn_chunk_fwd/evidence/acceptance_numbers.log.",
+      "note": "Runnable unit.py / run.py / _unit_runner.py harness not yet ported; the committed pytest is the validation of record. The adjoint oracle is autograd (ref/reference.py::analytical), which does not slot into the CPU-reference unit protocol as cleanly as the forward's. The runner port is DEFERRED to a follow-up task with PM approval (PR #138 REVIEW, 2026-10-07); until it lands this unit is NOT marked qualified in the full repo unit-protocol sense.",
+      "qualified": false
+    }
+  ],
+  "provenance": {
+    "derived_from": {"unit": "a5.gdn_chunk_bwd", "repository": "this repository"},
+    "deviations": [
+      "The shipped backward is the sim-imposed 8-kernel v1 chain, pure vector (zero matmul, zero barrier(Pipe.M)), not the §40 planned 3-kernel or the §2 cube finalize/wu structure (docs/research/a2_gdn_abi.md §7 Deviation 2). Correct vs autograd; ~10x slower than fla's chunk-parallel Triton backward (algorithmic, not tuning).",
+      "The checkpoints / fused-reduce / tapeless reverse_rec_fused (v2/v3) perf variants and their informal bench were removed from the deliverable (shelved perf thread, out of A2-K1 correctness scope)."
+    ]
+  },
+  "saved_state": {"dh0": "fp32 cotangent w.r.t. the initial state [B, HV, 128, 128]."}
+}
