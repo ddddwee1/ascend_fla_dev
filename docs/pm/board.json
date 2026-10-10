@@ -3387,6 +3387,10 @@
         {
           "at": "2026-10-08T02:32",
           "summary": "本 PM 另开 worktree-isolated 只读 subagent 独立复核 PR #138（head 600d2ea），在两条 embedded REVIEW（08:31、11:42、14:29 三轮）已核实的六项之外，发现一条此前三轮都没捉到的新阻塞项，并独立复核确认了 embedded 第三轮正在等待的那条泄露问题仍未解决。\n\n**用户已批准 force-push**（\"A2-K1批\"，针对 bb7e1c6 的历史改写，仅限申领人自己 fork 上的 task/A2-K1 分支）——已在 #44 与 #138（申领人实际在跟的线程）各发一条 REVIEW，verdict=rework，内容：(1) 转达批准，请申领人执行 squash/rebase 清理 bb7e1c6 并报告新 sha；(2) **新发现的独立阻塞项**——任务验收清单声称的 barrier 负对照（删 barrier -> 测试变红）经直接复现是假的：`scan.py` 的两处 matmul 都没带 `is_init=False`，删掉 line115 的 barrier 后 `test_a2_accumulate_barriers.py` 仍 6 passed/0 failed，静态守卫对本 PR 的 kernel 实际覆盖为零；(3) 任务开篇动机案例——inverse 阶段的 M10-081 类 FP32 累加链——并未被按『改成 cube+barrier』方式修复，而是被 wy.py 的逐行标量求解整条绕开，这件事没有像 Deviation 1/2 一样在 a2_gdn_abi.md §7 里被点名披露；(4) 三条不独立阻塞的小项（双 oracle 未用 fla.naive、T%64 检查只在测试 harness 里不在 kernel 入口、\"bit-exact\"措辞与实际 1e-4 容差不符），建议与 1-3 一并处理，避免再跑一轮。\n\nstatus 维持 review（仍在返工，不是合入前的最后一轮）。合入与 force-push 仍待申领人完成上述四项、PM 做第三轮独立复核确认。"
+        },
+        {
+          "at": "2026-10-10T05:10",
+          "summary": "心跳：距上一条动作（commit 8e515d9e4，2026-10-08T04:51:47Z 的文档修正+ACK 待 force-push）超过 48h 无 STATUS，已发 PING（issue #138）。按协议再 24h 无回应收回任务。status 维持 review，仍在等 force-push + barrier/inverse 两项修复。"
         }
       ],
       "result": null
