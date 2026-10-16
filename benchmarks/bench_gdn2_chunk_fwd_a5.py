@@ -290,7 +290,7 @@ def run_model(args):
     from ascend_fla.models.gdn2 import GDN2ForCausalLM
     if args.backend == "chunk":
         from ascend_fla.ops.gdn2_chunk_fwd import prepare
-        from ascend_fla.ops.gdn2 import prepare as prepare_decode
+        from ascend_fla.ops.gdn2.fused_recurrent import prepare as prepare_decode
         prepare(block_dim=args.block_dim, dtypes=(DTYPES[args.dtype],))
         prepare_decode()
     model = GDN2ForCausalLM.from_checkpoint(
