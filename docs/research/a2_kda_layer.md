@@ -37,7 +37,8 @@ A5 分支的专门主机对比覆盖 15 个分支/核数组合、320 次编译�
 | prep backward 完整形状 | bd1/2 各 28 项 T4096/HV32 梯度检查通过；28 对输出哈希一致 | 原冻结梯度预算不变；另 48 个契约案例、112 项输出比较通过 |
 | prep backward 补充边界 | 26 个数值案例通过，另 16 个端点观测单列 | 逐点四列保留；端点不计入 CPU 精度通过 |
 | 公开完整链路 | 3 种真实形状 × bd1/2 共 6 项通过，24 对返回输出、27 对缓存哈希跨 bd 一致；6,144 项逐头/逐 chunk 输出与192项逐头末态比较通过 | 普通前向、完整 cached-forward、9 个核心反向；未代表完整层训练 |
-| 原层 prefill→decode | prefill 128 token 与随后 5 个逐 token decode 均通过原 0.1 预算 | 仅原文件这一项无梯度测试，完整 11 项未完成 |
+| 原层 prefill→decode | prefill 128 token 与随后 5 个逐 token decode 均通过原 0.1 预算 | 仅原文件这一项无梯度测试，完整层尚未通过 |
+| 原始整份层测试 | 5 passed / 6 failed，0 setup error；65 vendor 预编完成，35 次自定义 kernel 执行 | 5 项失败来自 autograd 选择 A5 prep，另 1 项为 A5 报错断言；未通过验收 |
 | 新单元核数 | layout、prep 各自实测 vec-only 在 bd1/2 的参与数为 1/2 | 更高 block_dim 未测试 |
 | A2 累加静态守卫 | 6 passed | 无新增 cube 累加或事件 ID |
 | 主机全套 | 1585 passed / 10 skipped / 1 failed | 上游 README 看板生成不一致，尚未全绿 |
@@ -55,6 +56,10 @@ A2 `muladddst` 不提供本次补偿算法需要的融合残差，4096 项负对
 FP32 norm 正常数补充案例距正确舍入 FP64 最大 2 ULP，距 CPU FP32 最大 3 ULP。八项逐阶段真机探针逐位复现产品结果：平方项一致，差异位于规约、开方和除法舍入。该结果已提交 [精度审查](https://github.com/ddddwee1/ascend_fla_dev/issues/42#issuecomment-6211127376)，不能仅凭相对误差通过就跳过原有审查规则。
 
 `autograd.py` 仍有 17 处 helper 调用默认选择 A5。该文件不在已列出的写集中，最小 device 接线正在等待 [PM 范围回复](https://github.com/ddddwee1/ascend_fla_dev/issues/42#issuecomment-6209806081)。未修改该文件。上游主机检查失败已另报 [README 看板问题](https://github.com/ddddwee1/ascend_fla_dev/issues/42#issuecomment-6210793134)。
+
+在提交 `147237d8` 上，原始 `tests/test_kda_layer_npu.py` 整份运行结果为 5 passed / 6 failed（718.08 秒，包含完整预编）。三个浅跨度梯度案例、默认初始化前向、深跨度反向都在 `autograd.py:118` 调到 A5 `prepare_backward` 后失败。深跨度实现选择案例则收到 `A2 KDA declares only impl='stable'`，与原测试期待的 A5“门控跨度”报错不符。已按实际 A2 支持域修正这一断言，保留 A5 原断言和后续 stable 有限性检查；没有改任何数值预算。修改后的整份测试仍待接线获准后重跑，不计为通过。
+
+原始 11 项的逐项 pytest 回执、未过滤而仅脱敏的日志、源码哈希、65 项编译签名和健康回执位于 `kernels/projects/a2/kda_prep/evidence/integration/original-layer-diagnostic-v1/`。控制器正确返回失败码 1，运行后健康为 0。
 
 ## Torch NPU 基线
 

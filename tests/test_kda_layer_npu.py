@@ -1,4 +1,4 @@
-"""KDA 层的端到端梯度对齐（需要 A5 NPU + CANN）。
+"""KDA 层的端到端梯度对齐（需要已选定 SoC 的 NPU + CANN）。
 
 第二期的验收项。检查的是**整层**：投影、短卷积、门控变换（``-exp(A_log)*softplus``）、
 q/k 的 L2 归一化、beta 的 sigmoid、KDA 算子、``FusedRMSNormGated``、输出投影，以及
@@ -43,6 +43,7 @@ if not torch.npu.is_available():  # pragma: no cover
 
 from ascend_fla.layers.kda import KimiDeltaAttention  # noqa: E402
 from ascend_fla.ops.kda.chunk import HEAD_DIM  # noqa: E402
+from ascend_fla.platform import resolve_soc  # noqa: E402
 from ascend_fla.reference.kda import kda_recurrent_ref  # noqa: E402
 
 # dg 的契约预算是 0.25，A_log/dt_bias 的梯度直接由它来
@@ -200,9 +201,14 @@ def test_deep_gate_needs_stable_impl():
     span = _calibrate_span(up, x_cpu, 94.0)
     assert abs(span - 94.0) < 1.0, f"跨度校准失败：{span:.1f}"
     up = up.to("npu")
-    with pytest.raises(ValueError, match="门控跨度") as e:
-        up(x)
-    assert "upstream" in str(e.value), f"报错没指明是哪套实现：{e.value}"
+    if resolve_soc() == "a2":
+        # A2 只声明 stable，加载入口在门控跨度检查之前拒绝 upstream。
+        with pytest.raises(ValueError, match="A2 KDA declares only impl='stable'"):
+            up(x)
+    else:
+        with pytest.raises(ValueError, match="门控跨度") as e:
+            up(x)
+        assert "upstream" in str(e.value), f"报错没指明是哪套实现：{e.value}"
 
     # 默认就是 stable —— 同样的跨度应当跑得通
     st = KimiDeltaAttention(**kw).float()
