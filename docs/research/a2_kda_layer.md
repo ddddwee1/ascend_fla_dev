@@ -2,7 +2,7 @@
 
 当前 A2-15 尚未完成层级验收，**不建议翻转 `CAPABILITIES["a2"]["qualified"]`**。提交值保持 `False`。新增 layout 和 prep 的完整形状真机结果不能代替公开层、prefill→decode 或训练性能验收。
 
-本报告对应任务起点 `63ce595617c2c2416b8ba0c09bf94586107fc76e` 上的 A2-15 工作副本。最终提交和恢复归档仍待补齐。范围来自 [A2-15 派单](https://github.com/ddddwee1/ascend_fla_dev/issues/42#issuecomment-6194692557)。
+本报告的公开整链与 prefill→decode 数字对应提交 `bc25e7f2402cee98738206e5e577a8aa4ec54bf5`，基于任务起点 `63ce595617c2c2416b8ba0c09bf94586107fc76e`。当前 PR 为 draft；最终验收和恢复归档仍待补齐。范围来自 [A2-15 派单](https://github.com/ddddwee1/ascend_fla_dev/issues/42#issuecomment-6194692557)。
 
 ## 实现范围
 
@@ -36,6 +36,8 @@ A5 分支的专门主机对比覆盖 15 个分支/核数组合、320 次编译�
 | prep forward 补充边界 | bd1 的 60 个数值项通过；另 40 个极端值观测单列 | 不继承 A5 的端点资格 |
 | prep backward 完整形状 | bd1/2 各 28 项 T4096/HV32 梯度检查通过；28 对输出哈希一致 | 原冻结梯度预算不变；另 48 个契约案例、112 项输出比较通过 |
 | prep backward 补充边界 | 26 个数值案例通过，另 16 个端点观测单列 | 逐点四列保留；端点不计入 CPU 精度通过 |
+| 公开完整链路 | 3 种真实形状 × bd1/2 共 6 项通过，24 对返回输出、27 对缓存哈希跨 bd 一致；6,144 项逐头/逐 chunk 输出与192项逐头末态比较通过 | 普通前向、完整 cached-forward、9 个核心反向；未代表完整层训练 |
+| 原层 prefill→decode | prefill 128 token 与随后 5 个逐 token decode 均通过原 0.1 预算 | 仅原文件这一项无梯度测试，完整 11 项未完成 |
 | 新单元核数 | layout、prep 各自实测 vec-only 在 bd1/2 的参与数为 1/2 | 更高 block_dim 未测试 |
 | A2 累加静态守卫 | 6 passed | 无新增 cube 累加或事件 ID |
 | 主机全套 | 1585 passed / 10 skipped / 1 failed | 上游 README 看板生成不一致，尚未全绿 |
@@ -67,6 +69,28 @@ FP32 norm 正常数补充案例距正确舍入 FP64 最大 2 ULP，距 CPU FP32 
 
 这些数字不构成候选加速结论。公开候选的三轮前后夹测和训练性能仍待完成；若候选变慢，报告保留实际结果。
 
+
+## 公开整链与逐 token 结果
+
+每个进程先注册全部 65 个 vendor，之后才执行自定义 kernel。下面各形状在 bd1/2 均通过，普通前向与 cached-forward 的输出和末态逐位相同。参考为运行时生成的 Torch CPU FP32 逐 token 递推及梯度；九个缓存使用独立 CPU FP32 构造。
+
+| KDA 形状 B/H/HV/T | 输出相对 L2 | 末态相对 L2 | dg 相对 L2 | 九缓存最大相对 L2 |
+| --- | ---: | ---: | ---: | ---: |
+| 1/16/32/4096 | 0.00327451 | 0.00245604 | 0.02171016 | 0.00321225 |
+| 1/32/32/1024 | 0.00326434 | 0.00256218 | 0.01917324 | 0.00321154 |
+| 1/16/32/1024 | 0.00326325 | 0.00253628 | 0.01932947 | 0.00320915 |
+
+层测试没有改动：prefill 相对 L2 为 0.00447696；token 128–132 分别为 0.00370432、0.00422260、0.00431989、0.00307665、0.00428091。每步均按原预算 0.1 判定，并检查 recurrent state 与三份卷积状态交接。
+
+回执在 `kernels/projects/a2/kda_prep/evidence/integration/public-v3/`。其中 `reproduce_public.py` 是同一比较流程的可移植重放入口；它去除了私有缓存路径。先通过外部机器配置选择环境、设备锁和独立缓存，再在独立进程执行每个 block_dim：
+
+```bash
+python kernels/projects/a2/kda_prep/evidence/integration/public-v3/reproduce_public.py \
+  --repo <repo> --output <ignored-output>/public-bd1 --block-dim 1
+```
+
+该脚本也保留完整反向预编。bd1 会执行原层的 prefill→decode 测试。重放入口本身只完成语法/CLI核对；已执行数字来自同一比较流程的隔离运行，源码哈希与构建签名分别保存，不把可运行命令当作新执行证据。
+
 ## 尚未完成
 
-公开前向、完整 cached-forward 和九个核心反向 kernel 的新鲜组合验收仍待完成。整份层测试、逐 token prefill→decode、真实形状性能三明治、主机全绿、最终脱敏归档及恢复检查也未完成。全部完成并经 PM 审核后，才能建议翻转资格、转正式评审和提交 DONE。
+整份 11 项层测试、完整训练性能三明治、主机全绿、最终脱敏归档及恢复检查仍未完成。公开普通前向、完整 cached-forward、九个核心反向以及原层逐 token prefill→decode 已有本次真机结果。前向性能三明治正在执行。全部完成并经 PM 审核后，才能建议翻转资格、转正式评审和提交 DONE。

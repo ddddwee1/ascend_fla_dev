@@ -22,7 +22,7 @@ A2 `muladddst` 的真机探针没有返回补偿算法需要的融合乘积残�
 
 编译器按分配累计占用 UB，不自动复用内联 helper 的局部缓冲。反向 helper 因此使用显式、互不重叠的临时区，映射在 `kernels/scratch-layout.json`。主缓冲、系数表和索引表各自分配。每次 DMA 前后执行本地 ALL barrier；无预取或跨核共享，也没有新增事件 ID。该保守排程的性能尚未测量。
 
-原始反向在 bd1/2 各通过 28 项完整 T4096/HV32 输出检查，共 48 个契约案例、112 项输出比较通过。24 对契约输入、56 对输出及 16 对 gate 部分和哈希跨 bd 一致。反向三个缩小案例分别通过 sim/pipesim；gate pipesim 首次 60 秒超时，同源同案例的 180 秒有界复跑通过，原失败日志保留。bd1 的额外反向边界中，26 个数值案例通过，16 个端点案例保留逐点 candidate/CPU FP32/Torch NPU/FP64 四列观测。没有 candidate-only NaN；上溢、下溢及舍入差异仍待范围审查。完整公开层、prefill→decode 和三轮性能三明治仍待验收。当前证据不支持翻转公共 `qualified` 状态。
+原始反向在 bd1/2 各通过 28 项完整 T4096/HV32 输出检查，共 48 个契约案例、112 项输出比较通过。24 对契约输入、56 对输出及 16 对 gate 部分和哈希跨 bd 一致。反向三个缩小案例分别通过 sim/pipesim；gate pipesim 首次 60 秒超时，同源同案例的 180 秒有界复跑通过，原失败日志保留。bd1 的额外反向边界中，26 个数值案例通过，16 个端点案例保留逐点 candidate/CPU FP32/Torch NPU/FP64 四列观测。没有 candidate-only NaN；上溢、下溢及舍入差异仍待范围审查。公开低层前向/cached-forward/完整反向已在三种真实形状 × bd1/2 通过，原层的 prefill 128 token 加 5 步 decode 也通过。整份层训练测试和三轮训练性能三明治仍待验收。当前证据不支持翻转公共 `qualified` 状态。
 
 ## 单元运行
 
