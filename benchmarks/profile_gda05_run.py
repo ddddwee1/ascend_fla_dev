@@ -122,8 +122,9 @@ def parse_profile(directory, expected_ops, block_dim=None):
     matched = {entry: 0 for entry in expected_ops}
     for row in kernels:
         names = [normalize(row[key]) for key in ('name', 'type')]
-        matches = [entry for entry, op in expected_ops.items()
-                   if any(value.startswith(normalize(op)) for value in names)]
+        # Native Name/Type fields carry the registered complete op name.
+        # Prefix matching confuses PgdnBwdAtk with PgdnBwdAtkReverse.
+        matches = [entry for entry, op in expected_ops.items() if normalize(op) in names]
         assert len(matches) <= 1, 'Ambiguous native kernel attribution'
         row['native_entry'] = matches[0] if matches else None
         if matches:
