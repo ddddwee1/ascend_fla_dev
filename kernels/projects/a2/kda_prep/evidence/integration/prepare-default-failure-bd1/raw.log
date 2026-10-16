@@ -1,0 +1,59 @@
+{"stage": "registered", "name": "kda_layout_a2_bf16_bf16_kernel", "unique": 1}
+{"stage": "registered", "name": "kda_layout_a2_bf16_f32_kernel", "unique": 2}
+{"stage": "registered", "name": "kda_layout_a2_f32_bf16_kernel", "unique": 3}
+{"stage": "registered", "name": "kda_layout_a2_f32_f32_kernel", "unique": 4}
+{"stage": "registered", "name": "kda_layout_a2_zero_bf16_kernel", "unique": 5}
+{"stage": "registered", "name": "kda_layout_a2_zero_f32_kernel", "unique": 6}
+{"stage": "registered", "name": "kda_prep_a2_chunk_norm_bf16_bf16_kernel", "unique": 7}
+{"stage": "registered", "name": "kda_prep_a2_chunk_norm_bf16_f32_kernel", "unique": 8}
+{"stage": "registered", "name": "kda_prep_a2_chunk_norm_f32_bf16_kernel", "unique": 9}
+{"stage": "registered", "name": "kda_prep_a2_chunk_norm_f32_f32_kernel", "unique": 10}
+{"stage": "registered", "name": "kda_prep_a2_chunk_gate_bf16_bf16_bf16_kernel", "unique": 11}
+{"stage": "registered", "name": "kda_prep_a2_chunk_gate_bf16_bf16_f32_kernel", "unique": 12}
+{"stage": "registered", "name": "kda_prep_a2_chunk_gate_bf16_f32_bf16_kernel", "unique": 13}
+{"stage": "registered", "name": "kda_prep_a2_chunk_gate_bf16_f32_f32_kernel", "unique": 14}
+{"stage": "registered", "name": "kda_prep_a2_chunk_gate_f32_bf16_bf16_kernel", "unique": 15}
+{"stage": "registered", "name": "kda_prep_a2_chunk_gate_f32_bf16_f32_kernel", "unique": 16}
+{"stage": "registered", "name": "kda_prep_a2_chunk_gate_f32_f32_bf16_kernel", "unique": 17}
+{"stage": "registered", "name": "kda_prep_a2_chunk_gate_f32_f32_f32_kernel", "unique": 18}
+{"stage": "registered", "name": "kda_prep_a2_chunk_beta_bf16_kernel", "unique": 19}
+{"stage": "registered", "name": "kda_prep_a2_chunk_beta_f32_kernel", "unique": 20}
+{"stage": "registered", "name": "kda_prep_a2_backward_norm_bf16_kernel", "unique": 21}
+{"stage": "registered", "name": "kda_prep_a2_backward_norm_f32_kernel", "unique": 22}
+{"stage": "registered", "name": "kda_prep_a2_backward_gate_bf16_bf16_bf16_kernel", "unique": 23}
+{"stage": "registered", "name": "kda_prep_a2_backward_gate_bf16_bf16_f32_kernel", "unique": 24}
+{"stage": "registered", "name": "kda_prep_a2_backward_gate_bf16_f32_bf16_kernel", "unique": 25}
+{"stage": "registered", "name": "kda_prep_a2_backward_gate_bf16_f32_f32_kernel", "unique": 26}
+{"stage": "registered", "name": "kda_prep_a2_backward_gate_f32_bf16_bf16_kernel", "unique": 27}
+{"stage": "registered", "name": "kda_prep_a2_backward_gate_f32_bf16_f32_kernel", "unique": 28}
+{"stage": "registered", "name": "kda_prep_a2_backward_gate_f32_f32_bf16_kernel", "unique": 29}
+{"stage": "registered", "name": "kda_prep_a2_backward_gate_f32_f32_f32_kernel", "unique": 30}
+{"stage": "registered", "name": "kda_prep_a2_backward_gate_reduce_bf16_bf16_kernel", "unique": 31}
+{"stage": "registered", "name": "kda_prep_a2_backward_gate_reduce_bf16_f32_kernel", "unique": 32}
+{"stage": "registered", "name": "kda_prep_a2_backward_gate_reduce_f32_bf16_kernel", "unique": 33}
+{"stage": "registered", "name": "kda_prep_a2_backward_gate_reduce_f32_f32_kernel", "unique": 34}
+{"stage": "registered", "name": "kda_prep_a2_backward_beta_bf16_kernel", "unique": 35}
+{"stage": "registered", "name": "kda_prep_a2_backward_beta_f32_kernel", "unique": 36}
+{"stage": "registered", "name": "kda_sub1_gate_a2_kernel", "unique": 37}
+{"stage": "registered", "name": "kda_sub2_score_a2_kernel", "unique": 38}
+{"stage": "registered", "name": "tril_inverse64_a2_kernel", "unique": 39}
+{"stage": "registered", "name": "kda_sub3_wy_a2_kernel", "unique": 40}
+{"stage": "registered", "name": "kda_sub45_a2_kernel", "unique": 41}
+{"stage": "registered", "name": "scan_fused_a2_fp32gc_kernel", "unique": 42}
+{"stage": "registered", "name": "inverse_mm_a2_kernel", "unique": 43}
+{"stage": "registered", "name": "inverse_epilogue_a2_fp32gc_kernel", "unique": 44}
+{"stage": "registered", "name": "inverse_dainv_a2_kernel", "unique": 45}
+{"stage": "registered", "name": "inverse_dakk_fused_a2_kernel", "unique": 46}
+{"stage": "registered", "name": "finalize_pre_a2_fp32gc_kernel", "unique": 47}
+{"stage": "registered", "name": "finalize_pair_a2_kernel", "unique": 48}
+{"stage": "registered", "name": "finalize_post_a2_fp32gc_kernel", "unique": 49}
+{"stage": "registered", "name": "finalize_reduce_a2_kernel", "unique": 50}
+Traceback (most recent call last):
+  File "<private-run>/public_full_native.py", line 47, in <module>
+    prepare('a2',bd,backward=True,decode=True)
+  File "<private-run>/repo/ascend_fla/ops/kda/__init__.py", line 74, in prepare
+    _decode(device, block_dim if decode_block_dim is None else decode_block_dim)
+  File "<private-run>/repo/ascend_fla/ops/kda/fused_recurrent.py", line 72, in _compiled
+    raise ValueError("A2 decode requires BF16 q/k/v")
+ValueError: A2 decode requires BF16 q/k/v
+[ERROR] 2026-10-16-08:54:51 (PID:<process>, Device:0, RankID:-1) ERR99999 UNKNOWN applicaiton exception

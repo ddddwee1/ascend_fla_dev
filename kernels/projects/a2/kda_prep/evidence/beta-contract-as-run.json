@@ -1,0 +1,219 @@
+{
+  "schema": "ascriptor.kernel-unit/1",
+  "id": "a2.kda_prep.backward.beta",
+  "kind": "kernel",
+  "description": "A2 beta raw derivatives with mandatory frozen per-dtype precision comparisons in execute",
+  "inputs": {
+    "source": {
+      "description": "Generated raw data and operation-specific parameters/sensitivity"
+    }
+  },
+  "outputs": {
+    "destination": {
+      "description": "Actual typed output or raw gradient; dtype selected by case"
+    }
+  },
+  "domain": {
+    "device": "a2",
+    "block_dim": [
+      1,
+      2
+    ],
+    "K": 128,
+    "host": "Only allocation, metadata and launches in production; reference and comparison run on CPU in this test unit"
+  },
+  "dependencies": {
+    "python": ">=3.10",
+    "ascriptor": "==0.1.0",
+    "host": [
+      "torch",
+      "numpy"
+    ]
+  },
+  "comparison": {
+    "default": {
+      "mode": "allclose",
+      "atol": 0,
+      "rtol": 0.011638398136076292,
+      "max_relative_l2": 0.004990506387980159,
+      "reason": "Structural envelope from the largest existing budget. execute additionally enforces every unchanged per-dtype FP64 budget and applicable BF16 ULP limit."
+    },
+    "primary_golden": "Torch CPU FP32",
+    "precision_reference": "Independent analytic CPU FP64, isolated derivatives only"
+  },
+  "cases": [
+    {
+      "id": "beta_bf16_full_bd1",
+      "seed": 20261016,
+      "block_dim": 1,
+      "parameters": {
+        "kind": "beta",
+        "types": "bf16",
+        "shape": [
+          1,
+          4096,
+          32
+        ],
+        "N": 131072,
+        "backward": true
+      }
+    },
+    {
+      "id": "beta_bf16_reduced_bd1",
+      "seed": 20261016,
+      "block_dim": 1,
+      "parameters": {
+        "kind": "beta",
+        "types": "bf16",
+        "shape": [
+          1,
+          1,
+          17
+        ],
+        "N": 17,
+        "backward": true
+      }
+    },
+    {
+      "id": "beta_f32_full_bd1",
+      "seed": 20261016,
+      "block_dim": 1,
+      "parameters": {
+        "kind": "beta",
+        "types": "f32",
+        "shape": [
+          1,
+          4096,
+          32
+        ],
+        "N": 131072,
+        "backward": true
+      }
+    },
+    {
+      "id": "beta_f32_reduced_bd1",
+      "seed": 20261016,
+      "block_dim": 1,
+      "parameters": {
+        "kind": "beta",
+        "types": "f32",
+        "shape": [
+          1,
+          1,
+          17
+        ],
+        "N": 17,
+        "backward": true
+      }
+    },
+    {
+      "id": "beta_bf16_full_bd2",
+      "seed": 20261016,
+      "block_dim": 2,
+      "parameters": {
+        "kind": "beta",
+        "types": "bf16",
+        "shape": [
+          1,
+          4096,
+          32
+        ],
+        "N": 131072,
+        "backward": true
+      }
+    },
+    {
+      "id": "beta_bf16_reduced_bd2",
+      "seed": 20261016,
+      "block_dim": 2,
+      "parameters": {
+        "kind": "beta",
+        "types": "bf16",
+        "shape": [
+          1,
+          1,
+          17
+        ],
+        "N": 17,
+        "backward": true
+      }
+    },
+    {
+      "id": "beta_f32_full_bd2",
+      "seed": 20261016,
+      "block_dim": 2,
+      "parameters": {
+        "kind": "beta",
+        "types": "f32",
+        "shape": [
+          1,
+          4096,
+          32
+        ],
+        "N": 131072,
+        "backward": true
+      }
+    },
+    {
+      "id": "beta_f32_reduced_bd2",
+      "seed": 20261016,
+      "block_dim": 2,
+      "parameters": {
+        "kind": "beta",
+        "types": "f32",
+        "shape": [
+          1,
+          1,
+          17
+        ],
+        "N": 17,
+        "backward": true
+      }
+    }
+  ],
+  "support": [
+    {
+      "device": "a2",
+      "backend": "cce",
+      "stage": "reference",
+      "status": "passed",
+      "scope": "All declared CPU reference cases; native acceptance pending"
+    },
+    {
+      "device": "a2",
+      "backend": "cce",
+      "stage": "emit",
+      "status": "untested"
+    },
+    {
+      "device": "a2",
+      "backend": "cce",
+      "stage": "compile",
+      "status": "untested"
+    },
+    {
+      "device": "a2",
+      "backend": "cce",
+      "stage": "board",
+      "status": "untested"
+    },
+    {
+      "device": "a2",
+      "backend": "cce",
+      "stage": "sim",
+      "status": "untested"
+    },
+    {
+      "device": "a2",
+      "backend": "cce",
+      "stage": "pipesim",
+      "status": "untested"
+    }
+  ],
+  "provenance": {
+    "task": "A2-15",
+    "library": "90cfcdc720bbcd66e8bd4361c4dd4fbc1a2a57b5",
+    "budget_source": "Unchanged owned a5.kda_prep budget files; no A5 runtime import",
+    "qualification": "Pending complete per-case validation"
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "soc": "Ascend910B3",
+  "python": "3.11.15",
+  "torch": "2.10.0+cpu",
+  "torch_npu": "2.10.0",
+  "torch_npu_allow_hf32": false,
+  "device_geometry": {
+    "cube_cores": 20,
+    "vector_cores": 40
+  },
+  "ascriptor": "0.1.0",
+  "revisions": {
+    "library": "90cfcdc720bbcd66e8bd4361c4dd4fbc1a2a57b5",
+    "kernels": "b3b3f9c16df7c4626ed3c081032a1be5a753d0b1"
+  },
+  "cann": {
+    "compiler": {
+      "sha256": "c44017e925906ff08120ada7be44167be9f25d859c734ba202ae7be75ff5bede",
+      "fields": [
+        "Version=9.0.0",
+        "version_dir=cann",
+        "timestamp=20260428_134817545"
+      ]
+    },
+    "opp": {
+      "sha256": "3f6997bfb998c24cf107258e4cd4e76f6ffc520e0382770e75520083c20b162a",
+      "fields": [
+        "Version=9.0.0",
+        "version_dir=cann",
+        "timestamp=20260428_134817545"
+      ]
+    }
+  },
+  "opp_packages": [
+    "ascend910_93",
+    "ascend910b",
+    "config"
+  ],
+  "library_files_checked": 204,
+  "library_manifest_sha256": "a8b647cf586ac61ffa67139790a87319ae10639eb9c1d29219180d5795c9995f",
+  "source_sha256": {
+    "runtime.py": "43c6e243a570069a0ec7ef858deeee3d4dd7b8a0cf7f680de1a4800fcd57b0ca",
+    "reference.py": "e1e0357f3ed85ba38d1a2ceb0e9ce55a83f0f40f3acac4c563fa7489b9baed2e",
+    "_unit_runner.py": "8e91d95ed0294ddbfc204957b8bf77606a79123655fc096963b94658b633566b",
+    "run.py": "ec70d19fefe5d86226ef62ef10c7e871d0a2cf4a39c0052156803153b7097367",
+    "unit_impl.py": "7fe06d29b992993340f3e982f133a1d1f9640a0735cce9c1c975c93cfe302b85",
+    "unit.py": "4214546bf29e61356a3ce5f93ced998925c486166f7fbad357f9d93544baf765",
+    "kernels/forward.py": "5efa82439907d5e86a85edaaa0c56c12bca3fdaff26a6fd249b28131ffcb9b62",
+    "kernels/backward.py": "c78bad6adb97b352497353b338751fbcf91ab9d18461f906f835d5d4905f9794",
+    "backward/norm/unit.py": "8f28f46779261bddd84658b7c2e11679287ec78d447eafbd55c34618cb6516a4",
+    "backward/norm/run.py": "00909c9cbae3d83209834902f4f5130ae8c02e3df24db5d74a152f8f161784ac",
+    "backward/gate/unit.py": "0d97625fe09a541800c8484cfc154b772605036f81ee0a6be70feae407fde41b",
+    "backward/gate/run.py": "00909c9cbae3d83209834902f4f5130ae8c02e3df24db5d74a152f8f161784ac",
+    "backward/beta/unit.py": "8f28f46779261bddd84658b7c2e11679287ec78d447eafbd55c34618cb6516a4",
+    "backward/beta/run.py": "00909c9cbae3d83209834902f4f5130ae8c02e3df24db5d74a152f8f161784ac"
+  },
+  "block_dim": 2,
+  "scope": "prep backward leaf; full public layer not run"
+}

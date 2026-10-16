@@ -1,0 +1,494 @@
+{
+  "schema": "BF-08 backward budgets v1",
+  "scope": "Pre-implementation freeze; CPU precision study only; no native or model qualification.",
+  "authority": "D-PM-54 https://github.com/ddddwee1/ascend_fla_dev/issues/117#issuecomment-5754228432",
+  "formulas": {
+    "relative_l2": "norm(actual_fp64-reference_fp64)/norm(reference_fp64)",
+    "elementwise": "max(abs(actual_fp64-reference_fp64)/abs(reference_fp64)) over nonzero references; zero references must be exactly zero",
+    "ulp": "distance to FP64 correctly rounded to raw output dtype and to actual predecessor output; signed zeros have numeric distance zero"
+  },
+  "reference": "Independent analytic FP64 for isolated preparation derivatives; two CPU FP32 goldens for end-to-end KDA. Old host differences reported separately.",
+  "l2_cap": 0.01,
+  "floor_multiplier": 3,
+  "calibration_sha256": {
+    "norm": "374f6169fdd23de5f66d68805bf1dc5e5cfb1748cd94b671fcfe1f2a33547072",
+    "gate": "dc5cb7395e9602dc88bf51672934fe74423a9a473135a45dea78def08c792b6f",
+    "beta": "3b9acb31a0b797898b40d4662f807692a1bee5eb8e584c2f34199d82c1dd28ce"
+  },
+  "groups": {
+    "norm:bf16:dx": {
+      "output_dtype": "torch.bfloat16",
+      "calibration_case_ids": [
+        "norm:bf16:dx:gaussian:0",
+        "norm:bf16:dx:full_kimi:1",
+        "norm:bf16:dx:scale_0:2",
+        "norm:bf16:dx:scale_1e-20:3",
+        "norm:bf16:dx:scale_1e-08:4",
+        "norm:bf16:dx:scale_0.0001:5",
+        "norm:bf16:dx:scale_30:6"
+      ],
+      "floor_relative_l2": 0.001695991577532449,
+      "floor_max_relative_nonzero": 0.019609933398464667,
+      "old_to_rounded_fp64_max_ulp": 3,
+      "relative_l2_limit": 0.005087974732597347,
+      "elementwise_relative_limit": 0.058829800195394,
+      "zero_reference_nonzero_allowed": 0,
+      "ulp_limit_each_reference": null,
+      "ulp_policy_basis": "D-PM-54 calibration output/dtype classification; FP32 retains BF-07 no-ULP-passline rule"
+    },
+    "norm:f32:dx": {
+      "output_dtype": "torch.float32",
+      "calibration_case_ids": [
+        "norm:f32:dx:gaussian:11",
+        "norm:f32:dx:full_kimi:12",
+        "norm:f32:dx:scale_0:13",
+        "norm:f32:dx:scale_1e-20:14",
+        "norm:f32:dx:scale_1e-08:15",
+        "norm:f32:dx:scale_0.0001:16",
+        "norm:f32:dx:scale_30:17"
+      ],
+      "floor_relative_l2": 6.279634967708087e-08,
+      "floor_max_relative_nonzero": 0.04098930330172564,
+      "old_to_rounded_fp64_max_ulp": 619320,
+      "relative_l2_limit": 1.883890490312426e-07,
+      "elementwise_relative_limit": 0.12296790990517692,
+      "zero_reference_nonzero_allowed": 0,
+      "ulp_limit_each_reference": null,
+      "ulp_policy_basis": "D-PM-54 calibration output/dtype classification; FP32 retains BF-07 no-ULP-passline rule"
+    },
+    "gate:bf16_bf16_bf16:dg": {
+      "output_dtype": "torch.bfloat16",
+      "calibration_case_ids": [
+        "gate:bf16_bf16_bf16:dg:gaussian:0",
+        "gate:bf16_bf16_bf16:dg:full_kimi:3",
+        "gate:bf16_bf16_bf16:dg:threshold:6"
+      ],
+      "floor_relative_l2": 0.0016575487639722939,
+      "floor_max_relative_nonzero": 0.0038910553278032447,
+      "old_to_rounded_fp64_max_ulp": 1,
+      "relative_l2_limit": 0.004972646291916882,
+      "elementwise_relative_limit": 0.011673165983409735,
+      "zero_reference_nonzero_allowed": 0,
+      "ulp_limit_each_reference": 1,
+      "ulp_policy_basis": "D-PM-54 calibration output/dtype classification; FP32 retains BF-07 no-ULP-passline rule"
+    },
+    "gate:bf16_bf16_bf16:dA_log": {
+      "output_dtype": "torch.bfloat16",
+      "calibration_case_ids": [
+        "gate:bf16_bf16_bf16:dA_log:gaussian:1",
+        "gate:bf16_bf16_bf16:dA_log:full_kimi:4",
+        "gate:bf16_bf16_bf16:dA_log:threshold:7"
+      ],
+      "floor_relative_l2": 0.0018152276090041247,
+      "floor_max_relative_nonzero": 0.0033097093231029637,
+      "old_to_rounded_fp64_max_ulp": 0,
+      "relative_l2_limit": 0.005445682827012374,
+      "elementwise_relative_limit": 0.009929127969308891,
+      "zero_reference_nonzero_allowed": 0,
+      "ulp_limit_each_reference": 1,
+      "ulp_policy_basis": "D-PM-54 calibration output/dtype classification; FP32 retains BF-07 no-ULP-passline rule"
+    },
+    "gate:bf16_bf16_bf16:ddt_bias": {
+      "output_dtype": "torch.bfloat16",
+      "calibration_case_ids": [
+        "gate:bf16_bf16_bf16:ddt_bias:gaussian:2",
+        "gate:bf16_bf16_bf16:ddt_bias:full_kimi:5",
+        "gate:bf16_bf16_bf16:ddt_bias:threshold:8"
+      ],
+      "floor_relative_l2": 0.0016822694461403553,
+      "floor_max_relative_nonzero": 0.0037935925971554377,
+      "old_to_rounded_fp64_max_ulp": 0,
+      "relative_l2_limit": 0.005046808338421065,
+      "elementwise_relative_limit": 0.011380777791466313,
+      "zero_reference_nonzero_allowed": 0,
+      "ulp_limit_each_reference": 1,
+      "ulp_policy_basis": "D-PM-54 calibration output/dtype classification; FP32 retains BF-07 no-ULP-passline rule"
+    },
+    "gate:bf16_bf16_f32:dg": {
+      "output_dtype": "torch.bfloat16",
+      "calibration_case_ids": [
+        "gate:bf16_bf16_f32:dg:gaussian:9",
+        "gate:bf16_bf16_f32:dg:full_kimi:12",
+        "gate:bf16_bf16_f32:dg:threshold:15"
+      ],
+      "floor_relative_l2": 0.0016694958713559913,
+      "floor_max_relative_nonzero": 0.003891186710784821,
+      "old_to_rounded_fp64_max_ulp": 1,
+      "relative_l2_limit": 0.005008487614067974,
+      "elementwise_relative_limit": 0.011673560132354462,
+      "zero_reference_nonzero_allowed": 0,
+      "ulp_limit_each_reference": 1,
+      "ulp_policy_basis": "D-PM-54 calibration output/dtype classification; FP32 retains BF-07 no-ULP-passline rule"
+    },
+    "gate:bf16_bf16_f32:dA_log": {
+      "output_dtype": "torch.bfloat16",
+      "calibration_case_ids": [
+        "gate:bf16_bf16_f32:dA_log:gaussian:10",
+        "gate:bf16_bf16_f32:dA_log:full_kimi:13",
+        "gate:bf16_bf16_f32:dA_log:threshold:16"
+      ],
+      "floor_relative_l2": 0.002028955241083737,
+      "floor_max_relative_nonzero": 0.0030584624979906705,
+      "old_to_rounded_fp64_max_ulp": 1,
+      "relative_l2_limit": 0.006086865723251211,
+      "elementwise_relative_limit": 0.009175387493972011,
+      "zero_reference_nonzero_allowed": 0,
+      "ulp_limit_each_reference": 1,
+      "ulp_policy_basis": "D-PM-54 calibration output/dtype classification; FP32 retains BF-07 no-ULP-passline rule"
+    },
+    "gate:bf16_bf16_f32:ddt_bias": {
+      "output_dtype": "torch.float32",
+      "calibration_case_ids": [
+        "gate:bf16_bf16_f32:ddt_bias:gaussian:11",
+        "gate:bf16_bf16_f32:ddt_bias:full_kimi:14",
+        "gate:bf16_bf16_f32:ddt_bias:threshold:17"
+      ],
+      "floor_relative_l2": 1.443682588831314e-07,
+      "floor_max_relative_nonzero": 0.00017789112904890628,
+      "old_to_rounded_fp64_max_ulp": 1947,
+      "relative_l2_limit": 4.331047766493942e-07,
+      "elementwise_relative_limit": 0.0005336733871467189,
+      "zero_reference_nonzero_allowed": 0,
+      "ulp_limit_each_reference": null,
+      "ulp_policy_basis": "D-PM-54 calibration output/dtype classification; FP32 retains BF-07 no-ULP-passline rule"
+    },
+    "gate:bf16_f32_bf16:dg": {
+      "output_dtype": "torch.bfloat16",
+      "calibration_case_ids": [
+        "gate:bf16_f32_bf16:dg:gaussian:18",
+        "gate:bf16_f32_bf16:dg:full_kimi:21",
+        "gate:bf16_f32_bf16:dg:threshold:24"
+      ],
+      "floor_relative_l2": 0.0016713334349057888,
+      "floor_max_relative_nonzero": 0.0038910825273828697,
+      "old_to_rounded_fp64_max_ulp": 1,
+      "relative_l2_limit": 0.005014000304717366,
+      "elementwise_relative_limit": 0.011673247582148608,
+      "zero_reference_nonzero_allowed": 0,
+      "ulp_limit_each_reference": 1,
+      "ulp_policy_basis": "D-PM-54 calibration output/dtype classification; FP32 retains BF-07 no-ULP-passline rule"
+    },
+    "gate:bf16_f32_bf16:dA_log": {
+      "output_dtype": "torch.float32",
+      "calibration_case_ids": [
+        "gate:bf16_f32_bf16:dA_log:gaussian:19",
+        "gate:bf16_f32_bf16:dA_log:full_kimi:22",
+        "gate:bf16_f32_bf16:dA_log:threshold:25"
+      ],
+      "floor_relative_l2": 1.0206128300886045e-06,
+      "floor_max_relative_nonzero": 1.9003485031587713e-05,
+      "old_to_rounded_fp64_max_ulp": 205,
+      "relative_l2_limit": 3.0618384902658135e-06,
+      "elementwise_relative_limit": 5.701045509476314e-05,
+      "zero_reference_nonzero_allowed": 0,
+      "ulp_limit_each_reference": null,
+      "ulp_policy_basis": "D-PM-54 calibration output/dtype classification; FP32 retains BF-07 no-ULP-passline rule"
+    },
+    "gate:bf16_f32_bf16:ddt_bias": {
+      "output_dtype": "torch.bfloat16",
+      "calibration_case_ids": [
+        "gate:bf16_f32_bf16:ddt_bias:gaussian:20",
+        "gate:bf16_f32_bf16:ddt_bias:full_kimi:23",
+        "gate:bf16_f32_bf16:ddt_bias:threshold:26"
+      ],
+      "floor_relative_l2": 0.0016888796667091407,
+      "floor_max_relative_nonzero": 0.003885245788673125,
+      "old_to_rounded_fp64_max_ulp": 0,
+      "relative_l2_limit": 0.005066639000127422,
+      "elementwise_relative_limit": 0.011655737366019374,
+      "zero_reference_nonzero_allowed": 0,
+      "ulp_limit_each_reference": 1,
+      "ulp_policy_basis": "D-PM-54 calibration output/dtype classification; FP32 retains BF-07 no-ULP-passline rule"
+    },
+    "gate:bf16_f32_f32:dg": {
+      "output_dtype": "torch.bfloat16",
+      "calibration_case_ids": [
+        "gate:bf16_f32_f32:dg:gaussian:27",
+        "gate:bf16_f32_f32:dg:full_kimi:30",
+        "gate:bf16_f32_f32:dg:threshold:33"
+      ],
+      "floor_relative_l2": 0.0016688828457860321,
+      "floor_max_relative_nonzero": 0.0038911597125239348,
+      "old_to_rounded_fp64_max_ulp": 1,
+      "relative_l2_limit": 0.005006648537358096,
+      "elementwise_relative_limit": 0.011673479137571805,
+      "zero_reference_nonzero_allowed": 0,
+      "ulp_limit_each_reference": 1,
+      "ulp_policy_basis": "D-PM-54 calibration output/dtype classification; FP32 retains BF-07 no-ULP-passline rule"
+    },
+    "gate:bf16_f32_f32:dA_log": {
+      "output_dtype": "torch.float32",
+      "calibration_case_ids": [
+        "gate:bf16_f32_f32:dA_log:gaussian:28",
+        "gate:bf16_f32_f32:dA_log:full_kimi:31",
+        "gate:bf16_f32_f32:dA_log:threshold:34"
+      ],
+      "floor_relative_l2": 8.61497054252589e-07,
+      "floor_max_relative_nonzero": 0.00015994301019177587,
+      "old_to_rounded_fp64_max_ulp": 2474,
+      "relative_l2_limit": 2.584491162757767e-06,
+      "elementwise_relative_limit": 0.0004798290305753276,
+      "zero_reference_nonzero_allowed": 0,
+      "ulp_limit_each_reference": null,
+      "ulp_policy_basis": "D-PM-54 calibration output/dtype classification; FP32 retains BF-07 no-ULP-passline rule"
+    },
+    "gate:bf16_f32_f32:ddt_bias": {
+      "output_dtype": "torch.float32",
+      "calibration_case_ids": [
+        "gate:bf16_f32_f32:ddt_bias:gaussian:29",
+        "gate:bf16_f32_f32:ddt_bias:full_kimi:32",
+        "gate:bf16_f32_f32:ddt_bias:threshold:35"
+      ],
+      "floor_relative_l2": 1.405171509861251e-07,
+      "floor_max_relative_nonzero": 0.0007222818083829656,
+      "old_to_rounded_fp64_max_ulp": 7487,
+      "relative_l2_limit": 4.215514529583753e-07,
+      "elementwise_relative_limit": 0.0021668454251488967,
+      "zero_reference_nonzero_allowed": 0,
+      "ulp_limit_each_reference": null,
+      "ulp_policy_basis": "D-PM-54 calibration output/dtype classification; FP32 retains BF-07 no-ULP-passline rule"
+    },
+    "gate:f32_bf16_bf16:dg": {
+      "output_dtype": "torch.float32",
+      "calibration_case_ids": [
+        "gate:f32_bf16_bf16:dg:gaussian:36",
+        "gate:f32_bf16_bf16:dg:full_kimi:39",
+        "gate:f32_bf16_bf16:dg:threshold:42"
+      ],
+      "floor_relative_l2": 5.850207330644359e-08,
+      "floor_max_relative_nonzero": 3.9222768794615246e-07,
+      "old_to_rounded_fp64_max_ulp": 5,
+      "relative_l2_limit": 1.7550621991933077e-07,
+      "elementwise_relative_limit": 1.1766830638384573e-06,
+      "zero_reference_nonzero_allowed": 0,
+      "ulp_limit_each_reference": null,
+      "ulp_policy_basis": "D-PM-54 calibration output/dtype classification; FP32 retains BF-07 no-ULP-passline rule"
+    },
+    "gate:f32_bf16_bf16:dA_log": {
+      "output_dtype": "torch.bfloat16",
+      "calibration_case_ids": [
+        "gate:f32_bf16_bf16:dA_log:gaussian:37",
+        "gate:f32_bf16_bf16:dA_log:full_kimi:40",
+        "gate:f32_bf16_bf16:dA_log:threshold:43"
+      ],
+      "floor_relative_l2": 0.0037732991930391636,
+      "floor_max_relative_nonzero": 0.003809770823979895,
+      "old_to_rounded_fp64_max_ulp": 1,
+      "relative_l2_limit": 0.01,
+      "elementwise_relative_limit": 0.011429312471939684,
+      "zero_reference_nonzero_allowed": 0,
+      "ulp_limit_each_reference": 1,
+      "ulp_policy_basis": "D-PM-54 calibration output/dtype classification; FP32 retains BF-07 no-ULP-passline rule"
+    },
+    "gate:f32_bf16_bf16:ddt_bias": {
+      "output_dtype": "torch.bfloat16",
+      "calibration_case_ids": [
+        "gate:f32_bf16_bf16:ddt_bias:gaussian:38",
+        "gate:f32_bf16_bf16:ddt_bias:full_kimi:41",
+        "gate:f32_bf16_bf16:ddt_bias:threshold:44"
+      ],
+      "floor_relative_l2": 0.0017497193982922135,
+      "floor_max_relative_nonzero": 0.0038806857028357,
+      "old_to_rounded_fp64_max_ulp": 1,
+      "relative_l2_limit": 0.00524915819487664,
+      "elementwise_relative_limit": 0.0116420571085071,
+      "zero_reference_nonzero_allowed": 0,
+      "ulp_limit_each_reference": 1,
+      "ulp_policy_basis": "D-PM-54 calibration output/dtype classification; FP32 retains BF-07 no-ULP-passline rule"
+    },
+    "gate:f32_bf16_f32:dg": {
+      "output_dtype": "torch.float32",
+      "calibration_case_ids": [
+        "gate:f32_bf16_f32:dg:gaussian:45",
+        "gate:f32_bf16_f32:dg:full_kimi:48",
+        "gate:f32_bf16_f32:dg:threshold:51"
+      ],
+      "floor_relative_l2": 5.8800912535778895e-08,
+      "floor_max_relative_nonzero": 4.4380623571357836e-07,
+      "old_to_rounded_fp64_max_ulp": 5,
+      "relative_l2_limit": 1.764027376073367e-07,
+      "elementwise_relative_limit": 1.331418707140735e-06,
+      "zero_reference_nonzero_allowed": 0,
+      "ulp_limit_each_reference": null,
+      "ulp_policy_basis": "D-PM-54 calibration output/dtype classification; FP32 retains BF-07 no-ULP-passline rule"
+    },
+    "gate:f32_bf16_f32:dA_log": {
+      "output_dtype": "torch.bfloat16",
+      "calibration_case_ids": [
+        "gate:f32_bf16_f32:dA_log:gaussian:46",
+        "gate:f32_bf16_f32:dA_log:full_kimi:49",
+        "gate:f32_bf16_f32:dA_log:threshold:52"
+      ],
+      "floor_relative_l2": 0.0017317674660513901,
+      "floor_max_relative_nonzero": 0.0033250869592351307,
+      "old_to_rounded_fp64_max_ulp": 0,
+      "relative_l2_limit": 0.00519530239815417,
+      "elementwise_relative_limit": 0.009975260877705392,
+      "zero_reference_nonzero_allowed": 0,
+      "ulp_limit_each_reference": 1,
+      "ulp_policy_basis": "D-PM-54 calibration output/dtype classification; FP32 retains BF-07 no-ULP-passline rule"
+    },
+    "gate:f32_bf16_f32:ddt_bias": {
+      "output_dtype": "torch.float32",
+      "calibration_case_ids": [
+        "gate:f32_bf16_f32:ddt_bias:gaussian:47",
+        "gate:f32_bf16_f32:ddt_bias:full_kimi:50",
+        "gate:f32_bf16_f32:ddt_bias:threshold:53"
+      ],
+      "floor_relative_l2": 1.587677253320589e-07,
+      "floor_max_relative_nonzero": 0.0005516855854011225,
+      "old_to_rounded_fp64_max_ulp": 7548,
+      "relative_l2_limit": 4.763031759961767e-07,
+      "elementwise_relative_limit": 0.0016550567562033675,
+      "zero_reference_nonzero_allowed": 0,
+      "ulp_limit_each_reference": null,
+      "ulp_policy_basis": "D-PM-54 calibration output/dtype classification; FP32 retains BF-07 no-ULP-passline rule"
+    },
+    "gate:f32_f32_bf16:dg": {
+      "output_dtype": "torch.float32",
+      "calibration_case_ids": [
+        "gate:f32_f32_bf16:dg:gaussian:54",
+        "gate:f32_f32_bf16:dg:full_kimi:57",
+        "gate:f32_f32_bf16:dg:threshold:60"
+      ],
+      "floor_relative_l2": 5.5025572641590256e-08,
+      "floor_max_relative_nonzero": 4.1324396583422475e-07,
+      "old_to_rounded_fp64_max_ulp": 6,
+      "relative_l2_limit": 1.6507671792477077e-07,
+      "elementwise_relative_limit": 1.2397318975026742e-06,
+      "zero_reference_nonzero_allowed": 0,
+      "ulp_limit_each_reference": null,
+      "ulp_policy_basis": "D-PM-54 calibration output/dtype classification; FP32 retains BF-07 no-ULP-passline rule"
+    },
+    "gate:f32_f32_bf16:dA_log": {
+      "output_dtype": "torch.float32",
+      "calibration_case_ids": [
+        "gate:f32_f32_bf16:dA_log:gaussian:55",
+        "gate:f32_f32_bf16:dA_log:full_kimi:58",
+        "gate:f32_f32_bf16:dA_log:threshold:61"
+      ],
+      "floor_relative_l2": 1.0443136860912955e-06,
+      "floor_max_relative_nonzero": 6.318669735852297e-05,
+      "old_to_rounded_fp64_max_ulp": 677,
+      "relative_l2_limit": 3.1329410582738866e-06,
+      "elementwise_relative_limit": 0.0001895600920755689,
+      "zero_reference_nonzero_allowed": 0,
+      "ulp_limit_each_reference": null,
+      "ulp_policy_basis": "D-PM-54 calibration output/dtype classification; FP32 retains BF-07 no-ULP-passline rule"
+    },
+    "gate:f32_f32_bf16:ddt_bias": {
+      "output_dtype": "torch.bfloat16",
+      "calibration_case_ids": [
+        "gate:f32_f32_bf16:ddt_bias:gaussian:56",
+        "gate:f32_f32_bf16:ddt_bias:full_kimi:59",
+        "gate:f32_f32_bf16:ddt_bias:threshold:62"
+      ],
+      "floor_relative_l2": 0.0016747053983254105,
+      "floor_max_relative_nonzero": 0.003854803776060587,
+      "old_to_rounded_fp64_max_ulp": 1,
+      "relative_l2_limit": 0.005024116194976232,
+      "elementwise_relative_limit": 0.01156441132818176,
+      "zero_reference_nonzero_allowed": 0,
+      "ulp_limit_each_reference": 1,
+      "ulp_policy_basis": "D-PM-54 calibration output/dtype classification; FP32 retains BF-07 no-ULP-passline rule"
+    },
+    "gate:f32_f32_f32:dg": {
+      "output_dtype": "torch.float32",
+      "calibration_case_ids": [
+        "gate:f32_f32_f32:dg:gaussian:63",
+        "gate:f32_f32_f32:dg:full_kimi:66",
+        "gate:f32_f32_f32:dg:threshold:69"
+      ],
+      "floor_relative_l2": 5.527651302154307e-08,
+      "floor_max_relative_nonzero": 3.6630985929367317e-07,
+      "old_to_rounded_fp64_max_ulp": 6,
+      "relative_l2_limit": 1.6582953906462921e-07,
+      "elementwise_relative_limit": 1.0989295778810195e-06,
+      "zero_reference_nonzero_allowed": 0,
+      "ulp_limit_each_reference": null,
+      "ulp_policy_basis": "D-PM-54 calibration output/dtype classification; FP32 retains BF-07 no-ULP-passline rule"
+    },
+    "gate:f32_f32_f32:dA_log": {
+      "output_dtype": "torch.float32",
+      "calibration_case_ids": [
+        "gate:f32_f32_f32:dA_log:gaussian:64",
+        "gate:f32_f32_f32:dA_log:full_kimi:67",
+        "gate:f32_f32_f32:dA_log:threshold:70"
+      ],
+      "floor_relative_l2": 5.940614811985948e-07,
+      "floor_max_relative_nonzero": 3.986986164890883e-05,
+      "old_to_rounded_fp64_max_ulp": 499,
+      "relative_l2_limit": 1.7821844435957844e-06,
+      "elementwise_relative_limit": 0.0001196095849467265,
+      "zero_reference_nonzero_allowed": 0,
+      "ulp_limit_each_reference": null,
+      "ulp_policy_basis": "D-PM-54 calibration output/dtype classification; FP32 retains BF-07 no-ULP-passline rule"
+    },
+    "gate:f32_f32_f32:ddt_bias": {
+      "output_dtype": "torch.float32",
+      "calibration_case_ids": [
+        "gate:f32_f32_f32:ddt_bias:gaussian:65",
+        "gate:f32_f32_f32:ddt_bias:full_kimi:68",
+        "gate:f32_f32_f32:ddt_bias:threshold:71"
+      ],
+      "floor_relative_l2": 1.4719301473991355e-07,
+      "floor_max_relative_nonzero": 0.0007312911553903001,
+      "old_to_rounded_fp64_max_ulp": 8666,
+      "relative_l2_limit": 4.415790442197406e-07,
+      "elementwise_relative_limit": 0.0021938734661709003,
+      "zero_reference_nonzero_allowed": 0,
+      "ulp_limit_each_reference": null,
+      "ulp_policy_basis": "D-PM-54 calibration output/dtype classification; FP32 retains BF-07 no-ULP-passline rule"
+    },
+    "beta:bf16:dbeta": {
+      "output_dtype": "torch.bfloat16",
+      "calibration_case_ids": [
+        "beta:bf16:dbeta:gaussian:0",
+        "beta:bf16:dbeta:full_kimi:1",
+        "beta:bf16:dbeta:zero:2"
+      ],
+      "floor_relative_l2": 0.0016635021293267198,
+      "floor_max_relative_nonzero": 0.003879466045358764,
+      "old_to_rounded_fp64_max_ulp": 1,
+      "relative_l2_limit": 0.004990506387980159,
+      "elementwise_relative_limit": 0.011638398136076292,
+      "zero_reference_nonzero_allowed": 0,
+      "ulp_limit_each_reference": 1,
+      "ulp_policy_basis": "D-PM-54 calibration output/dtype classification; FP32 retains BF-07 no-ULP-passline rule"
+    },
+    "beta:f32:dbeta": {
+      "output_dtype": "torch.float32",
+      "calibration_case_ids": [
+        "beta:f32:dbeta:gaussian:4",
+        "beta:f32:dbeta:full_kimi:5",
+        "beta:f32:dbeta:zero:6"
+      ],
+      "floor_relative_l2": 6.521930812209837e-08,
+      "floor_max_relative_nonzero": 3.285143416601931e-06,
+      "old_to_rounded_fp64_max_ulp": 31,
+      "relative_l2_limit": 1.9565792436629512e-07,
+      "elementwise_relative_limit": 9.855430249805792e-06,
+      "zero_reference_nonzero_allowed": 0,
+      "ulp_limit_each_reference": null,
+      "ulp_policy_basis": "D-PM-54 calibration output/dtype classification; FP32 retains BF-07 no-ULP-passline rule"
+    }
+  },
+  "ordinary_acceptance_scope": "All finite cases without a located FP32 range/nonfinite endpoint, including large finite rows and near-null parallel sensitivities. Exclusion from floor estimation never grants an acceptance exemption.",
+  "endpoint_policy": "D-PM-48/50/52 retain only their explicit definitions. Existing FP32 overflow/underflow/saturation semantics compared pointwise to CPU FP32 and actual old NPU, FP64 differences reported. No new endpoint class or pass line is authorized. Outside existing definitions any exceeded required budget remains failed pending owner disposition.",
+  "end_to_end_relative_l2": {
+    "o": 0.05,
+    "final_state": 0.05,
+    "dq": 0.05,
+    "dk": 0.15,
+    "dv": 0.05,
+    "dg": 0.25,
+    "dbeta": 0.05,
+    "dh0": 0.05
+  },
+  "gate_span": {
+    "forward": 155,
+    "backward": 105
+  },
+  "bitwise": "outputs and gradients identical across block_dim 1,2,3,4; inputs unchanged; disabled routes identity",
+  "ulp_reporting": "Both-reference distributions for every output. Every BF16 element farther than1ULP from either comparator is individually listed with three-way bits and sensitivity row or condition number."
+}
