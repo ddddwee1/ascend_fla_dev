@@ -1,0 +1,88 @@
+{
+  "schema": "kda-prep-budgets/1",
+  "scope": "Forward preprocessing only; fixed before any candidate kernel source exists. Stage2 needs its own pre-implementation gradient calibration if retained in this task.",
+  "calibration_sha256": "fbf78d52224a6b7ed68dab4aaefe90d66da96bccf05d5cf7ce193e7667b504a5",
+  "floor_definition": "Maximum predecessor FP32-vs-FP64 error per operation and dtype tuple over declared ordinary finite calibration population; input already rounded to declared raw dtype. Endpoints are reported separately, never included to inflate these limits.",
+  "limits": {
+    "norm:bf16_bf16": {
+      "relative_l2": 0.005047884085284465,
+      "max_relative_nonzero": 0.011672969828497944
+    },
+    "norm:bf16_f32": {
+      "relative_l2": 1.8892900244007207e-07,
+      "max_relative_nonzero": 5.422593638666157e-07
+    },
+    "norm:f32_bf16": {
+      "relative_l2": 0.005005332401431067,
+      "max_relative_nonzero": 0.011673144813292246
+    },
+    "norm:f32_f32": {
+      "relative_l2": 1.5908351167188408e-07,
+      "max_relative_nonzero": 5.293661603890089e-07
+    },
+    "gate:bf16_bf16_bf16": {
+      "relative_l2": 1.385770801461847e-07,
+      "max_relative_nonzero": 5.106379369265594e-07
+    },
+    "gate:bf16_bf16_f32": {
+      "relative_l2": 1.464126540337291e-07,
+      "max_relative_nonzero": 8.144640195580126e-07
+    },
+    "gate:bf16_f32_bf16": {
+      "relative_l2": 1.3019290956223217e-07,
+      "max_relative_nonzero": 5.831864113937513e-07
+    },
+    "gate:bf16_f32_f32": {
+      "relative_l2": 1.3734466048431782e-07,
+      "max_relative_nonzero": 7.298292393636251e-07
+    },
+    "gate:f32_bf16_bf16": {
+      "relative_l2": 1.3859049513332232e-07,
+      "max_relative_nonzero": 8.413248231707547e-07
+    },
+    "gate:f32_bf16_f32": {
+      "relative_l2": 1.4307970796651619e-07,
+      "max_relative_nonzero": 8.008841120856054e-07
+    },
+    "gate:f32_f32_bf16": {
+      "relative_l2": 1.3380063716264698e-07,
+      "max_relative_nonzero": 8.577936471171129e-07
+    },
+    "gate:f32_f32_f32": {
+      "relative_l2": 1.3941702837033546e-07,
+      "max_relative_nonzero": 7.166924504844789e-07
+    },
+    "beta:bf16": {
+      "relative_l2": 1.1688584942602394e-07,
+      "max_relative_nonzero": 3.543025674180203e-07
+    },
+    "beta:f32": {
+      "relative_l2": 1.1465413372516245e-07,
+      "max_relative_nonzero": 3.463000927174088e-07
+    }
+  },
+  "zero_reference": "Every zero reference element must have zero absolute error; all-zero tensors must match exactly. No additive tolerance.",
+  "norm_ulp": {
+    "bf16_output": 1,
+    "fp32_output_review_trigger": 1,
+    "fp32_above_one": "Not automatically accepted. Report both predecessor and correctly rounded FP64 ULP, locate reduction/sqrt/division boundary and obtain PM review per specification. Existing predecessor maxima2/3 are observations, not a replacement limit."
+  },
+  "semantic_endpoints": "Preserve predecessor FP32 operation sequence at overflow/underflow/nonfinite endpoints; compare zero/NaN/Inf/sign masks and finite values against actual predecessor, report FP64 ideal discrepancy separately. If silicon differs, retain failure and RISK; no automatic exemption or new numerical guard.",
+  "end_to_end_cpu_fp32_relative_l2": {
+    "o": 0.05,
+    "final_state": 0.05,
+    "dq": 0.05,
+    "dk": 0.15,
+    "dv": 0.05,
+    "dg": 0.25,
+    "dbeta": 0.05,
+    "dh0": 0.05
+  },
+  "gate_spans": {
+    "forward": 155,
+    "backward": 105
+  },
+  "cross_block_dim": "bitwise",
+  "disabled_flags": "same object and bits",
+  "performance": "actual Torch NPU and predecessor same-device three synchronized old/new/old rounds; no speed threshold"
+}

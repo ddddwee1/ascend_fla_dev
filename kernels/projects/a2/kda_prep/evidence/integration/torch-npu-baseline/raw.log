@@ -1,0 +1,16 @@
+<repo>/ascend_fla/reference/kda.py:250: UserWarning: Cannot create tensor with interal format while allow_internel_format=False, tensor will be created with base format. (Triggered internally at ../torch_npu/csrc/aten/common/TensorFactories.cpp:340.)
+  o = torch.zeros_like(v)
+device=npu soc=a2 dtype=bfloat16 warmup=3 iters=10 K=V=128 chunk=64 synchronized=yes fwd_only=yes
+shape                B/H/HV/T            vectorized(ms)   ref_loop(ms)   speedup
+------------------------------------------------------------------------------------
+smoke                1/1/1/64                    20.150         47.515      2.4x
+                     精度[kda_chunk_ref]: o relL2=1.644e-03 state=1.414e-07 | cpu chunk vs recurrent relL2=3.413e-07
+kimi_linear_layer    1/32/32/1024                23.453            nan         —
+                     精度[kda_chunk_vectorized]: o relL2=1.659e-03 state=1.777e-07
+qwen3_next_layer     1/16/32/1024                22.934            nan         —
+                     精度[kda_chunk_vectorized]: o relL2=1.661e-03 state=1.790e-07
+long_context         1/16/32/4096                49.635            nan         —
+                     精度[kda_chunk_vectorized]: o relL2=1.659e-03 state=1.800e-07
+
+已写入 <private-run>/native-torch-current-bd1-v1/results.json
+{"stage": "complete", "shapes": 4, "custom_launches": 0, "cpu_golden": "FP32", "source_selected": true}

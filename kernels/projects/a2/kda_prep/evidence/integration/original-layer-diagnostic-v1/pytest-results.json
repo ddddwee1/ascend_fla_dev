@@ -1,0 +1,236 @@
+{
+  "reports": [
+    {
+      "nodeid": "tests/test_kda_layer_npu.py::test_layer_grads_match_cpu_reference[smoke]",
+      "stage": "setup",
+      "outcome": "passed",
+      "duration_seconds": 713.5211087437347,
+      "longrepr": null
+    },
+    {
+      "nodeid": "tests/test_kda_layer_npu.py::test_layer_grads_match_cpu_reference[smoke]",
+      "stage": "call",
+      "outcome": "failed",
+      "duration_seconds": 0.7372974930331111,
+      "longrepr": "tests/test_kda_layer_npu.py:121: in test_layer_grads_match_cpu_reference\n    o_npu, _ = layer_npu(x_npu)\n<site-packages>/torch/nn/modules/module.py:1776: in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n<site-packages>/torch/nn/modules/module.py:1787: in _call_impl\n    return forward_call(*args, **kwargs)\nascend_fla/layers/kda.py:328: in forward\n    o, final_state = chunk_kda(\nascend_fla/ops/kda/autograd.py:271: in chunk_kda\n    q, k, g, beta = _prepare_training_inputs(\nascend_fla/ops/kda/autograd.py:118: in _prepare_training_inputs\n    runtime.prepare_backward(device, block_dim)\nkernels/projects/a5/kda_prep/runtime.py:125: in prepare_backward\n    raise ValueError('KDA prep backward requires a5 and chunk block_dim 1,2,3,4')\nE   ValueError: KDA prep backward requires a5 and chunk block_dim 1,2,3,4"
+    },
+    {
+      "nodeid": "tests/test_kda_layer_npu.py::test_layer_grads_match_cpu_reference[smoke]",
+      "stage": "teardown",
+      "outcome": "passed",
+      "duration_seconds": 0.00034019071608781815,
+      "longrepr": null
+    },
+    {
+      "nodeid": "tests/test_kda_layer_npu.py::test_layer_grads_match_cpu_reference[multi_chunk]",
+      "stage": "setup",
+      "outcome": "passed",
+      "duration_seconds": 0.0005378294736146927,
+      "longrepr": null
+    },
+    {
+      "nodeid": "tests/test_kda_layer_npu.py::test_layer_grads_match_cpu_reference[multi_chunk]",
+      "stage": "call",
+      "outcome": "failed",
+      "duration_seconds": 0.33928653970360756,
+      "longrepr": "tests/test_kda_layer_npu.py:121: in test_layer_grads_match_cpu_reference\n    o_npu, _ = layer_npu(x_npu)\n<site-packages>/torch/nn/modules/module.py:1776: in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n<site-packages>/torch/nn/modules/module.py:1787: in _call_impl\n    return forward_call(*args, **kwargs)\nascend_fla/layers/kda.py:328: in forward\n    o, final_state = chunk_kda(\nascend_fla/ops/kda/autograd.py:271: in chunk_kda\n    q, k, g, beta = _prepare_training_inputs(\nascend_fla/ops/kda/autograd.py:118: in _prepare_training_inputs\n    runtime.prepare_backward(device, block_dim)\nkernels/projects/a5/kda_prep/runtime.py:125: in prepare_backward\n    raise ValueError('KDA prep backward requires a5 and chunk block_dim 1,2,3,4')\nE   ValueError: KDA prep backward requires a5 and chunk block_dim 1,2,3,4"
+    },
+    {
+      "nodeid": "tests/test_kda_layer_npu.py::test_layer_grads_match_cpu_reference[multi_chunk]",
+      "stage": "teardown",
+      "outcome": "passed",
+      "duration_seconds": 0.0002595204859972,
+      "longrepr": null
+    },
+    {
+      "nodeid": "tests/test_kda_layer_npu.py::test_layer_grads_match_cpu_reference[gva]",
+      "stage": "setup",
+      "outcome": "passed",
+      "duration_seconds": 0.00043081026524305344,
+      "longrepr": null
+    },
+    {
+      "nodeid": "tests/test_kda_layer_npu.py::test_layer_grads_match_cpu_reference[gva]",
+      "stage": "call",
+      "outcome": "failed",
+      "duration_seconds": 0.3020843639969826,
+      "longrepr": "tests/test_kda_layer_npu.py:121: in test_layer_grads_match_cpu_reference\n    o_npu, _ = layer_npu(x_npu)\n<site-packages>/torch/nn/modules/module.py:1776: in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n<site-packages>/torch/nn/modules/module.py:1787: in _call_impl\n    return forward_call(*args, **kwargs)\nascend_fla/layers/kda.py:328: in forward\n    o, final_state = chunk_kda(\nascend_fla/ops/kda/autograd.py:271: in chunk_kda\n    q, k, g, beta = _prepare_training_inputs(\nascend_fla/ops/kda/autograd.py:118: in _prepare_training_inputs\n    runtime.prepare_backward(device, block_dim)\nkernels/projects/a5/kda_prep/runtime.py:125: in prepare_backward\n    raise ValueError('KDA prep backward requires a5 and chunk block_dim 1,2,3,4')\nE   ValueError: KDA prep backward requires a5 and chunk block_dim 1,2,3,4"
+    },
+    {
+      "nodeid": "tests/test_kda_layer_npu.py::test_layer_grads_match_cpu_reference[gva]",
+      "stage": "teardown",
+      "outcome": "passed",
+      "duration_seconds": 0.0002578599378466606,
+      "longrepr": null
+    },
+    {
+      "nodeid": "tests/test_kda_layer_npu.py::test_layer_rejects_unsupported_config",
+      "stage": "setup",
+      "outcome": "passed",
+      "duration_seconds": 0.0001665893942117691,
+      "longrepr": null
+    },
+    {
+      "nodeid": "tests/test_kda_layer_npu.py::test_layer_rejects_unsupported_config",
+      "stage": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.016606375575065613,
+      "longrepr": null
+    },
+    {
+      "nodeid": "tests/test_kda_layer_npu.py::test_layer_rejects_unsupported_config",
+      "stage": "teardown",
+      "outcome": "passed",
+      "duration_seconds": 0.0001295199617743492,
+      "longrepr": null
+    },
+    {
+      "nodeid": "tests/test_kda_layer_npu.py::test_deep_gate_needs_stable_impl",
+      "stage": "setup",
+      "outcome": "passed",
+      "duration_seconds": 0.0001472504809498787,
+      "longrepr": null
+    },
+    {
+      "nodeid": "tests/test_kda_layer_npu.py::test_deep_gate_needs_stable_impl",
+      "stage": "call",
+      "outcome": "failed",
+      "duration_seconds": 0.012504511512815952,
+      "longrepr": "tests/test_kda_layer_npu.py:204: in test_deep_gate_needs_stable_impl\n    up(x)\n<site-packages>/torch/nn/modules/module.py:1776: in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n<site-packages>/torch/nn/modules/module.py:1787: in _call_impl\n    return forward_call(*args, **kwargs)\nascend_fla/layers/kda.py:328: in forward\n    o, final_state = chunk_kda(\nascend_fla/ops/kda/autograd.py:271: in chunk_kda\n    q, k, g, beta = _prepare_training_inputs(\nascend_fla/ops/kda/autograd.py:116: in _prepare_training_inputs\n    fwd_chain(device, block_dim, impl)\nascend_fla/ops/kda/chunk.py:326: in _compiled_chain\n    for name, fn in (kda_fwd_kernels(impl, device) if device == \"a2\" else kda_fwd_kernels(impl)).items()}\nascend_fla/ops/kda/chunk.py:286: in kda_fwd_kernels\n    raise ValueError(\"A2 KDA declares only impl='stable'\")\nE   ValueError: A2 KDA declares only impl='stable'\n\nDuring handling of the above exception, another exception occurred:\ntests/test_kda_layer_npu.py:203: in test_deep_gate_needs_stable_impl\n    with pytest.raises(ValueError, match=\"\u95e8\u63a7\u8de8\u5ea6\") as e:\nE   AssertionError: Regex pattern did not match.\nE    Regex: '\u95e8\u63a7\u8de8\u5ea6'\nE    Input: \"A2 KDA declares only impl='stable'\""
+    },
+    {
+      "nodeid": "tests/test_kda_layer_npu.py::test_deep_gate_needs_stable_impl",
+      "stage": "teardown",
+      "outcome": "passed",
+      "duration_seconds": 0.00016066059470176697,
+      "longrepr": null
+    },
+    {
+      "nodeid": "tests/test_kda_layer_npu.py::test_default_init_forward_matches_recurrent_oracle",
+      "stage": "setup",
+      "outcome": "passed",
+      "duration_seconds": 0.00015329010784626007,
+      "longrepr": null
+    },
+    {
+      "nodeid": "tests/test_kda_layer_npu.py::test_default_init_forward_matches_recurrent_oracle",
+      "stage": "call",
+      "outcome": "failed",
+      "duration_seconds": 0.09640980139374733,
+      "longrepr": "tests/test_kda_layer_npu.py:234: in test_default_init_forward_matches_recurrent_oracle\n    o_npu, _ = layer_npu(x.to(\"npu\"))\n<site-packages>/torch/nn/modules/module.py:1776: in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n<site-packages>/torch/nn/modules/module.py:1787: in _call_impl\n    return forward_call(*args, **kwargs)\nascend_fla/layers/kda.py:328: in forward\n    o, final_state = chunk_kda(\nascend_fla/ops/kda/autograd.py:271: in chunk_kda\n    q, k, g, beta = _prepare_training_inputs(\nascend_fla/ops/kda/autograd.py:118: in _prepare_training_inputs\n    runtime.prepare_backward(device, block_dim)\nkernels/projects/a5/kda_prep/runtime.py:125: in prepare_backward\n    raise ValueError('KDA prep backward requires a5 and chunk block_dim 1,2,3,4')\nE   ValueError: KDA prep backward requires a5 and chunk block_dim 1,2,3,4"
+    },
+    {
+      "nodeid": "tests/test_kda_layer_npu.py::test_default_init_forward_matches_recurrent_oracle",
+      "stage": "teardown",
+      "outcome": "passed",
+      "duration_seconds": 0.00016751978546380997,
+      "longrepr": null
+    },
+    {
+      "nodeid": "tests/test_kda_layer_npu.py::test_deep_gate_backward_matches_cpu_reference",
+      "stage": "setup",
+      "outcome": "passed",
+      "duration_seconds": 0.0001638699322938919,
+      "longrepr": null
+    },
+    {
+      "nodeid": "tests/test_kda_layer_npu.py::test_deep_gate_backward_matches_cpu_reference",
+      "stage": "call",
+      "outcome": "failed",
+      "duration_seconds": 0.31058744341135025,
+      "longrepr": "tests/test_kda_layer_npu.py:294: in test_deep_gate_backward_matches_cpu_reference\n    o_npu, _ = layer_npu(x_npu)\n<site-packages>/torch/nn/modules/module.py:1776: in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n<site-packages>/torch/nn/modules/module.py:1787: in _call_impl\n    return forward_call(*args, **kwargs)\nascend_fla/layers/kda.py:328: in forward\n    o, final_state = chunk_kda(\nascend_fla/ops/kda/autograd.py:271: in chunk_kda\n    q, k, g, beta = _prepare_training_inputs(\nascend_fla/ops/kda/autograd.py:118: in _prepare_training_inputs\n    runtime.prepare_backward(device, block_dim)\nkernels/projects/a5/kda_prep/runtime.py:125: in prepare_backward\n    raise ValueError('KDA prep backward requires a5 and chunk block_dim 1,2,3,4')\nE   ValueError: KDA prep backward requires a5 and chunk block_dim 1,2,3,4"
+    },
+    {
+      "nodeid": "tests/test_kda_layer_npu.py::test_deep_gate_backward_matches_cpu_reference",
+      "stage": "teardown",
+      "outcome": "passed",
+      "duration_seconds": 0.0001734299585223198,
+      "longrepr": null
+    },
+    {
+      "nodeid": "tests/test_kda_layer_npu.py::test_layer_gate_span_is_a_random_variable_with_a_ceiling",
+      "stage": "setup",
+      "outcome": "passed",
+      "duration_seconds": 0.0001707402989268303,
+      "longrepr": null
+    },
+    {
+      "nodeid": "tests/test_kda_layer_npu.py::test_layer_gate_span_is_a_random_variable_with_a_ceiling",
+      "stage": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.15679668821394444,
+      "longrepr": null
+    },
+    {
+      "nodeid": "tests/test_kda_layer_npu.py::test_layer_gate_span_is_a_random_variable_with_a_ceiling",
+      "stage": "teardown",
+      "outcome": "passed",
+      "duration_seconds": 0.00015079975128173828,
+      "longrepr": null
+    },
+    {
+      "nodeid": "tests/test_kda_layer_npu.py::test_prefill_then_decode_matches_one_shot_reference",
+      "stage": "setup",
+      "outcome": "passed",
+      "duration_seconds": 0.00016235001385211945,
+      "longrepr": null
+    },
+    {
+      "nodeid": "tests/test_kda_layer_npu.py::test_prefill_then_decode_matches_one_shot_reference",
+      "stage": "call",
+      "outcome": "passed",
+      "duration_seconds": 1.2108370391651988,
+      "longrepr": null
+    },
+    {
+      "nodeid": "tests/test_kda_layer_npu.py::test_prefill_then_decode_matches_one_shot_reference",
+      "stage": "teardown",
+      "outcome": "passed",
+      "duration_seconds": 0.00016329996287822723,
+      "longrepr": null
+    },
+    {
+      "nodeid": "tests/test_kda_layer_npu.py::test_layer_refuses_to_switch_paths_silently",
+      "stage": "setup",
+      "outcome": "passed",
+      "duration_seconds": 0.00016753096133470535,
+      "longrepr": null
+    },
+    {
+      "nodeid": "tests/test_kda_layer_npu.py::test_layer_refuses_to_switch_paths_silently",
+      "stage": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.009634329006075859,
+      "longrepr": null
+    },
+    {
+      "nodeid": "tests/test_kda_layer_npu.py::test_layer_refuses_to_switch_paths_silently",
+      "stage": "teardown",
+      "outcome": "passed",
+      "duration_seconds": 0.00011515989899635315,
+      "longrepr": null
+    },
+    {
+      "nodeid": "tests/test_kda_layer_npu.py::test_decode_path_refuses_to_run_under_grad",
+      "stage": "setup",
+      "outcome": "passed",
+      "duration_seconds": 0.00014735106378793716,
+      "longrepr": null
+    },
+    {
+      "nodeid": "tests/test_kda_layer_npu.py::test_decode_path_refuses_to_run_under_grad",
+      "stage": "call",
+      "outcome": "passed",
+      "duration_seconds": 0.008716668002307415,
+      "longrepr": null
+    },
+    {
+      "nodeid": "tests/test_kda_layer_npu.py::test_decode_path_refuses_to_run_under_grad",
+      "stage": "teardown",
+      "outcome": "passed",
+      "duration_seconds": 0.00022814050316810608,
+      "longrepr": null
+    }
+  ],
+  "custom_launches": 35
+}

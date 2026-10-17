@@ -1,0 +1,70 @@
+{
+  "soc": "Ascend910B3",
+  "python": "3.11.15",
+  "torch": "2.10.0+cpu",
+  "torch_npu": "2.10.0",
+  "torch_npu_allow_hf32": false,
+  "device_geometry": {
+    "cube_cores": 20,
+    "vector_cores": 40
+  },
+  "ascriptor": "0.1.0",
+  "revisions": {
+    "library": "90cfcdc720bbcd66e8bd4361c4dd4fbc1a2a57b5",
+    "kernels": "b3b3f9c16df7c4626ed3c081032a1be5a753d0b1"
+  },
+  "cann": {
+    "compiler": {
+      "sha256": "c44017e925906ff08120ada7be44167be9f25d859c734ba202ae7be75ff5bede",
+      "fields": [
+        "Version=9.0.0",
+        "version_dir=cann",
+        "timestamp=20260428_134817545"
+      ]
+    },
+    "opp": {
+      "sha256": "3f6997bfb998c24cf107258e4cd4e76f6ffc520e0382770e75520083c20b162a",
+      "fields": [
+        "Version=9.0.0",
+        "version_dir=cann",
+        "timestamp=20260428_134817545"
+      ]
+    }
+  },
+  "opp_packages": [
+    "ascend910_93",
+    "ascend910b",
+    "config"
+  ],
+  "library_files_checked": 204,
+  "library_manifest_sha256": "a8b647cf586ac61ffa67139790a87319ae10639eb9c1d29219180d5795c9995f",
+  "source_sha256": {
+    "ascend_fla/ops/kda/__init__.py": "deed52c84fe15046673d940447456d4a153936bb42cc3596e914938ce070db2e",
+    "ascend_fla/ops/kda/autograd.py": "4e9a7afd948e04eda19b72634eb280fca1eccf3a273268de7a428b140788bfc7",
+    "ascend_fla/ops/kda/chunk.py": "b63cedd3ee44384063b527ddd2d646d3bb7b5caabcffc163ffac911fbea73a46",
+    "ascend_fla/ops/kda/chunk_bwd.py": "9f695e8ddfbcbe7b4e9c3f63c35bee560fcbf4314696e09fa9b9392a2b5dc988",
+    "ascend_fla/ops/kda/fused_recurrent.py": "d377dbd67e81b057308a77b3e4a87daf3c21b5f83b40e42f272865242bc05a80",
+    "kernels/projects/a2/kda_layout/runtime.py": "74563a7da283dc6806b3eb574dd5e2e0c3bc648cc68c5dbb53ff8f8db4b7c8ef",
+    "kernels/projects/a2/kda_layout/reference.py": "7a79705eb7b21a69ced94ef248d5595b003e23862e31dd1ab37f3e685a6a30ea",
+    "kernels/projects/a2/kda_layout/unit.py": "10be7f08be198c4ccfb82fc86303a4f25dd24e620848e4e296bdea938688eb5c",
+    "kernels/projects/a2/kda_layout/run.py": "213d97a60b6ee8ac0233d5fe51ef694b691d68582e9a8a044ae88d64d2c17fb9",
+    "kernels/projects/a2/kda_layout/_unit_runner.py": "8e91d95ed0294ddbfc204957b8bf77606a79123655fc096963b94658b633566b",
+    "kernels/projects/a2/kda_layout/kernels/move.py": "5cdff167949d7e1cd4c79fbb9e33110a4e0361ff48761476a5af682869bda6d8",
+    "kernels/projects/a2/kda_prep/runtime.py": "43c6e243a570069a0ec7ef858deeee3d4dd7b8a0cf7f680de1a4800fcd57b0ca",
+    "kernels/projects/a2/kda_prep/reference.py": "e1e0357f3ed85ba38d1a2ceb0e9ce55a83f0f40f3acac4c563fa7489b9baed2e",
+    "kernels/projects/a2/kda_prep/_unit_runner.py": "8e91d95ed0294ddbfc204957b8bf77606a79123655fc096963b94658b633566b",
+    "kernels/projects/a2/kda_prep/run.py": "ec70d19fefe5d86226ef62ef10c7e871d0a2cf4a39c0052156803153b7097367",
+    "kernels/projects/a2/kda_prep/unit_impl.py": "7fe06d29b992993340f3e982f133a1d1f9640a0735cce9c1c975c93cfe302b85",
+    "kernels/projects/a2/kda_prep/unit.py": "4214546bf29e61356a3ce5f93ced998925c486166f7fbad357f9d93544baf765",
+    "kernels/projects/a2/kda_prep/kernels/forward.py": "5efa82439907d5e86a85edaaa0c56c12bca3fdaff26a6fd249b28131ffcb9b62",
+    "kernels/projects/a2/kda_prep/kernels/backward.py": "c78bad6adb97b352497353b338751fbcf91ab9d18461f906f835d5d4905f9794",
+    "kernels/projects/a2/kda_prep/backward/norm/unit.py": "8f28f46779261bddd84658b7c2e11679287ec78d447eafbd55c34618cb6516a4",
+    "kernels/projects/a2/kda_prep/backward/norm/run.py": "00909c9cbae3d83209834902f4f5130ae8c02e3df24db5d74a152f8f161784ac",
+    "kernels/projects/a2/kda_prep/backward/gate/unit.py": "0d97625fe09a541800c8484cfc154b772605036f81ee0a6be70feae407fde41b",
+    "kernels/projects/a2/kda_prep/backward/gate/run.py": "00909c9cbae3d83209834902f4f5130ae8c02e3df24db5d74a152f8f161784ac",
+    "kernels/projects/a2/kda_prep/backward/beta/unit.py": "8f28f46779261bddd84658b7c2e11679287ec78d447eafbd55c34618cb6516a4",
+    "kernels/projects/a2/kda_prep/backward/beta/run.py": "00909c9cbae3d83209834902f4f5130ae8c02e3df24db5d74a152f8f161784ac"
+  },
+  "block_dim": 1,
+  "scope": "Fresh public forward/cached-forward and all nine backward kernels; layer autograd separately pending"
+}

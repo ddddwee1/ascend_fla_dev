@@ -14,7 +14,8 @@ import torch
 
 from ascend_fla.platform import capability
 
-from .chunk import HEAD_DIM, VALUE_DIM, _load_kernel, _prepare_kernel_inputs, _prep_runtime
+from .chunk import (HEAD_DIM, VALUE_DIM, _load_kernel, _prepare_kernel_inputs,
+                    _prep_runtime, _layout_runtime, _launch_a2)
 
 #: a5 decode 路径的 block_dim，从能力表读（a5 的别名）。真值住在 ``platform.CAPABILITIES``。
 #: 这个 kernel 只用向量核、不碰 cube，``GetVecNum() == 2 * block_dim``，比 chunk 的 4 宽；
@@ -22,9 +23,9 @@ from .chunk import HEAD_DIM, VALUE_DIM, _load_kernel, _prepare_kernel_inputs, _p
 SUPPORTED_BLOCK_DIM = capability("a5")["supported_block_dim"]["decode"]
 
 
-def _unit_root() -> pathlib.Path:
+def _unit_root(device="a5") -> pathlib.Path:
     repo = pathlib.Path(__file__).resolve().parents[3]
-    root = repo / "kernels/projects/a5/kda_fused_recurrent"
+    root = repo / f"kernels/projects/{device}/kda_fused_recurrent"
     if not (root / "kernels").is_dir():
         raise FileNotFoundError(f"找不到本仓的 kda_fused_recurrent 单元（试了 {root}）")
     return root
@@ -39,14 +40,24 @@ def kda_fused_recurrent_kernel() -> Any:
 @functools.lru_cache(maxsize=None)
 def _compiled_pair(device: str, block_dim: int) -> dict:
     from ...runtime.compile import compile_kernel
+    if device == "a2":
+        _layout_runtime(device).prepare(device, block_dim)
+        _prep_runtime(device).prepare(device, block_dim, "decode")
+        return {torch.bfloat16: compile_kernel(_native_kernel(torch.bfloat16, device),
+                                               device=device, block_dim=block_dim)}
     _prep_runtime().prepare(device, block_dim, "decode")
     return {dtype: compile_kernel(_native_kernel(dtype), device=device,
                                   block_dim=block_dim)
             for dtype in (torch.float32, torch.bfloat16)}
 
 
-@functools.lru_cache(maxsize=2)
-def _native_kernel(dtype: torch.dtype) -> Any:
+@functools.lru_cache(maxsize=None)
+def _native_kernel(dtype: torch.dtype, device: str = "a5") -> Any:
+    if device == "a2":
+        if dtype != torch.bfloat16:
+            raise ValueError("A2 decode requires BF16 q/k/v; no FP32 input kernel is declared")
+        return _load_kernel("fr_a2", _unit_root(device) / "kernels", "step",
+                            "kda_fused_recurrent_a2_kernel")
     root = pathlib.Path(__file__).resolve().parents[3]
     directory = root / "kernels/projects/a5/kda_fused_recurrent_bf16/kernels"
     suffix = "bf16" if dtype == torch.bfloat16 else "fp32"
@@ -54,14 +65,20 @@ def _native_kernel(dtype: torch.dtype) -> Any:
 
 
 @functools.lru_cache(maxsize=None)
-def _compiled(device: str, block_dim: int, dtype: torch.dtype = torch.float32) -> Any:
-    # prepare(decode=True) retains its existing two-argument call and registers
-    # BOTH dtype vendors before the first custom execution in the process.
+def _compiled(device: str, block_dim: int, dtype: torch.dtype | None = None) -> Any:
+    # prepare(decode=True) uses the SoC's default input dtype. Explicit calls
+    # still reject unsupported dtypes; A5 registers both existing vendors.
+    if dtype is None:
+        dtype = torch.bfloat16 if device == "a2" else torch.float32
+    if device == "a2" and dtype != torch.bfloat16:
+        raise ValueError("A2 decode requires BF16 q/k/v")
     return _compiled_pair(device, block_dim)[dtype]
 
 
-def _check(q, k, v, g, beta, initial_state, block_dim) -> tuple[int, int, int, int]:
+def _check(q, k, v, g, beta, initial_state, block_dim, *, device="a5") -> tuple[int, int, int, int]:
     """门控。返回 ``(B, T, H, HV)``。不满足就报错，绝不静默降级（AGENTS.md §7）。"""
+    if device == "a2" and block_dim not in capability(device)["supported_block_dim"]["decode"]:
+        raise ValueError("A2 decode block_dim must be one of (1, 2)")
     if block_dim not in SUPPORTED_BLOCK_DIM:
         raise ValueError(
             f"block_dim 只支持 {SUPPORTED_BLOCK_DIM}，收到 {block_dim}；"
@@ -173,7 +190,9 @@ def fused_recurrent_kda(
     device = resolve_soc(device)
     require_qualified(device)
 
-    b, t, h, hv = _check(q, k, v, g, beta, initial_state, block_dim)
+    b, t, h, hv = _check(q, k, v, g, beta, initial_state, block_dim, device=device)
+    if device == "a2" and v.dtype != torch.bfloat16:
+        raise ValueError("A2 decode requires BF16 q/k/v; raw q/k normalization may produce BF16")
     q, k, g, beta = _prepare_kernel_inputs(
         q, k, g, beta, A_log=A_log, dt_bias=dt_bias,
         use_qk_l2norm_in_kernel=use_qk_l2norm_in_kernel,
@@ -187,6 +206,18 @@ def fused_recurrent_kda(
     dev = q.device
     o = torch.empty(b, t, hv, VALUE_DIM, dtype=v.dtype, device=dev)
     final_state = torch.empty(b, hv, HEAD_DIM, VALUE_DIM, dtype=torch.float32, device=dev)
+    if device == "a2":
+        entry = _compiled(device, block_dim, v.dtype)
+        state0 = initial_state
+        if state0 is None:
+            state0 = _layout_runtime(device).zeros((b, hv, HEAD_DIM, VALUE_DIM),
+                                                   torch.float32, dev, block_dim=block_dim)
+        _launch_a2(entry, (q.view(b*t, h*HEAD_DIM), k.view(b*t, h*HEAD_DIM),
+                           v.view(b*t, hv*VALUE_DIM), g.view(b*t, hv*HEAD_DIM),
+                           beta.view(b*t, hv), state0),
+                   (o.view(b*t, hv*VALUE_DIM), final_state),
+                   dict(B=b, T=t, H=h, HV=hv, scale=sc))
+        return o, (final_state if output_final_state else None)
     # The absent initial-state pointer is never read: initialization is in VF.
     state0 = initial_state if initial_state is not None else final_state
     _compiled(device, block_dim, v.dtype)(

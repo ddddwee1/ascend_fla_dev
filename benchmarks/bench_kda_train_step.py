@@ -27,6 +27,7 @@ import argparse
 import json
 import pathlib
 import subprocess
+import statistics
 import sys
 import tempfile
 import time
@@ -40,7 +41,7 @@ from ascend_fla.ops.kda import (  # noqa: E402
     chunk_kda_fwd_with_caches,
     prepare,
 )
-from ascend_fla.ops.kda.chunk import SUPPORTED_BLOCK_DIM  # noqa: E402
+from ascend_fla.platform import CAPABILITIES, resolve_soc  # noqa: E402
 from ascend_fla.reference.kda import kda_chunk_vectorized  # noqa: E402
 from benchmarks.bench_kda_torch_npu import SHAPES, make_inputs  # noqa: E402
 
@@ -62,40 +63,48 @@ def _grad_inputs(x: dict) -> dict:
     return {n: t.clone().requires_grad_(True) for n, t in x.items()}
 
 
-def run_shape(name: str, block_dim: int, warmup: int, iters: int) -> dict:
+def run_shape(name: str, block_dim: int, warmup: int, iters: int,
+              soc: str | None = None, sandwich_rounds: int = 3) -> dict:
     # 必须先 prepare：本脚本第一档是纯前向（它不会预编译反向链），等跑到带缓存那一档
     # 再注册反向的 vendor 树就晚了 —— CANN 只在首次算子解析时读 ASCEND_CUSTOM_OPP_PATH。
     # 不调 prepare 会被 runtime/binding.py 的门控拦住并报错，而不是静默失效。
-    prepare("a5", block_dim, backward=True)
+    soc = resolve_soc(soc)
+    prepare(soc, block_dim, backward=True)
     shp = SHAPES[name]
     x = make_inputs(**shp, dtype=torch.bfloat16, device="npu")
-    common = dict(block_dim=block_dim, layout_device="npu")
-
-    # 门控检查默认开（对 g 做一次 cumsum + 两次规约），单独测一下它的代价 ——
-    # 不然它会悄悄算进算子账上，和第一期的数也不可比
-    ms_fwd = timed(lambda: chunk_kda_fwd(**x, output_final_state=True,
-                                         check_gate_range=False, **common), warmup, iters)
-    ms_fwd_checked = timed(lambda: chunk_kda_fwd(**x, output_final_state=True, **common),
-                           warmup, iters)
-    ms_caches = timed(lambda: chunk_kda_fwd_with_caches(**x, **common), warmup, iters)
+    common = dict(device=soc, block_dim=block_dim, layout_device="npu")
 
     def train_step():
         leaves = _grad_inputs(x)
-        o, state = chunk_kda(**leaves, output_final_state=True, block_dim=block_dim,
-                             layout_device="npu")
+        o, state = chunk_kda(**leaves, output_final_state=True, **common)
         (o.float().sum() + state.float().sum()).backward()
-
-    ms_train = timed(train_step, warmup, iters)
 
     def ref_step():
         leaves = _grad_inputs(x)
         o, state = kda_chunk_vectorized(**leaves, output_final_state=True)
         (o.float().sum() + state.float().sum()).backward()
 
-    ms_ref = timed(ref_step, warmup, iters)
+    rounds = []
+    for index in range(sandwich_rounds):
+        before = timed(ref_step, warmup, iters)
+        fwd = timed(lambda: chunk_kda_fwd(**x, output_final_state=True,
+                                         check_gate_range=False, **common), warmup, iters)
+        checked = timed(lambda: chunk_kda_fwd(**x, output_final_state=True, **common), warmup, iters)
+        cached = timed(lambda: chunk_kda_fwd_with_caches(**x, **common), warmup, iters)
+        train = timed(train_step, warmup, iters)
+        after = timed(ref_step, warmup, iters)
+        rounds.append(dict(round=index+1, baseline_before_ms=before, baseline_after_ms=after,
+                           fwd_ms=fwd, checked_fwd_ms=checked, cached_fwd_ms=cached,
+                           train_ms=train, speedup=((before+after)/2)/train))
+    ms_fwd = statistics.median(r['fwd_ms'] for r in rounds)
+    ms_fwd_checked = statistics.median(r['checked_fwd_ms'] for r in rounds)
+    ms_caches = statistics.median(r['cached_fwd_ms'] for r in rounds)
+    ms_train = statistics.median(r['train_ms'] for r in rounds)
+    ms_ref = statistics.median((r['baseline_before_ms']+r['baseline_after_ms'])/2 for r in rounds)
 
     return dict(
-        shape=name, dims=shp, block_dim=block_dim, dtype="bfloat16",
+        shape=name, dims=shp, soc=soc, block_dim=block_dim, dtype="bfloat16",
+        sandwich_rounds=rounds, timing_summary="median across synchronized rounds",
         ms_fwd=ms_fwd, ms_fwd_with_gate_check=ms_fwd_checked,
         ms_fwd_with_caches=ms_caches, ms_fwd_bwd=ms_train,
         ms_torch_npu_fwd_bwd=ms_ref,
@@ -124,11 +133,15 @@ def _print_table(rows: list[dict]) -> None:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--shape", default="all", choices=[*SHAPES, "all"])
-    ap.add_argument("--block-dim", type=int, nargs="*", default=[1])
+    ap.add_argument("--block-dim", type=int, nargs="+", default=[1])
+    ap.add_argument("--soc", choices=sorted(CAPABILITIES), help="Explicit SoC; otherwise use the configured resolver")
+    ap.add_argument("--sandwich-rounds", type=int, default=3)
     ap.add_argument("--warmup", type=int, default=2)
     ap.add_argument("--iters", type=int, default=5)
     ap.add_argument("--json-out", type=pathlib.Path)
     args = ap.parse_args()
+    if args.sandwich_rounds < 1 or args.iters < 1 or args.warmup < 0:
+        ap.error("rounds/iters must be positive and warmup nonnegative")
 
     try:
         import torch_npu  # noqa: F401
@@ -138,13 +151,15 @@ def main() -> int:
     if not torch.npu.is_available():
         print("torch.npu.is_available() 为 False", file=sys.stderr)
         return 2
-    bad = [b for b in args.block_dim if b not in SUPPORTED_BLOCK_DIM]
+    soc = resolve_soc(args.soc)
+    supported = CAPABILITIES[soc]["supported_block_dim"].get("chunk", ())
+    bad = [b for b in args.block_dim if b not in supported]
     if bad:
-        print(f"block_dim {bad} 超出契约声明的 {list(SUPPORTED_BLOCK_DIM)}", file=sys.stderr)
+        print(f"block_dim {bad} 超出契约声明的 {list(supported)} ({soc})", file=sys.stderr)
         return 2
 
     names = list(SHAPES) if args.shape == "all" else [args.shape]
-    print(f"dtype=bfloat16 K=V=128 chunk=64 warmup={args.warmup} iters={args.iters} "
+    print(f"soc={soc} dtype=bfloat16 K=V=128 chunk=64 warmup={args.warmup} iters={args.iters} "
           f"synchronized=yes layout_device=npu 含反向=yes")
 
     if len(args.block_dim) > 1:
@@ -154,7 +169,8 @@ def main() -> int:
                 out = pathlib.Path(td) / f"bd{bd}.json"
                 r = subprocess.run(
                     [sys.executable, str(pathlib.Path(__file__).resolve()),
-                     "--shape", args.shape, "--block-dim", str(bd),
+                     "--shape", args.shape, "--block-dim", str(bd), "--soc", soc,
+                     "--sandwich-rounds", str(args.sandwich_rounds),
                      "--warmup", str(args.warmup), "--iters", str(args.iters),
                      "--json-out", str(out)],
                     capture_output=True, text=True)
@@ -165,7 +181,7 @@ def main() -> int:
                     return 1
                 rows += json.loads(out.read_text(encoding="utf-8"))
     else:
-        rows = [run_shape(n, args.block_dim[0], args.warmup, args.iters) for n in names]
+        rows = [run_shape(n, args.block_dim[0], args.warmup, args.iters, soc, args.sandwich_rounds) for n in names]
 
     _print_table(rows)
     if args.json_out:

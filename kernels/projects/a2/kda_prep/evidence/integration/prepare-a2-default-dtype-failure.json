@@ -1,0 +1,260 @@
+{
+  "scope": "host control-flow reproduction only; no vendor build or device execution",
+  "message": "A2 decode requires BF16 q/k/v",
+  "requests_before_error": 50,
+  "calls": [
+    {
+      "name": "kda_layout_a2_bf16_bf16_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "kda_layout_a2_bf16_f32_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "kda_layout_a2_f32_bf16_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "kda_layout_a2_f32_f32_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "kda_layout_a2_zero_bf16_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "kda_layout_a2_zero_f32_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "kda_prep_a2_chunk_norm_bf16_bf16_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "kda_prep_a2_chunk_norm_bf16_f32_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "kda_prep_a2_chunk_norm_f32_bf16_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "kda_prep_a2_chunk_norm_f32_f32_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "kda_prep_a2_chunk_gate_bf16_bf16_bf16_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "kda_prep_a2_chunk_gate_bf16_bf16_f32_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "kda_prep_a2_chunk_gate_bf16_f32_bf16_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "kda_prep_a2_chunk_gate_bf16_f32_f32_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "kda_prep_a2_chunk_gate_f32_bf16_bf16_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "kda_prep_a2_chunk_gate_f32_bf16_f32_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "kda_prep_a2_chunk_gate_f32_f32_bf16_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "kda_prep_a2_chunk_gate_f32_f32_f32_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "kda_prep_a2_chunk_beta_bf16_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "kda_prep_a2_chunk_beta_f32_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "kda_prep_a2_backward_norm_bf16_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "kda_prep_a2_backward_norm_f32_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "kda_prep_a2_backward_gate_bf16_bf16_bf16_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "kda_prep_a2_backward_gate_bf16_bf16_f32_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "kda_prep_a2_backward_gate_bf16_f32_bf16_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "kda_prep_a2_backward_gate_bf16_f32_f32_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "kda_prep_a2_backward_gate_f32_bf16_bf16_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "kda_prep_a2_backward_gate_f32_bf16_f32_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "kda_prep_a2_backward_gate_f32_f32_bf16_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "kda_prep_a2_backward_gate_f32_f32_f32_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "kda_prep_a2_backward_gate_reduce_bf16_bf16_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "kda_prep_a2_backward_gate_reduce_bf16_f32_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "kda_prep_a2_backward_gate_reduce_f32_bf16_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "kda_prep_a2_backward_gate_reduce_f32_f32_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "kda_prep_a2_backward_beta_bf16_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "kda_prep_a2_backward_beta_f32_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "kda_sub1_gate_a2_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "kda_sub2_score_a2_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "tril_inverse64_a2_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "kda_sub3_wy_a2_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "kda_sub45_a2_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "scan_fused_a2_fp32gc_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "inverse_mm_a2_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "inverse_epilogue_a2_fp32gc_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "inverse_dainv_a2_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "inverse_dakk_fused_a2_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "finalize_pre_a2_fp32gc_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "finalize_pair_a2_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "finalize_post_a2_fp32gc_kernel",
+      "device": "a2",
+      "block_dim": 1
+    },
+    {
+      "name": "finalize_reduce_a2_kernel",
+      "device": "a2",
+      "block_dim": 1
+    }
+  ],
+  "owner": "ascend_fla/ops/kda/fused_recurrent.py:_compiled",
+  "cause": "prepare(decode=True) invokes _compiled(device,bd) without dtype; A5 default FP32 is rejected by the A2 BF16-only branch",
+  "source_sha256": "3be90c5dbe61e2de19f466d20a2fba5e80033e08ba766fab31f0ae2698f8fff0"
+}

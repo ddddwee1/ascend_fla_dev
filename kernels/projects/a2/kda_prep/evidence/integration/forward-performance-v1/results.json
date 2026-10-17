@@ -1,0 +1,146 @@
+[
+  {
+    "shape": "long_context",
+    "dimensions": {
+      "B": 1,
+      "H": 16,
+      "HV": 32,
+      "T": 4096
+    },
+    "dtype": "torch.bfloat16",
+    "block_dim": 1,
+    "warmup": 3,
+    "iterations": 10,
+    "synchronized": true,
+    "backward_precompiled": true,
+    "rounds": [
+      {
+        "round": 1,
+        "baseline_before_ms": 47.70119646564126,
+        "forward_ms": 64.83222050592303,
+        "checked_forward_ms": 65.12263268232346,
+        "cached_forward_ms": 367.7732078358531,
+        "baseline_after_ms": 47.69905935972929,
+        "forward_speedup": 0.7357472494456274
+      },
+      {
+        "round": 2,
+        "baseline_before_ms": 46.67125949636102,
+        "forward_ms": 64.967305585742,
+        "checked_forward_ms": 65.13640275225043,
+        "cached_forward_ms": 367.77829695492983,
+        "baseline_after_ms": 47.4834262393415,
+        "forward_speedup": 0.7246312963636752
+      },
+      {
+        "round": 3,
+        "baseline_before_ms": 47.62235740199685,
+        "forward_ms": 64.83675241470337,
+        "checked_forward_ms": 65.16751563176513,
+        "cached_forward_ms": 367.8418289870024,
+        "baseline_after_ms": 47.49745624139905,
+        "forward_speedup": 0.7335331436327853
+      }
+    ],
+    "median_forward_ms": 64.83675241470337,
+    "median_cached_forward_ms": 367.77829695492983,
+    "median_forward_speedup": 0.7335331436327853,
+    "scope": "Operator forward/cached-forward only; not complete layer or training performance"
+  },
+  {
+    "shape": "kimi_linear_layer",
+    "dimensions": {
+      "B": 1,
+      "H": 32,
+      "HV": 32,
+      "T": 1024
+    },
+    "dtype": "torch.bfloat16",
+    "block_dim": 1,
+    "warmup": 3,
+    "iterations": 10,
+    "synchronized": true,
+    "backward_precompiled": true,
+    "rounds": [
+      {
+        "round": 1,
+        "baseline_before_ms": 22.730723209679127,
+        "forward_ms": 16.03787001222372,
+        "checked_forward_ms": 16.59753741696477,
+        "cached_forward_ms": 84.96955819427967,
+        "baseline_after_ms": 22.900506481528282,
+        "forward_speedup": 1.4226087895845354
+      },
+      {
+        "round": 2,
+        "baseline_before_ms": 22.784412186592817,
+        "forward_ms": 16.028929967433214,
+        "checked_forward_ms": 16.46161340177059,
+        "cached_forward_ms": 84.75741501897573,
+        "baseline_after_ms": 22.142544761300087,
+        "forward_speedup": 1.4014334406343179
+      },
+      {
+        "round": 3,
+        "baseline_before_ms": 22.18905668705702,
+        "forward_ms": 16.003310959786177,
+        "checked_forward_ms": 16.47070227190852,
+        "cached_forward_ms": 84.7145070321858,
+        "baseline_after_ms": 21.482552960515022,
+        "forward_speedup": 1.3644554479167461
+      }
+    ],
+    "median_forward_ms": 16.028929967433214,
+    "median_cached_forward_ms": 84.75741501897573,
+    "median_forward_speedup": 1.4014334406343179,
+    "scope": "Operator forward/cached-forward only; not complete layer or training performance"
+  },
+  {
+    "shape": "qwen3_next_layer",
+    "dimensions": {
+      "B": 1,
+      "H": 16,
+      "HV": 32,
+      "T": 1024
+    },
+    "dtype": "torch.bfloat16",
+    "block_dim": 1,
+    "warmup": 3,
+    "iterations": 10,
+    "synchronized": true,
+    "backward_precompiled": true,
+    "rounds": [
+      {
+        "round": 1,
+        "baseline_before_ms": 21.18638874962926,
+        "forward_ms": 16.03751601651311,
+        "checked_forward_ms": 16.50388240814209,
+        "cached_forward_ms": 86.03385826572776,
+        "baseline_after_ms": 21.21191779151559,
+        "forward_speedup": 1.3218476757089195
+      },
+      {
+        "round": 2,
+        "baseline_before_ms": 21.40158200636506,
+        "forward_ms": 16.047492064535618,
+        "checked_forward_ms": 16.468006372451782,
+        "cached_forward_ms": 86.05255614966154,
+        "baseline_after_ms": 21.27475282177329,
+        "forward_speedup": 1.3296886098000174
+      },
+      {
+        "round": 3,
+        "baseline_before_ms": 21.249827835708857,
+        "forward_ms": 16.016912925988436,
+        "checked_forward_ms": 16.498167347162962,
+        "cached_forward_ms": 86.26497546210885,
+        "baseline_after_ms": 22.170309722423553,
+        "forward_speedup": 1.3554465132816118
+      }
+    ],
+    "median_forward_ms": 16.03751601651311,
+    "median_cached_forward_ms": 86.05255614966154,
+    "median_forward_speedup": 1.3296886098000174,
+    "scope": "Operator forward/cached-forward only; not complete layer or training performance"
+  }
+]

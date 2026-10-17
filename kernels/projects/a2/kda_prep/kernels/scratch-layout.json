@@ -1,0 +1,566 @@
+{
+  "slots": 70,
+  "bytes": 17920,
+  "regions": {
+    "_select64:selected": {
+      "slot": 0,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "f32"
+    },
+    "_select64:address": {
+      "slot": 1,
+      "shape": [
+        1,
+        8
+      ],
+      "dtype": "u32"
+    },
+    "_broadcast64:block": {
+      "slot": 2,
+      "shape": [
+        8,
+        8
+      ],
+      "dtype": "f32"
+    },
+    "_broadcast64:result": {
+      "slot": 3,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "f32"
+    },
+    "_reduce_add64:reduced": {
+      "slot": 4,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "f32"
+    },
+    "_reduce_max64:reduced": {
+      "slot": 5,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "f32"
+    },
+    "_gather64:gathered": {
+      "slot": 6,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "f32"
+    },
+    "_inverse_exponent:mask": {
+      "slot": 7,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "u32"
+    },
+    "_inverse_exponent:bits": {
+      "slot": 8,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "u32"
+    },
+    "_inverse_exponent:power": {
+      "slot": 9,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "i32"
+    },
+    "_product_residual:mask": {
+      "slot": 10,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "u32"
+    },
+    "_product_residual:ah": {
+      "slot": 11,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "f32"
+    },
+    "_product_residual:al": {
+      "slot": 12,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "f32"
+    },
+    "_product_residual:bh": {
+      "slot": 13,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "f32"
+    },
+    "_product_residual:bl": {
+      "slot": 14,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "f32"
+    },
+    "_product_residual:error": {
+      "slot": 15,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "f32"
+    },
+    "_product_residual:term": {
+      "slot": 16,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "f32"
+    },
+    "_dd_add:s": {
+      "slot": 17,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_add:v": {
+      "slot": 18,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_add:e": {
+      "slot": 19,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_add:t": {
+      "slot": 20,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_add:h": {
+      "slot": 21,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_add:l": {
+      "slot": 22,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_add:overflow": {
+      "slot": 23,
+      "shape": [
+        1,
+        32
+      ],
+      "dtype": "u8"
+    },
+    "_dd_add_constant:s": {
+      "slot": 24,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_add_constant:e": {
+      "slot": 25,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_add_constant:t": {
+      "slot": 26,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_add_constant:h": {
+      "slot": 27,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_add_constant:l": {
+      "slot": 28,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_mul:p": {
+      "slot": 29,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_mul:e": {
+      "slot": 30,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_mul:t": {
+      "slot": 31,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_mul:h": {
+      "slot": 32,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_mul:l": {
+      "slot": 33,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_mul:zero": {
+      "slot": 34,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_mul:overflow": {
+      "slot": 35,
+      "shape": [
+        1,
+        32
+      ],
+      "dtype": "u8"
+    },
+    "_dd_div:q": {
+      "slot": 36,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_div:zero": {
+      "slot": 37,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_div:ph": {
+      "slot": 38,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_div:pl": {
+      "slot": 39,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_div:rh": {
+      "slot": 40,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_div:rl": {
+      "slot": 41,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_div:correction": {
+      "slot": 42,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_exp_negative:h": {
+      "slot": 43,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_exp_negative:l": {
+      "slot": 44,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_exp_negative:zh": {
+      "slot": 45,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_exp_negative:zl": {
+      "slot": 46,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_exp_negative:fallback": {
+      "slot": 47,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_exp_negative:floor": {
+      "slot": 48,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_exp_negative:zero": {
+      "slot": 49,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_exp_negative:outside": {
+      "slot": 50,
+      "shape": [
+        1,
+        32
+      ],
+      "dtype": "u8"
+    },
+    "_dd_softplus_sigmoid:zero": {
+      "slot": 51,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_softplus_sigmoid:one": {
+      "slot": 52,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_softplus_sigmoid:two": {
+      "slot": 53,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_softplus_sigmoid:xh": {
+      "slot": 54,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_softplus_sigmoid:xl": {
+      "slot": 55,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_softplus_sigmoid:eh": {
+      "slot": 56,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_softplus_sigmoid:el": {
+      "slot": 57,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_softplus_sigmoid:bh": {
+      "slot": 58,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_softplus_sigmoid:bl": {
+      "slot": 59,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_softplus_sigmoid:nh": {
+      "slot": 60,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_softplus_sigmoid:nl": {
+      "slot": 61,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_softplus_sigmoid:zh": {
+      "slot": 62,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_softplus_sigmoid:zl": {
+      "slot": 63,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_softplus_sigmoid:zz_h": {
+      "slot": 64,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_softplus_sigmoid:zz_l": {
+      "slot": 65,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_softplus_sigmoid:ph": {
+      "slot": 66,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_softplus_sigmoid:pl": {
+      "slot": 67,
+      "shape": [
+        1,
+        64
+      ],
+      "dtype": "DT.float"
+    },
+    "_dd_softplus_sigmoid:positive": {
+      "slot": 68,
+      "shape": [
+        1,
+        32
+      ],
+      "dtype": "u8"
+    },
+    "_dd_softplus_sigmoid:upper": {
+      "slot": 69,
+      "shape": [
+        1,
+        32
+      ],
+      "dtype": "u8"
+    }
+  }
+}

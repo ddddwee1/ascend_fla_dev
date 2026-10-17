@@ -1,0 +1,94 @@
+{
+  "backend": "cce",
+  "cases": [
+    {
+      "block_dim": 1,
+      "comparison": {
+        "destination": {
+          "comparison": {
+            "atol": 0,
+            "max_relative_l2": 0.005047884085284465,
+            "mode": "allclose",
+            "reason": "Structural envelope from the largest existing budget. execute additionally enforces every unchanged per-dtype FP64 budget and applicable BF16 ULP limit.",
+            "rtol": 0.011673144813292246
+          },
+          "max_abs_error": 0.0,
+          "passed": true,
+          "relative_l2_error": 0.0
+        }
+      },
+      "execution_evidence": [
+        {
+          "backend_executed": false,
+          "block_dim": 1,
+          "deadlock": null,
+          "device": "a2",
+          "event_balance": [],
+          "hazards": [],
+          "kernel": "kda_prep_a2_chunk_beta_f32_kernel",
+          "launcher": "pipesim",
+          "model": "lowered events and hazards",
+          "model_cycles": 1144,
+          "requested_backend": "cce",
+          "sim_processes": "threads",
+          "stage": "pipesim"
+        }
+      ],
+      "id": "beta_f32_reduced_bd1",
+      "parameters": {
+        "N": 17,
+        "backward": false,
+        "kind": "beta",
+        "shape": [
+          1,
+          1,
+          17
+        ],
+        "types": "f32"
+      },
+      "passed": true,
+      "reference": {
+        "destination": {
+          "comparison": {
+            "atol": 0,
+            "max_relative_l2": 0.005047884085284465,
+            "mode": "allclose",
+            "reason": "Structural envelope from the largest existing budget. execute additionally enforces every unchanged per-dtype FP64 budget and applicable BF16 ULP limit.",
+            "rtol": 0.011673144813292246
+          },
+          "dtype": "float32",
+          "sha256": "3fc37431f345dddff909ce84421e70afc37f49206c99436bb3999ce2e129d474",
+          "shape": [
+            1,
+            17
+          ]
+        }
+      },
+      "seed": 20261016
+    }
+  ],
+  "command": "check",
+  "contract_sha256": "30eb67ce0f843d7c009d29c8cd5d33d548130b89862fe6299fcaf8ba23a07863",
+  "device": "a2",
+  "dsl_imported": true,
+  "imports": {
+    "ascriptor": "<private-workspace>/tmp/PK-03/workspace/library/ascriptor/__init__.py",
+    "ascriptor.a2": "<private-workspace>/tmp/PK-03/workspace/library/ascriptor/a2.py",
+    "unit": "<private-run>/repo/kernels/projects/a2/kda_prep/unit.py"
+  },
+  "kernel_imported": false,
+  "launcher": "pipesim",
+  "passed": true,
+  "runner_sha256": "8e91d95ed0294ddbfc204957b8bf77606a79123655fc096963b94658b633566b",
+  "schema": "ascriptor.unit-result/1",
+  "simulator_imported": true,
+  "stage": "pipesim",
+  "started_at": "2026-10-16T08:11:56.211932+00:00",
+  "unit": "a2.kda_prep",
+  "versions": {
+    "ascriptor": null,
+    "numpy": "1.26.4",
+    "python": "3.11.15",
+    "torch": "2.10.0+cpu"
+  }
+}

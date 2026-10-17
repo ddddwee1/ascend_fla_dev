@@ -1,0 +1,207 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.15, pytest-8.3.2, pluggy-1.6.0 -- <python>
+rootdir: <repo>
+configfile: pyproject.toml
+plugins: xdist-3.6.1, anyio-4.13.0
+collecting ... collected 11 items
+
+tests/test_kda_layer_npu.py::test_layer_grads_match_cpu_reference[smoke] PREPARED 1 kda_layout_a2_bf16_bf16_kernel
+PREPARED 2 kda_layout_a2_bf16_f32_kernel
+PREPARED 3 kda_layout_a2_f32_bf16_kernel
+PREPARED 4 kda_layout_a2_f32_f32_kernel
+PREPARED 5 kda_layout_a2_zero_bf16_kernel
+PREPARED 6 kda_layout_a2_zero_f32_kernel
+PREPARED 7 kda_prep_a2_chunk_norm_bf16_bf16_kernel
+PREPARED 8 kda_prep_a2_chunk_norm_bf16_f32_kernel
+PREPARED 9 kda_prep_a2_chunk_norm_f32_bf16_kernel
+PREPARED 10 kda_prep_a2_chunk_norm_f32_f32_kernel
+PREPARED 11 kda_prep_a2_chunk_gate_bf16_bf16_bf16_kernel
+PREPARED 12 kda_prep_a2_chunk_gate_bf16_bf16_f32_kernel
+PREPARED 13 kda_prep_a2_chunk_gate_bf16_f32_bf16_kernel
+PREPARED 14 kda_prep_a2_chunk_gate_bf16_f32_f32_kernel
+PREPARED 15 kda_prep_a2_chunk_gate_f32_bf16_bf16_kernel
+PREPARED 16 kda_prep_a2_chunk_gate_f32_bf16_f32_kernel
+PREPARED 17 kda_prep_a2_chunk_gate_f32_f32_bf16_kernel
+PREPARED 18 kda_prep_a2_chunk_gate_f32_f32_f32_kernel
+PREPARED 19 kda_prep_a2_chunk_beta_bf16_kernel
+PREPARED 20 kda_prep_a2_chunk_beta_f32_kernel
+PREPARED 21 kda_prep_a2_backward_norm_bf16_kernel
+PREPARED 22 kda_prep_a2_backward_norm_f32_kernel
+PREPARED 23 kda_prep_a2_backward_gate_bf16_bf16_bf16_kernel
+PREPARED 24 kda_prep_a2_backward_gate_bf16_bf16_f32_kernel
+PREPARED 25 kda_prep_a2_backward_gate_bf16_f32_bf16_kernel
+PREPARED 26 kda_prep_a2_backward_gate_bf16_f32_f32_kernel
+PREPARED 27 kda_prep_a2_backward_gate_f32_bf16_bf16_kernel
+PREPARED 28 kda_prep_a2_backward_gate_f32_bf16_f32_kernel
+PREPARED 29 kda_prep_a2_backward_gate_f32_f32_bf16_kernel
+PREPARED 30 kda_prep_a2_backward_gate_f32_f32_f32_kernel
+PREPARED 31 kda_prep_a2_backward_gate_reduce_bf16_bf16_kernel
+PREPARED 32 kda_prep_a2_backward_gate_reduce_bf16_f32_kernel
+PREPARED 33 kda_prep_a2_backward_gate_reduce_f32_bf16_kernel
+PREPARED 34 kda_prep_a2_backward_gate_reduce_f32_f32_kernel
+PREPARED 35 kda_prep_a2_backward_beta_bf16_kernel
+PREPARED 36 kda_prep_a2_backward_beta_f32_kernel
+PREPARED 37 kda_sub1_gate_a2_kernel
+PREPARED 38 kda_sub2_score_a2_kernel
+PREPARED 39 tril_inverse64_a2_kernel
+PREPARED 40 kda_sub3_wy_a2_kernel
+PREPARED 41 kda_sub45_a2_kernel
+PREPARED 42 scan_fused_a2_fp32gc_kernel
+PREPARED 43 inverse_mm_a2_kernel
+PREPARED 44 inverse_epilogue_a2_fp32gc_kernel
+PREPARED 45 inverse_dainv_a2_kernel
+PREPARED 46 inverse_dakk_fused_a2_kernel
+PREPARED 47 finalize_pre_a2_fp32gc_kernel
+PREPARED 48 finalize_pair_a2_kernel
+PREPARED 49 finalize_post_a2_fp32gc_kernel
+PREPARED 50 finalize_reduce_a2_kernel
+PREPARED 51 kda_prep_a2_decode_norm_bf16_bf16_kernel
+PREPARED 52 kda_prep_a2_decode_norm_bf16_f32_kernel
+PREPARED 53 kda_prep_a2_decode_norm_f32_bf16_kernel
+PREPARED 54 kda_prep_a2_decode_norm_f32_f32_kernel
+PREPARED 55 kda_prep_a2_decode_gate_bf16_bf16_bf16_kernel
+PREPARED 56 kda_prep_a2_decode_gate_bf16_bf16_f32_kernel
+PREPARED 57 kda_prep_a2_decode_gate_bf16_f32_bf16_kernel
+PREPARED 58 kda_prep_a2_decode_gate_bf16_f32_f32_kernel
+PREPARED 59 kda_prep_a2_decode_gate_f32_bf16_bf16_kernel
+PREPARED 60 kda_prep_a2_decode_gate_f32_bf16_f32_kernel
+PREPARED 61 kda_prep_a2_decode_gate_f32_f32_bf16_kernel
+PREPARED 62 kda_prep_a2_decode_gate_f32_f32_f32_kernel
+PREPARED 63 kda_prep_a2_decode_beta_bf16_kernel
+PREPARED 64 kda_prep_a2_decode_beta_f32_kernel
+PREPARED 65 kda_fused_recurrent_a2_kernel
+FAILED
+tests/test_kda_layer_npu.py::test_layer_grads_match_cpu_reference[multi_chunk] FAILED
+tests/test_kda_layer_npu.py::test_layer_grads_match_cpu_reference[gva] FAILED
+tests/test_kda_layer_npu.py::test_layer_rejects_unsupported_config PASSED
+tests/test_kda_layer_npu.py::test_deep_gate_needs_stable_impl FAILED
+tests/test_kda_layer_npu.py::test_default_init_forward_matches_recurrent_oracle FAILED
+tests/test_kda_layer_npu.py::test_deep_gate_backward_matches_cpu_reference FAILED
+tests/test_kda_layer_npu.py::test_layer_gate_span_is_a_random_variable_with_a_ceiling 
+HV=8 下 8 个 seed 的 chunk 内门控跨度：54.2 / 79.8 / 88.2 / 92.8 / 94.3 / 98.4 / 98.5 / 100.6   （fla 初始化的理论上界 100.8）
+输入 scale 0.5/0.05/0.01 下的跨度：94.0 / 93.0 / 93.0   （应当几乎相同）
+PASSED
+tests/test_kda_layer_npu.py::test_prefill_then_decode_matches_one_shot_reference 
+prefill（chunk，128 token）相对 L2 = 4.477e-03
+decode 逐 token 相对 L2：t128=3.704e-03  t129=4.223e-03  t130=4.320e-03  t131=3.077e-03  t132=4.281e-03
+PASSED
+tests/test_kda_layer_npu.py::test_layer_refuses_to_switch_paths_silently PASSED
+tests/test_kda_layer_npu.py::test_decode_path_refuses_to_run_under_grad PASSED
+
+=================================== FAILURES ===================================
+_________________ test_layer_grads_match_cpu_reference[smoke] __________________
+tests/test_kda_layer_npu.py:121: in test_layer_grads_match_cpu_reference
+    o_npu, _ = layer_npu(x_npu)
+<site-packages>/torch/nn/modules/module.py:1776: in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+<site-packages>/torch/nn/modules/module.py:1787: in _call_impl
+    return forward_call(*args, **kwargs)
+ascend_fla/layers/kda.py:328: in forward
+    o, final_state = chunk_kda(
+ascend_fla/ops/kda/autograd.py:271: in chunk_kda
+    q, k, g, beta = _prepare_training_inputs(
+ascend_fla/ops/kda/autograd.py:118: in _prepare_training_inputs
+    runtime.prepare_backward(device, block_dim)
+kernels/projects/a5/kda_prep/runtime.py:125: in prepare_backward
+    raise ValueError('KDA prep backward requires a5 and chunk block_dim 1,2,3,4')
+E   ValueError: KDA prep backward requires a5 and chunk block_dim 1,2,3,4
+______________ test_layer_grads_match_cpu_reference[multi_chunk] _______________
+tests/test_kda_layer_npu.py:121: in test_layer_grads_match_cpu_reference
+    o_npu, _ = layer_npu(x_npu)
+<site-packages>/torch/nn/modules/module.py:1776: in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+<site-packages>/torch/nn/modules/module.py:1787: in _call_impl
+    return forward_call(*args, **kwargs)
+ascend_fla/layers/kda.py:328: in forward
+    o, final_state = chunk_kda(
+ascend_fla/ops/kda/autograd.py:271: in chunk_kda
+    q, k, g, beta = _prepare_training_inputs(
+ascend_fla/ops/kda/autograd.py:118: in _prepare_training_inputs
+    runtime.prepare_backward(device, block_dim)
+kernels/projects/a5/kda_prep/runtime.py:125: in prepare_backward
+    raise ValueError('KDA prep backward requires a5 and chunk block_dim 1,2,3,4')
+E   ValueError: KDA prep backward requires a5 and chunk block_dim 1,2,3,4
+__________________ test_layer_grads_match_cpu_reference[gva] ___________________
+tests/test_kda_layer_npu.py:121: in test_layer_grads_match_cpu_reference
+    o_npu, _ = layer_npu(x_npu)
+<site-packages>/torch/nn/modules/module.py:1776: in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+<site-packages>/torch/nn/modules/module.py:1787: in _call_impl
+    return forward_call(*args, **kwargs)
+ascend_fla/layers/kda.py:328: in forward
+    o, final_state = chunk_kda(
+ascend_fla/ops/kda/autograd.py:271: in chunk_kda
+    q, k, g, beta = _prepare_training_inputs(
+ascend_fla/ops/kda/autograd.py:118: in _prepare_training_inputs
+    runtime.prepare_backward(device, block_dim)
+kernels/projects/a5/kda_prep/runtime.py:125: in prepare_backward
+    raise ValueError('KDA prep backward requires a5 and chunk block_dim 1,2,3,4')
+E   ValueError: KDA prep backward requires a5 and chunk block_dim 1,2,3,4
+_______________________ test_deep_gate_needs_stable_impl _______________________
+tests/test_kda_layer_npu.py:204: in test_deep_gate_needs_stable_impl
+    up(x)
+<site-packages>/torch/nn/modules/module.py:1776: in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+<site-packages>/torch/nn/modules/module.py:1787: in _call_impl
+    return forward_call(*args, **kwargs)
+ascend_fla/layers/kda.py:328: in forward
+    o, final_state = chunk_kda(
+ascend_fla/ops/kda/autograd.py:271: in chunk_kda
+    q, k, g, beta = _prepare_training_inputs(
+ascend_fla/ops/kda/autograd.py:116: in _prepare_training_inputs
+    fwd_chain(device, block_dim, impl)
+ascend_fla/ops/kda/chunk.py:326: in _compiled_chain
+    for name, fn in (kda_fwd_kernels(impl, device) if device == "a2" else kda_fwd_kernels(impl)).items()}
+ascend_fla/ops/kda/chunk.py:286: in kda_fwd_kernels
+    raise ValueError("A2 KDA declares only impl='stable'")
+E   ValueError: A2 KDA declares only impl='stable'
+
+During handling of the above exception, another exception occurred:
+tests/test_kda_layer_npu.py:203: in test_deep_gate_needs_stable_impl
+    with pytest.raises(ValueError, match="门控跨度") as e:
+E   AssertionError: Regex pattern did not match.
+E    Regex: '门控跨度'
+E    Input: "A2 KDA declares only impl='stable'"
+______________ test_default_init_forward_matches_recurrent_oracle ______________
+tests/test_kda_layer_npu.py:234: in test_default_init_forward_matches_recurrent_oracle
+    o_npu, _ = layer_npu(x.to("npu"))
+<site-packages>/torch/nn/modules/module.py:1776: in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+<site-packages>/torch/nn/modules/module.py:1787: in _call_impl
+    return forward_call(*args, **kwargs)
+ascend_fla/layers/kda.py:328: in forward
+    o, final_state = chunk_kda(
+ascend_fla/ops/kda/autograd.py:271: in chunk_kda
+    q, k, g, beta = _prepare_training_inputs(
+ascend_fla/ops/kda/autograd.py:118: in _prepare_training_inputs
+    runtime.prepare_backward(device, block_dim)
+kernels/projects/a5/kda_prep/runtime.py:125: in prepare_backward
+    raise ValueError('KDA prep backward requires a5 and chunk block_dim 1,2,3,4')
+E   ValueError: KDA prep backward requires a5 and chunk block_dim 1,2,3,4
+________________ test_deep_gate_backward_matches_cpu_reference _________________
+tests/test_kda_layer_npu.py:294: in test_deep_gate_backward_matches_cpu_reference
+    o_npu, _ = layer_npu(x_npu)
+<site-packages>/torch/nn/modules/module.py:1776: in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+<site-packages>/torch/nn/modules/module.py:1787: in _call_impl
+    return forward_call(*args, **kwargs)
+ascend_fla/layers/kda.py:328: in forward
+    o, final_state = chunk_kda(
+ascend_fla/ops/kda/autograd.py:271: in chunk_kda
+    q, k, g, beta = _prepare_training_inputs(
+ascend_fla/ops/kda/autograd.py:118: in _prepare_training_inputs
+    runtime.prepare_backward(device, block_dim)
+kernels/projects/a5/kda_prep/runtime.py:125: in prepare_backward
+    raise ValueError('KDA prep backward requires a5 and chunk block_dim 1,2,3,4')
+E   ValueError: KDA prep backward requires a5 and chunk block_dim 1,2,3,4
+=========================== short test summary info ============================
+FAILED tests/test_kda_layer_npu.py::test_layer_grads_match_cpu_reference[smoke] - ValueError: KDA prep backward requires a5 and chunk block_dim 1,2,3,4
+FAILED tests/test_kda_layer_npu.py::test_layer_grads_match_cpu_reference[multi_chunk] - ValueError: KDA prep backward requires a5 and chunk block_dim 1,2,3,4
+FAILED tests/test_kda_layer_npu.py::test_layer_grads_match_cpu_reference[gva] - ValueError: KDA prep backward requires a5 and chunk block_dim 1,2,3,4
+FAILED tests/test_kda_layer_npu.py::test_deep_gate_needs_stable_impl - AssertionError: Regex pattern did not match.
+ Regex: '门控跨度'
+ Input: "A2 KDA declares only impl='stable'"
+FAILED tests/test_kda_layer_npu.py::test_default_init_forward_matches_recurrent_oracle - ValueError: KDA prep backward requires a5 and chunk block_dim 1,2,3,4
+FAILED tests/test_kda_layer_npu.py::test_deep_gate_backward_matches_cpu_reference - ValueError: KDA prep backward requires a5 and chunk block_dim 1,2,3,4
+=================== 6 failed, 5 passed in 718.08s (0:11:58) ====================
+{"pytest_returncode": 1, "calls_passed": 5, "calls_failed": 6, "setup_errors": 0, "registered_vendors": 65, "custom_launches": 35, "qualified_after": false, "scope": "Original file, known pending autograd helper routing retained; not a complete layer acceptance"}

@@ -26,6 +26,7 @@ import time
 import torch
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
+from ascend_fla.platform import CAPABILITIES, resolve_soc
 from ascend_fla.reference.kda import kda_chunk_ref, kda_chunk_vectorized, kda_recurrent_ref  # noqa: E402
 
 # 与 docs/matrix/models.json 的 test_case_shapes 对应。B/H/HV/T 之外的 K=V=128 是定尺约束。
@@ -89,6 +90,7 @@ def main() -> int:
     ap.add_argument("--shape", default="kimi_linear_layer", choices=[*SHAPES, "all"])
     ap.add_argument("--dtype", default="bfloat16", choices=["bfloat16", "float32"])
     ap.add_argument("--device", default="npu", choices=["npu", "cpu", "cuda"])
+    ap.add_argument("--soc", choices=sorted(CAPABILITIES), help="Explicit NPU SoC; otherwise use the configured resolver")
     ap.add_argument("--warmup", type=int, default=3)
     ap.add_argument("--iters", type=int, default=10)
     ap.add_argument("--accuracy", action="store_true", help="同时对 CPU fp32 参考做精度比对（第二 oracle）")
@@ -105,10 +107,11 @@ def main() -> int:
             print("torch.npu.is_available() 为 False", file=sys.stderr)
             return 2
 
+    soc = resolve_soc(args.soc) if args.device == "npu" else None
     dtype = getattr(torch, args.dtype)
     names = list(SHAPES) if args.shape == "all" else [args.shape]
 
-    print(f"device={args.device} dtype={args.dtype} warmup={args.warmup} iters={args.iters} "
+    print(f"device={args.device} soc={soc} dtype={args.dtype} warmup={args.warmup} iters={args.iters} "
           f"K=V={K_DIM} chunk=64 synchronized=yes fwd_only=yes")
     print(f"{'shape':<20} {'B/H/HV/T':<18} {'vectorized(ms)':>15} {'ref_loop(ms)':>14}  {'speedup':>8}")
     print("-" * 84)
@@ -128,13 +131,15 @@ def main() -> int:
         speed = f"{ms_ref / ms_vec:.1f}x" if ms_ref == ms_ref else "—"
         print(f"{name:<20} {dims:<18} {ms_vec:>15.3f} {ms_ref:>14.3f}  {speed:>8}")
 
-        rec = dict(shape=name, dims=shp, dtype=args.dtype, device=args.device,
+        rec = dict(shape=name, dims=shp, dtype=args.dtype, device=args.device, soc=soc,
                    ms_vectorized=ms_vec, ms_ref_loop=(ms_ref if ms_ref == ms_ref else None),
                    warmup=args.warmup, iters=args.iters, synchronized=True, forward_only=True)
 
         if args.accuracy:
             o_dev, s_dev = kda_chunk_vectorized(**kw)
-            x_cpu = {k: v.cpu() for k, v in x.items()}
+            # Widen the exact device inputs so the CPU golden also returns FP32.
+            x_cpu = {k: v.cpu().float() for k, v in x.items()}
+            rec["cpu_reference_dtype"] = "torch.float32"
             # CPU 参考按形状选实现：循环版（kda_chunk_ref / kda_recurrent_ref）在 T=1024、
             # HV=32 下要跑上千次 python 循环，实测 wall 1.5min 就烧掉 59min CPU time。
             # 大形状只用向量化 CPU 版当参考（它已与 fla 上游 naive 对齐到 1.1e-07）。

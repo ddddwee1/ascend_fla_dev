@@ -1,0 +1,46 @@
+{
+  "soc": "Ascend910B3",
+  "python": "3.11.15",
+  "torch": "2.10.0+cpu",
+  "torch_npu": "2.10.0",
+  "torch_npu_allow_hf32": false,
+  "device_geometry": {
+    "cube_cores": 20,
+    "vector_cores": 40
+  },
+  "ascriptor": "0.1.0",
+  "revisions": {
+    "library": "90cfcdc720bbcd66e8bd4361c4dd4fbc1a2a57b5",
+    "kernels": "b3b3f9c16df7c4626ed3c081032a1be5a753d0b1"
+  },
+  "cann": {
+    "compiler": {
+      "sha256": "c44017e925906ff08120ada7be44167be9f25d859c734ba202ae7be75ff5bede",
+      "fields": [
+        "Version=9.0.0",
+        "version_dir=cann",
+        "timestamp=20260428_134817545"
+      ]
+    },
+    "opp": {
+      "sha256": "3f6997bfb998c24cf107258e4cd4e76f6ffc520e0382770e75520083c20b162a",
+      "fields": [
+        "Version=9.0.0",
+        "version_dir=cann",
+        "timestamp=20260428_134817545"
+      ]
+    }
+  },
+  "opp_packages": [
+    "ascend910_93",
+    "ascend910b",
+    "config"
+  ],
+  "library_files_checked": 204,
+  "library_manifest_sha256": "a8b647cf586ac61ffa67139790a87319ae10639eb9c1d29219180d5795c9995f",
+  "source_sha256": {
+    "benchmarks/bench_kda_torch_npu.py": "783b3446ce43ff8c89697f27e8725ca2bef200de491e745469a54c7df7775c23",
+    "ascend_fla/reference/kda.py": "9f245ae5c6c6c92b9f2de955213ae11f1d4ce0a07e73c3ff3a548b2d5cb9397e"
+  },
+  "scope": "Torch NPU baseline only; no custom kernel or sandwich comparison"
+}
