@@ -103,6 +103,28 @@ def compare_trees(got, reference, budget):
     return {"passed": passed, "budget": budget, "tensors": rows, "equal_scalar_paths": scalar_paths}
 
 
+def compare_operator(got, reference, dtype):
+    """Apply the unit's operator tolerances, separately from model budgets."""
+    unit = "gdn2_chunk_fwd" + ("_bf16" if dtype == "bfloat16" else "")
+    contract_path = ROOT / "kernels/projects/a5" / unit / "contract.json"
+    comparison = json.loads(contract_path.read_text())["comparison"]
+    rules = [dict(comparison["default"], **comparison.get("outputs", {}).get(name, {}))
+             for name in ("o", "final_state")]
+    result = compare_trees(got, reference, max(r["max_relative_l2"] for r in rules))
+    for index, rule in enumerate(rules):
+        if rule["mode"] != "allclose":
+            raise ValueError("operator checks require the declared allclose contract")
+        row = result["tensors"][str(index)]
+        row["comparison"] = rule
+        row["allclose"] = bool(torch.allclose(got[index].double(), reference[index].double(),
+                                             atol=rule["atol"], rtol=rule["rtol"]))
+        row["passed"] = (row["finite"] and row["allclose"] and
+                         row["relative_l2"] <= rule["max_relative_l2"])
+    result["passed"] = all(row["passed"] for row in result["tensors"].values())
+    result["contract_sha256"] = sha256(contract_path)
+    return result
+
+
 def tensor_digest(tensor):
     return hashlib.sha256(snapshot(tensor).view(torch.uint8).numpy().tobytes()).hexdigest()
 
@@ -195,11 +217,10 @@ def run_operator(args):
                                              use_qk_l2norm=True, qk_norm_eps=QK_EPS)
         native_golden = torch_npu_composed(*tensors)
         actual = candidate()
-        budget = 1e-3 if args.dtype == "float32" else 1e-2
-        checks = {name: compare_trees(snapshot(actual), snapshot(want), budget)
+        checks = {name: compare_operator(snapshot(actual), snapshot(want), args.dtype)
                   for name, want in [("cpu_fp32_recurrence", cpu_golden),
                                      ("torch_npu_composition", native_golden)]}
-        checks["oracle_agreement"] = compare_trees(snapshot(native_golden), cpu_golden, budget)
+        checks["oracle_agreement"] = compare_operator(snapshot(native_golden), cpu_golden, args.dtype)
         row = {"seq_len": length, "heads": args.heads, "dtype": args.dtype,
                "block_dim": args.block_dim, "checks": checks,
                "output_sha256": tensor_digest(actual[0]),
@@ -214,10 +235,11 @@ def run_operator(args):
                 before = timed(lambda: torch_npu_composed(*tensors), args.reps, args.warmup)
                 measured = timed(candidate, args.reps, args.warmup)
                 after = timed(lambda: torch_npu_composed(*tensors), args.reps, args.warmup)
-                baseline = statistics.median([before["median_ms"], after["median_ms"]])
+                baseline = min(before["median_ms"], after["median_ms"])
                 row["sandwiches"].append({
                     "number": number + 1, "baseline_before": before, "candidate": measured,
                     "baseline_after": after, "ratio_candidate_over_baseline": measured["median_ms"] / baseline,
+                    "baseline_reference": "faster adjacent baseline median",
                     "baseline_drift": abs(before["median_ms"] - after["median_ms"]) / baseline})
         row["passed"] = True
         row["performance_passed"] = (None if args.check_only else
