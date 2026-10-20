@@ -310,8 +310,7 @@ def execute(args):
     torch.npu.matmul.allow_hf32 = False
     torch.npu.conv.allow_hf32 = False
     precision = {"matmul_allow_hf32": torch.npu.matmul.allow_hf32,
-                 "conv_allow_hf32": torch.npu.conv.allow_hf32,
-                 "allow_internal_format": torch.npu.config.allow_internal_format}
+                 "conv_allow_hf32": torch.npu.conv.allow_hf32}
     data, tokens, examples = load_inputs(args.manifest)
     if bench.sha256(args.checkpoint) != bench.CHECKPOINT_SHA256:
         raise ValueError("wrong checkpoint")
