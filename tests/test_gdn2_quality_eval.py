@@ -137,6 +137,43 @@ def test_branching_does_not_advance_the_shared_prefix_cache():
     assert torch.equal(original, cache[0]["recurrent_state"])
 
 
+def test_real_model_forked_choice_scores_match_independent_cold_forwards(tmp_path):
+    from ascend_fla.models import GDN2Config, GDN2ForCausalLM
+
+    config = GDN2Config(vocab_size=32, padding_multiple=8, block_size=32,
+                       n_layer=2, n_embd=16, intermediate_size=24,
+                       num_heads=1, head_dim=128, conv_size=4)
+    with torch.random.fork_rng(), torch.inference_mode():
+        torch.manual_seed(146)
+        model = GDN2ForCausalLM(config).eval()
+        runner = quality.ModelRunner(model, torch.float32, "cpu", tmp_path)
+        item = example([0, 1, 2])
+        cached = quality.hellaswag_example(runner, item, 32)
+        cold_scores = []
+        for choice in item["choices"]:
+            ids = choice["ids"]
+            logits = model(torch.tensor([item["context_ids"] + ids[:-1]]))
+            logp = logits[0, -len(ids):].float().log_softmax(-1)
+            selected = logp.gather(1, torch.tensor(ids).reshape(-1, 1))
+            cold_scores.append(float(selected.double().sum()))
+        assert cached["loglikelihoods"] == pytest.approx(cold_scores, abs=1e-5, rel=1e-6)
+        reordered = {**item, "choices": list(reversed(item["choices"])), "gold": 3 - item["gold"]}
+        reverse = quality.hellaswag_example(runner, reordered, 32)
+        assert reverse["loglikelihoods"] == pytest.approx(list(reversed(cold_scores)), abs=1e-5, rel=1e-6)
+
+        _, prefix_cache = runner.forward(item["context_ids"])
+        before = {p: value.clone() if isinstance(value, torch.Tensor) else value
+                  for p, value in quality.bench.flatten(prefix_cache)}
+        runner.forward([3, 4], prefix_cache)
+        runner.forward([5, 6, 7], prefix_cache)
+        after = dict(quality.bench.flatten(prefix_cache))
+        for path, value in before.items():
+            if isinstance(value, torch.Tensor):
+                assert torch.equal(after[path], value), path
+            else:
+                assert after[path] == value, path
+
+
 def test_weighted_nll_and_noninferiority_detect_clear_regression():
     plan = {**quality.PLAN, "bootstrap_replicates": 500}
     baseline = [{"id": str(i), "sum_nll": float(n), "n_tokens": n} for i, n in enumerate([1, 2, 10, 20])]
