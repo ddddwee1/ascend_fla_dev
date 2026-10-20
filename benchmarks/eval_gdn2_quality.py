@@ -306,6 +306,12 @@ def load_inputs(path):
 def execute(args):
     import torch_npu  # noqa: F401
     from ascend_fla.models.gdn2 import GDN2ForCausalLM
+    # FP32 is a full-precision control; do not silently enable reduced-mantissa math.
+    torch.npu.matmul.allow_hf32 = False
+    torch.npu.conv.allow_hf32 = False
+    precision = {"matmul_allow_hf32": torch.npu.matmul.allow_hf32,
+                 "conv_allow_hf32": torch.npu.conv.allow_hf32,
+                 "allow_internal_format": torch.npu.config.allow_internal_format}
     data, tokens, examples = load_inputs(args.manifest)
     if bench.sha256(args.checkpoint) != bench.CHECKPOINT_SHA256:
         raise ValueError("wrong checkpoint")
@@ -330,7 +336,9 @@ def execute(args):
     identity = {"schema": SCHEMA, "group": args.group, "backend": backend,
                 "dtype": str(dtype), "manifest_sha256": bench.sha256(args.manifest),
                 "evaluator_sha256": bench.sha256(__file__), "environment": environment,
-                "model_sources": {p: bench.sha256(ROOT / p) for p in MODEL_FILES},
+                "model_sources": {p: bench.sha256(ROOT / p) for p in sorted(set(MODEL_FILES) | {
+                    str(p.relative_to(ROOT)) for p in (ROOT / "ascend_fla").rglob("*.py")})},
+                "precision": precision,
                 "checkpoint_sha256": bench.CHECKPOINT_SHA256, "pilot_items": args.limit}
     args.output.mkdir(parents=True, exist_ok=True)
     header = args.output / "identity.json"
@@ -465,7 +473,7 @@ def compare(args):
         if (record["manifest_sha256"] != bench.sha256(args.manifest) or
                 record["evaluator_sha256"] != bench.sha256(__file__) or record["parts"].keys() != expected.keys()):
             raise ValueError("completed run does not cover this manifest/evaluator and every required part")
-        for key in ("schema", "manifest_sha256", "evaluator_sha256", "environment", "model_sources", "checkpoint_sha256"):
+        for key in ("schema", "manifest_sha256", "evaluator_sha256", "environment", "model_sources", "checkpoint_sha256", "precision"):
             if record[key] != summaries["A"][key]:
                 raise ValueError(f"paired run identity differs: {key}")
         if record["dtype"] != str(GROUPS[group][1]) or record["backend"] != GROUPS[group][0]:
