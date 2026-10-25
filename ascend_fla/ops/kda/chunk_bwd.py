@@ -37,7 +37,7 @@ from typing import Any
 
 import torch
 
-from ascend_fla.platform import require_qualified, resolve_soc
+from ascend_fla.platform import capability, require_qualified, resolve_soc
 
 from .chunk import (
     BWD_CACHE_NAMES,
@@ -49,6 +49,8 @@ from .chunk import (
     _kernels_root,
     _resolve_layout,
     _layout_runtime,
+    _load_kernel,
+    _launch_a2,
 )
 
 __all__ = ["chunk_kda_bwd", "kda_bwd_kernels"]
@@ -90,16 +92,17 @@ def _bwd_kernels_root() -> pathlib.Path:
     return root
 
 
-def _stable_bwd_root() -> pathlib.Path:
+def _stable_bwd_root(device="a5") -> pathlib.Path:
     """本仓自有单元 ``kernels/projects/a5/kda_bwd_stable`` 的位置。"""
-    root = pathlib.Path(__file__).resolve().parents[3] / "kernels/projects/a5/kda_bwd_stable"
+    unit = "kda_bwd_stable_fp32gc" if device == "a2" else "kda_bwd_stable"
+    root = pathlib.Path(__file__).resolve().parents[3] / f"kernels/projects/{device}/{unit}"
     if not (root / "kernels").is_dir():
         raise FileNotFoundError(f"找不到本仓的 kda_bwd_stable 单元（试了 {root}）")
     return root
 
 
-@functools.lru_cache(maxsize=2)
-def kda_bwd_kernels(impl: str = "stable") -> dict[str, Any]:
+@functools.lru_cache(maxsize=None)
+def kda_bwd_kernels(impl: str = "stable", device: str = "a5") -> dict[str, Any]:
     """按文件逐个加载九个 kernel。
 
     不 import 单元的 ``kernels`` 包 —— 它的 ``stages.py`` 依赖 ``_unit_runner``
@@ -113,6 +116,13 @@ def kda_bwd_kernels(impl: str = "stable") -> dict[str, Any]:
     """
     if impl not in IMPLS:
         raise ValueError(f"impl 只能是 {IMPLS}，收到 {impl!r}")
+    if device == "a2":
+        if impl != "stable":
+            raise ValueError("A2 KDA backward declares only impl='stable'")
+        directory = _stable_bwd_root(device) / "kernels"
+        entries = (('scan_fused', 'scan_fused_a2_fp32gc_kernel'), ('inverse_mm', 'inverse_mm_a2_kernel'), ('inverse_epilogue', 'inverse_epilogue_a2_fp32gc_kernel'), ('inverse_dainv', 'inverse_dainv_a2_kernel'), ('inverse_dakk_fused', 'inverse_dakk_fused_a2_kernel'), ('finalize_pre', 'finalize_pre_a2_fp32gc_kernel'), ('finalize_pair', 'finalize_pair_a2_kernel'), ('finalize_post', 'finalize_post_a2_fp32gc_kernel'), ('finalize_reduce', 'finalize_reduce_a2_kernel'))
+        return {stage: _load_kernel("a2_bwd", directory, stage, name)
+                for stage, name in entries}
     up_dir = _bwd_kernels_root() / "kernels"
     st_dir = _stable_bwd_root() / "kernels" if impl == "stable" else None
     plan = []
@@ -139,13 +149,15 @@ def _compiled_chain(device: str, block_dim: int, impl: str = "stable") -> dict[s
     """(device, block_dim, impl) → 已编译的九个 kernel。理由同前向的 ``_compiled_chain``。"""
     from ...runtime.compile import compile_kernel
 
-    _layout_runtime().prepare(device, block_dim)
+    (_layout_runtime(device) if device == "a2" else _layout_runtime()).prepare(device, block_dim)
     return {name: compile_kernel(fn, device=device, block_dim=block_dim)
-            for name, fn in kda_bwd_kernels(impl).items()}
+            for name, fn in (kda_bwd_kernels(impl, device) if device == "a2" else kda_bwd_kernels(impl)).items()}
 
 
-def _check(q, k, v, beta, do, dht, caches, block_dim) -> tuple[int, int, int, int]:
+def _check(q, k, v, beta, do, dht, caches, block_dim, *, device="a5") -> tuple[int, int, int, int]:
     """门控。返回 ``(B, H, HV, C)``。任何不满足都报错，绝不静默降级。"""
+    if device == "a2" and block_dim not in capability(device)["supported_block_dim"]["chunk"]:
+        raise ValueError("A2 backward block_dim must be one of (1, 2)")
     if block_dim not in SUPPORTED_BLOCK_DIM:
         raise ValueError(
             f"block_dim 只支持 {SUPPORTED_BLOCK_DIM}（ascriptor kda_bwd 契约声明的范围），"
@@ -199,8 +211,9 @@ def _check(q, k, v, beta, do, dht, caches, block_dim) -> tuple[int, int, int, in
         got = caches[name]
         if tuple(got.shape) != shape:
             raise ValueError(f"caches[{name!r}] 应为 {shape}，收到 {tuple(got.shape)}")
-        if got.dtype != torch.bfloat16:
-            raise ValueError(f"caches[{name!r}] 的 dtype 应为 bfloat16，收到 {got.dtype}")
+        expected_dtype = torch.float32 if device == "a2" and name == "g_cumsum" else torch.bfloat16
+        if got.dtype != expected_dtype:
+            raise ValueError(f"caches[{name!r}] 的 dtype 应为 {expected_dtype}，收到 {got.dtype}")
         if not got.is_contiguous():
             raise ValueError(f"caches[{name!r}] 必须是连续张量，收到 stride={tuple(got.stride())}")
     return b, h, hv, c
@@ -244,8 +257,10 @@ def chunk_kda_bwd(
     """
     device = resolve_soc(device)
     require_qualified(device)
-    b, h, hv, c = _check(q, k, v, beta, do, dht, caches, block_dim)
+    b, h, hv, c = _check(q, k, v, beta, do, dht, caches, block_dim, device=device)
     _resolve_layout(layout_device)
+    if device == "a2":
+        return _run_chain_a2(q, k, v, beta, do, dht, caches, block_dim=block_dim, impl=impl)
     compiled = _compiled_chain(device, block_dim, impl)
     dev = q.device
     t = c * L_PER_CHUNK
@@ -363,3 +378,58 @@ def chunk_kda_bwd(
     )
 
     return {"dq": dq, "dk": dk, "dv": dv_out, "dbeta": dbeta_out, "dg": dg_out, "dh0": dh0}
+
+
+def _run_chain_a2(q, k, v, beta, do, dht, caches, *, block_dim, impl):
+    """Execute the FP32-gc unit's nine-stage ABI without host transformations."""
+    kern = _compiled_chain("a2", block_dim, impl)
+    inputs = dict(q=q, k=k, v=v, beta=beta, do=do, dht=dht, saved=caches)
+    L, D = L_PER_CHUNK, HEAD_DIM
+    options = None
+
+    def empty(*shape, dtype=torch.bfloat16):
+        # Public execution allocates outputs; the standalone harness seeds NaNs.
+        return torch.empty(shape, dtype=dtype, device=q.device)
+
+    def launch_kernel(entry, args, unused_options):
+        ni, no = len(entry.input_names), len(entry.output_names)
+        outputs = args[ni:ni+no]
+        explicit = args[ni+no:]
+        scalars = dict(zip(entry.scalar_names[:len(explicit)], explicit, strict=True))
+        _launch_a2(entry, args[:ni], outputs, scalars)
+        return outputs[0] if no == 1 else outputs
+    saved = inputs['saved']
+    b, t, h, _ = inputs['q'].shape
+    hv, c, bt = (inputs['v'].shape[2], t // L, b * t)
+
+    def tok(x, width):
+        return x.view(bt, width)
+    q2, k2 = (tok(inputs['q'], h * D), tok(inputs['k'], h * D))
+    v2, do2, beta2 = (tok(inputs['v'], hv * D), tok(inputs['do'], hv * D), tok(inputs['beta'], hv))
+    gc2 = tok(saved['g_cumsum'], hv * D)
+    aqk2, akk2 = (tok(saved['Aqk'], hv * L), tok(saved['Akk'], hv * L))
+    kg2, qg2, w2, vnew2 = (tok(saved[n], hv * D) for n in ('kg', 'qg', 'w', 'v_new'))
+    d_aqk, d_h = (empty(bt, hv * L), empty(b, c, hv, D, D))
+    d_v_scan, d_h0 = (empty(bt, hv * D), empty(b, hv, D, D))
+    d_aqk, d_h, d_v_scan, d_h0 = launch_kernel(kern['scan_fused'], (kg2, qg2, w2, gc2, do2, aqk2, vnew2, inputs['dht'], d_aqk, d_h, d_v_scan, d_h0, b, hv, c), options)
+    mm_out = tuple((empty(b, hv, c, L, D) for _ in range(5)))
+    d_qg, d_kg, d_w, d_v_beta, d_k_beta_g = launch_kernel(kern['inverse_mm'], (do2, vnew2, d_v_scan, saved['h'], d_h, akk2, *mm_out, b, hv, c), options)
+    ep_out = (empty(bt, hv * D), empty(bt, hv * D), empty(bt, hv * D), empty(bt, hv, dtype=torch.float32), empty(bt, hv * D), empty(b, hv, c, L, D))
+    dq_hv, dk_hv, dv_out, dbeta, dg_core, k_exp = launch_kernel(kern['inverse_epilogue'], (d_qg, d_kg, d_v_beta, d_k_beta_g, q2, k2, v2, gc2, beta2, saved['h'], d_h, *ep_out, b, h, hv, c), options)
+    dtri = launch_kernel(kern['inverse_dainv'], (d_v_scan, v2, d_w, k_exp, beta2, empty(b, hv, c, L, L), b, hv, c), options)
+    d_akk = launch_kernel(kern['inverse_dakk_fused'], (akk2, dtri, empty(bt, hv * L), b, hv, c), options)
+    pre_out = (empty(b, hv, c, L, D), empty(b, hv, c, L, D), empty(b, hv, c, L, D), empty(b, hv, c, L, L), empty(b, hv, c, L, L), empty(b, hv, c, L, L))
+    q_scaled, k_scaled, kg_f, m_qk, m_base, m_beta = launch_kernel(kern['finalize_pre'], (q2, k2, gc2, beta2, d_aqk, d_akk, *pre_out, b, h, hv, c), options)
+
+    def flat(x):
+        return x.view(b, hv, t, x.shape[-1])
+    pair_out = tuple((empty(b, hv, t, D) for _ in range(4)))
+    qk_left, qk_right, s_base, t_beta = launch_kernel(kern['finalize_pair'], (flat(m_qk), flat(m_base), flat(m_beta), flat(q_scaled), flat(k_scaled), flat(kg_f), *pair_out, b, hv, t), options)
+
+    def chunked(x):
+        return x.view(b, hv, c, L, x.shape[-1])
+    post_out = (empty(b, hv, c, L, D, dtype=torch.float32), empty(b, hv, c, L, D, dtype=torch.float32), empty(bt, hv), empty(bt, hv * D))
+    dq_post, dk_post, dbeta_out, dg_out = launch_kernel(kern['finalize_post'], (gc2, chunked(qk_left), chunked(qk_right), chunked(s_base), chunked(t_beta), q2, k2, beta2, dq_hv, dk_hv, dbeta, dg_core, *post_out, b, h, hv, c), options)
+    dq, dk = launch_kernel(kern['finalize_reduce'], (dq_post, dk_post, empty(bt, h * D), empty(bt, h * D), b, hv, h, c), options)
+    outputs = {'dq': dq.view(b, t, h, D), 'dk': dk.view(b, t, h, D), 'dv': dv_out.view(b, t, hv, D), 'dbeta': dbeta_out.view(b, t, hv), 'dg': dg_out.view(b, t, hv, D), 'dh0': d_h0}
+    return outputs

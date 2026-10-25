@@ -1,0 +1,4570 @@
+[
+  {
+    "case": "norm_bf16_bf16_scale0",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "ed6feb95fa42576aa770778e6ffbd40d8d01a3cbeb6e42dea682b435b5fd251b"
+    },
+    "output_sha256": "ed6feb95fa42576aa770778e6ffbd40d8d01a3cbeb6e42dea682b435b5fd251b",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 0.0,
+          "max_relative_nonzero": 0.0,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 0.0,
+          "max_relative_nonzero": 0.0,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 0.005047884085284465,
+          "max_relative_nonzero": 0.011672969828497944
+        },
+        "passed": true,
+        "ulp_to_fp64": 0,
+        "ulp_to_fp32": 0
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "norm_bf16_bf16_scale1e-20",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "ed76c9d4c787ae6b116cf6e83018e724ffd0c2bb3fee47c87b2a31363c36591d"
+    },
+    "output_sha256": "a5324c86efb0f68e315a71520bc894f0086031cc6650a118ba50fe50194fda7d",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 0.0016771229743052873,
+          "max_relative_nonzero": 0.0033825503355704696,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 0.0016771247091753483,
+          "max_relative_nonzero": 0.0033825503355704696,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 0.005047884085284465,
+          "max_relative_nonzero": 0.011672969828497944
+        },
+        "passed": true,
+        "ulp_to_fp64": 1,
+        "ulp_to_fp32": 0
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "norm_bf16_bf16_scale1e-08",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "02aa18e74b00163b671b85c2e5c55ef04af72682ee665d1a5776f607b96d93c5"
+    },
+    "output_sha256": "bec95df2e623fb1a95ef6ecfb0d25bb054200d4acc64b1064547f179e7a70246",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 0.0016745857599964808,
+          "max_relative_nonzero": 0.0033825592884087195,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 0.0016745869179381797,
+          "max_relative_nonzero": 0.0033825503355704696,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 0.005047884085284465,
+          "max_relative_nonzero": 0.011672969828497944
+        },
+        "passed": true,
+        "ulp_to_fp64": 1,
+        "ulp_to_fp32": 0
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "norm_bf16_bf16_scale0.0001",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "1709f3cf3ac9a16c1fbaaee1cf3852f94a3a5e2fcd18c13547e51d4ff353831b"
+    },
+    "output_sha256": "a6a37f08c125ada1d5d9e36630c31b0f7d6389ac4eddbdadbe73ab66e02989d9",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 0.0016588679960746647,
+          "max_relative_nonzero": 0.003873213282204937,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 0.0016588676742304072,
+          "max_relative_nonzero": 0.0038731894706530226,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 0.005047884085284465,
+          "max_relative_nonzero": 0.011672969828497944
+        },
+        "passed": true,
+        "ulp_to_fp64": 0,
+        "ulp_to_fp32": 0
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "norm_bf16_bf16_scale1",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "7cd996b194c00ac568fdb8f940b8476bb96de5c21f7254fe0bc1bf0d45616a81"
+    },
+    "output_sha256": "a6606fef0a535f03b2efe5afe25b354ad4a4e27d024b23268d931d671f660264",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 0.0016611699703271252,
+          "max_relative_nonzero": 0.0038812646355252454,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 0.0016611702610623605,
+          "max_relative_nonzero": 0.0038813512507697746,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 0.005047884085284465,
+          "max_relative_nonzero": 0.011672969828497944
+        },
+        "passed": true,
+        "ulp_to_fp64": 0,
+        "ulp_to_fp32": 0
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "norm_bf16_bf16_scale30",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "e0013569748801d28c4d8417e2d6f9273a43476ae48a15f8969d1844b10c9cb0"
+    },
+    "output_sha256": "ba4a4e000f1e174f924b998ea46be4756595be16c9314b36a811c9f2d5861fa2",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 0.0016603316602825952,
+          "max_relative_nonzero": 0.0038873129276685687,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 0.0016603318129091806,
+          "max_relative_nonzero": 0.003887355165235453,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 0.005047884085284465,
+          "max_relative_nonzero": 0.011672969828497944
+        },
+        "passed": true,
+        "ulp_to_fp64": 0,
+        "ulp_to_fp32": 0
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "norm_bf16_bf16_scale1e+10",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "617a2a56972fa27c2ff37b4327b969e6daf906462aab4cffbebe1a489d8bc66f"
+    },
+    "output_sha256": "6c17f246ef6cb00e516931a51704ea228d261cc66fc4d83891d0f337ccacf1e8",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 1,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 0.0016487971767250665,
+          "max_relative_nonzero": 0.003888804246356327,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 0.0016487973515499912,
+          "max_relative_nonzero": 0.003888785646558557,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 0.005047884085284465,
+          "max_relative_nonzero": 0.011672969828497944
+        },
+        "passed": true,
+        "ulp_to_fp64": 0,
+        "ulp_to_fp32": 0
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "norm_bf16_bf16_scale1e+18",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "f6a01cc464d29eb58d02768417504ed3110739abc7f474b3f9b42d396438aaf5"
+    },
+    "output_sha256": "09ddc95d6761c472fbef6dabd082812ffbc73b40199aad90617bbd7bb4235886",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 1,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance"
+  },
+  {
+    "case": "norm_bf16_bf16_scale1e+20",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "8dcdfead1e531c1173b613ec2b2cafe846c8adf9166146afd306be67ab300c48"
+    },
+    "output_sha256": "ed6feb95fa42576aa770778e6ffbd40d8d01a3cbeb6e42dea682b435b5fd251b",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance"
+  },
+  {
+    "case": "norm_bf16_bf16_nonfinite",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "6e97b95bbdcaaf68aec75947d1b200113668798a6ecea8370a7a85bce3272ddf"
+    },
+    "output_sha256": "1c84c35ac9e237970966a1b435fb55fdb3cf3450368dc2628560cf1d72a432e1",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 382,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 382,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance"
+  },
+  {
+    "case": "norm_bf16_f32_scale0",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "ed6feb95fa42576aa770778e6ffbd40d8d01a3cbeb6e42dea682b435b5fd251b"
+    },
+    "output_sha256": "3e75b0b4c545c3f16e8923ba88ae31c528dacc4df42bab2737f5789909fb0566",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 0.0,
+          "max_relative_nonzero": 0.0,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 0.0,
+          "max_relative_nonzero": 0.0,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.8892900244007207e-07,
+          "max_relative_nonzero": 5.422593638666157e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true,
+    "fp32_ulp_to_rounded_fp64": {
+      "maximum": 0,
+      "over_one": 0
+    },
+    "fp32_ulp_to_cpu_fp32": {
+      "maximum": 0,
+      "over_one": 0
+    }
+  },
+  {
+    "case": "norm_bf16_f32_scale1e-20",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "ed76c9d4c787ae6b116cf6e83018e724ffd0c2bb3fee47c87b2a31363c36591d"
+    },
+    "output_sha256": "07769e745421c293987c7e89ecaf7f4b1d35ba809e4dba2d372c478544f8d134",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 4987,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 5.95506828338173e-08,
+          "max_relative_nonzero": 9.137426900584796e-08,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 2.100138834763363e-08,
+          "max_relative_nonzero": 9.469697866448662e-08,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.8892900244007207e-07,
+          "max_relative_nonzero": 5.422593638666157e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true,
+    "fp32_ulp_to_rounded_fp64": {
+      "maximum": 1,
+      "over_one": 0
+    },
+    "fp32_ulp_to_cpu_fp32": {
+      "maximum": 1,
+      "over_one": 0
+    }
+  },
+  {
+    "case": "norm_bf16_f32_scale1e-08",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "02aa18e74b00163b671b85c2e5c55ef04af72682ee665d1a5776f607b96d93c5"
+    },
+    "output_sha256": "258a0df2925b35054fb66a078f4c8c8d8c05248f041d34d9786be134f8110ff1",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 5087,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 5.4429508029311714e-08,
+          "max_relative_nonzero": 8.681423937709408e-08,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 2.1301153697806464e-08,
+          "max_relative_nonzero": 9.469697866448662e-08,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.8892900244007207e-07,
+          "max_relative_nonzero": 5.422593638666157e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true,
+    "fp32_ulp_to_rounded_fp64": {
+      "maximum": 1,
+      "over_one": 0
+    },
+    "fp32_ulp_to_cpu_fp32": {
+      "maximum": 1,
+      "over_one": 0
+    }
+  },
+  {
+    "case": "norm_bf16_f32_scale0.0001",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "1709f3cf3ac9a16c1fbaaee1cf3852f94a3a5e2fcd18c13547e51d4ff353831b"
+    },
+    "output_sha256": "330694a6b357b11d9b6bb34c751b125bc1be719fee5c192397754150c2681168",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 23551,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 8003,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 4.2250737728479573e-08,
+          "max_relative_nonzero": 1.5867931473839032e-07,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 4.3756559091038765e-08,
+          "max_relative_nonzero": 2.373932887492911e-07,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.8892900244007207e-07,
+          "max_relative_nonzero": 5.422593638666157e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true,
+    "fp32_ulp_to_rounded_fp64": {
+      "maximum": 2,
+      "over_one": 207
+    },
+    "fp32_ulp_to_cpu_fp32": {
+      "maximum": 3,
+      "over_one": 1226
+    }
+  },
+  {
+    "case": "norm_bf16_f32_scale1",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "7cd996b194c00ac568fdb8f940b8476bb96de5c21f7254fe0bc1bf0d45616a81"
+    },
+    "output_sha256": "493e38ac4590995d2f9d32b4e276f02470229b05ac12496cb51f59c68832c4c9",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 24481,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 14618,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 4.176551023684101e-08,
+          "max_relative_nonzero": 1.49964791725232e-07,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 4.65996819943707e-08,
+          "max_relative_nonzero": 2.035560633600816e-07,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.8892900244007207e-07,
+          "max_relative_nonzero": 5.422593638666157e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true,
+    "fp32_ulp_to_rounded_fp64": {
+      "maximum": 2,
+      "over_one": 225
+    },
+    "fp32_ulp_to_cpu_fp32": {
+      "maximum": 2,
+      "over_one": 2363
+    }
+  },
+  {
+    "case": "norm_bf16_f32_scale30",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "e0013569748801d28c4d8417e2d6f9273a43476ae48a15f8969d1844b10c9cb0"
+    },
+    "output_sha256": "4c56fa66768e5e6fff898748ba8c1e6d4347f52f322b43781c6c8fc686fd4141",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 25107,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 14067,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 4.141426733151063e-08,
+          "max_relative_nonzero": 1.555818563044413e-07,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 4.8428908572926574e-08,
+          "max_relative_nonzero": 2.203609799320561e-07,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.8892900244007207e-07,
+          "max_relative_nonzero": 5.422593638666157e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true,
+    "fp32_ulp_to_rounded_fp64": {
+      "maximum": 2,
+      "over_one": 128
+    },
+    "fp32_ulp_to_cpu_fp32": {
+      "maximum": 2,
+      "over_one": 3157
+    }
+  },
+  {
+    "case": "norm_bf16_f32_scale1e+10",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "617a2a56972fa27c2ff37b4327b969e6daf906462aab4cffbebe1a489d8bc66f"
+    },
+    "output_sha256": "215d19240ea291255309a17285f5fbe985011b504eb190f2b0621244e7afe1da",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 24585,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 13716,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 3.979954218626783e-08,
+          "max_relative_nonzero": 1.494522769455591e-07,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 4.459571962223239e-08,
+          "max_relative_nonzero": 2.3742583855541572e-07,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.8892900244007207e-07,
+          "max_relative_nonzero": 5.422593638666157e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true,
+    "fp32_ulp_to_rounded_fp64": {
+      "maximum": 2,
+      "over_one": 126
+    },
+    "fp32_ulp_to_cpu_fp32": {
+      "maximum": 3,
+      "over_one": 1212
+    }
+  },
+  {
+    "case": "norm_bf16_f32_scale1e+18",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "f6a01cc464d29eb58d02768417504ed3110739abc7f474b3f9b42d396438aaf5"
+    },
+    "output_sha256": "176b09609fa967172c60829a0e138ad7cbe4f9bef5b53574ba53fd4443951979",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 22885,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 13609,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance",
+    "fp32_ulp_to_rounded_fp64": {
+      "maximum": 2,
+      "over_one": 246
+    },
+    "fp32_ulp_to_cpu_fp32": {
+      "maximum": 2,
+      "over_one": 4034
+    }
+  },
+  {
+    "case": "norm_bf16_f32_scale1e+20",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "8dcdfead1e531c1173b613ec2b2cafe846c8adf9166146afd306be67ab300c48"
+    },
+    "output_sha256": "3e75b0b4c545c3f16e8923ba88ae31c528dacc4df42bab2737f5789909fb0566",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance",
+    "fp32_ulp_to_rounded_fp64": {
+      "maximum": 1054645070,
+      "over_one": 98304
+    },
+    "fp32_ulp_to_cpu_fp32": {
+      "maximum": 0,
+      "over_one": 0
+    }
+  },
+  {
+    "case": "norm_bf16_f32_nonfinite",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "6e97b95bbdcaaf68aec75947d1b200113668798a6ecea8370a7a85bce3272ddf"
+    },
+    "output_sha256": "0228b0d3a736030460a2ea6e1a705bd674386e8b40f41a12b927c2207c4dcd01",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 382,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 382,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance",
+    "fp32_ulp_to_rounded_fp64": {
+      "maximum": 0,
+      "over_one": 0
+    },
+    "fp32_ulp_to_cpu_fp32": {
+      "maximum": 0,
+      "over_one": 0
+    }
+  },
+  {
+    "case": "norm_f32_bf16_scale0",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "3e75b0b4c545c3f16e8923ba88ae31c528dacc4df42bab2737f5789909fb0566"
+    },
+    "output_sha256": "ed6feb95fa42576aa770778e6ffbd40d8d01a3cbeb6e42dea682b435b5fd251b",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 0.0,
+          "max_relative_nonzero": 0.0,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 0.0,
+          "max_relative_nonzero": 0.0,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 0.005005332401431067,
+          "max_relative_nonzero": 0.011673144813292246
+        },
+        "passed": true,
+        "ulp_to_fp64": 0,
+        "ulp_to_fp32": 0
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "norm_f32_bf16_scale1e-20",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "0584d782ba3000beec5980da028094bc2e2fcc12e18273623222a58e5a2da3c2"
+    },
+    "output_sha256": "b0a62c1273ab71c0b291d064535fdbd9690856d6195fda984b98521d827c5096",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 0.001654986412910624,
+          "max_relative_nonzero": 0.003888492285798673,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 0.0016549862532469015,
+          "max_relative_nonzero": 0.003888547232721602,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 0.005005332401431067,
+          "max_relative_nonzero": 0.011673144813292246
+        },
+        "passed": true,
+        "ulp_to_fp64": 1,
+        "ulp_to_fp32": 0
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "norm_f32_bf16_scale1e-08",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "14bb3bf45f8d488f9ba40f03d1cc931704fa4795b083bed609daf02a0932a5da"
+    },
+    "output_sha256": "b4cbd858804c9b0bf3cc1a4d93dc9a36aa5293d845e064b281f3a5d325fe48aa",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 0.0016595044648556794,
+          "max_relative_nonzero": 0.003888615580394763,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 0.0016595043388193608,
+          "max_relative_nonzero": 0.0038886664396259245,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 0.005005332401431067,
+          "max_relative_nonzero": 0.011673144813292246
+        },
+        "passed": true,
+        "ulp_to_fp64": 0,
+        "ulp_to_fp32": 0
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "norm_f32_bf16_scale0.0001",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "5c7c7e832e7d0e3f9d31640b7dd05a179ce6d0364c85c89f01bad43b260d5696"
+    },
+    "output_sha256": "5aa7cf366692226345a2ec82c488ad29772db4b85709eba399d7e8c6f946d7f4",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 0.0016659119728691682,
+          "max_relative_nonzero": 0.0038876177648107238,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 0.0016659119170773155,
+          "max_relative_nonzero": 0.0038876203533710226,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 0.005005332401431067,
+          "max_relative_nonzero": 0.011673144813292246
+        },
+        "passed": true,
+        "ulp_to_fp64": 0,
+        "ulp_to_fp32": 0
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "norm_f32_bf16_scale1",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "722819e3eee5a11b566d16206d4e508b653a685bc010583d10ef5da71548f0c1"
+    },
+    "output_sha256": "7de3a70bcb2ad6b2d97498357f0c292e5e8e55ca6ebfd15b7fc6755d55b324d6",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 1,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 0.0016569295401220143,
+          "max_relative_nonzero": 0.0038832397221975983,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 0.001656929696984115,
+          "max_relative_nonzero": 0.003883243818360801,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 0.005005332401431067,
+          "max_relative_nonzero": 0.011673144813292246
+        },
+        "passed": true,
+        "ulp_to_fp64": 0,
+        "ulp_to_fp32": 1
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "norm_f32_bf16_scale30",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "e7f22bca51a185a6f8d018bf82d35a25d5b43cbba8aa11b6dc4bd1c4e5c61ba4"
+    },
+    "output_sha256": "7de3a70bcb2ad6b2d97498357f0c292e5e8e55ca6ebfd15b7fc6755d55b324d6",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 0.001656929580418528,
+          "max_relative_nonzero": 0.0038832410008550846,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 0.0016569297759206224,
+          "max_relative_nonzero": 0.003883243818360801,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 0.005005332401431067,
+          "max_relative_nonzero": 0.011673144813292246
+        },
+        "passed": true,
+        "ulp_to_fp64": 0,
+        "ulp_to_fp32": 0
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "norm_f32_bf16_scale1e+10",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "e60bcdd657e3d6880577ba46aee8aa53d32835dc03064c4c9ac0e317e2d7e31a"
+    },
+    "output_sha256": "c8645307edbe43aa93aaaa59e58a77985d423d1dbc1a1d13844a725ee692d55c",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 0.001656929319601331,
+          "max_relative_nonzero": 0.0038832208285242836,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 0.001656929289603437,
+          "max_relative_nonzero": 0.003883243818360801,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 0.005005332401431067,
+          "max_relative_nonzero": 0.011673144813292246
+        },
+        "passed": true,
+        "ulp_to_fp64": 1,
+        "ulp_to_fp32": 0
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "norm_f32_bf16_scale1e+18",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "a275c70136768cce3b82fb35cb28c3e292b46dd3b7d8335111e5e154e5097400"
+    },
+    "output_sha256": "c8645307edbe43aa93aaaa59e58a77985d423d1dbc1a1d13844a725ee692d55c",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 1,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 1,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance"
+  },
+  {
+    "case": "norm_f32_bf16_scale1e+20",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "a05944afe34e37e9f46789d32b9a3ca6fb8051a746ca071501c820d5d9b961ae"
+    },
+    "output_sha256": "ed6feb95fa42576aa770778e6ffbd40d8d01a3cbeb6e42dea682b435b5fd251b",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance"
+  },
+  {
+    "case": "norm_f32_bf16_nonfinite",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "54a357a0296cde13eee72598edbb7c288a594c5285b8f132105578fe825d877f"
+    },
+    "output_sha256": "1c84c35ac9e237970966a1b435fb55fdb3cf3450368dc2628560cf1d72a432e1",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 382,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 382,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance"
+  },
+  {
+    "case": "norm_f32_f32_scale0",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "3e75b0b4c545c3f16e8923ba88ae31c528dacc4df42bab2737f5789909fb0566"
+    },
+    "output_sha256": "3e75b0b4c545c3f16e8923ba88ae31c528dacc4df42bab2737f5789909fb0566",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 0.0,
+          "max_relative_nonzero": 0.0,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 0.0,
+          "max_relative_nonzero": 0.0,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.5908351167188408e-07,
+          "max_relative_nonzero": 5.293661603890089e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true,
+    "fp32_ulp_to_rounded_fp64": {
+      "maximum": 0,
+      "over_one": 0
+    },
+    "fp32_ulp_to_cpu_fp32": {
+      "maximum": 0,
+      "over_one": 0
+    }
+  },
+  {
+    "case": "norm_f32_f32_scale1e-20",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "0584d782ba3000beec5980da028094bc2e2fcc12e18273623222a58e5a2da3c2"
+    },
+    "output_sha256": "6b26404e8ee28efa381a8747906f22cc763e82ae793dfc3332d0c1b9205d579f",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 2018,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 5.2023521382154e-08,
+          "max_relative_nonzero": 1.0522976815111646e-07,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 1.229909021027526e-08,
+          "max_relative_nonzero": 1.1916519537372112e-07,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.5908351167188408e-07,
+          "max_relative_nonzero": 5.293661603890089e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true,
+    "fp32_ulp_to_rounded_fp64": {
+      "maximum": 1,
+      "over_one": 0
+    },
+    "fp32_ulp_to_cpu_fp32": {
+      "maximum": 1,
+      "over_one": 0
+    }
+  },
+  {
+    "case": "norm_f32_f32_scale1e-08",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "14bb3bf45f8d488f9ba40f03d1cc931704fa4795b083bed609daf02a0932a5da"
+    },
+    "output_sha256": "db9e2b0e1fa9e9433e7149b5f20432f96124c67b1e14abe7fe7203991fddbcc1",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 2023,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 4.669713228063349e-08,
+          "max_relative_nonzero": 9.933381520148473e-08,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 1.171981609810044e-08,
+          "max_relative_nonzero": 1.1917644310754959e-07,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.5908351167188408e-07,
+          "max_relative_nonzero": 5.293661603890089e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true,
+    "fp32_ulp_to_rounded_fp64": {
+      "maximum": 1,
+      "over_one": 0
+    },
+    "fp32_ulp_to_cpu_fp32": {
+      "maximum": 1,
+      "over_one": 0
+    }
+  },
+  {
+    "case": "norm_f32_f32_scale0.0001",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "5c7c7e832e7d0e3f9d31640b7dd05a179ce6d0364c85c89f01bad43b260d5696"
+    },
+    "output_sha256": "396b3ebcf2f42ff621553a0e9b47a9603a5df9844e84c3bf28c764a955691806",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 20183,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 9243,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 4.176413576512404e-08,
+          "max_relative_nonzero": 1.6813476919897034e-07,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 4.128743955591382e-08,
+          "max_relative_nonzero": 2.3763688181438612e-07,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.5908351167188408e-07,
+          "max_relative_nonzero": 5.293661603890089e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true,
+    "fp32_ulp_to_rounded_fp64": {
+      "maximum": 2,
+      "over_one": 228
+    },
+    "fp32_ulp_to_cpu_fp32": {
+      "maximum": 3,
+      "over_one": 1296
+    }
+  },
+  {
+    "case": "norm_f32_f32_scale1",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "722819e3eee5a11b566d16206d4e508b653a685bc010583d10ef5da71548f0c1"
+    },
+    "output_sha256": "cd9a3447170d67f403a2ab467c866b7fa91d2d24ebdfa015ae2e036e664190a2",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 24482,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 16677,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 4.043419103094104e-08,
+          "max_relative_nonzero": 1.4199691647995122e-07,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 4.637940973070471e-08,
+          "max_relative_nonzero": 1.954082767715934e-07,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.5908351167188408e-07,
+          "max_relative_nonzero": 5.293661603890089e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true,
+    "fp32_ulp_to_rounded_fp64": {
+      "maximum": 2,
+      "over_one": 156
+    },
+    "fp32_ulp_to_cpu_fp32": {
+      "maximum": 2,
+      "over_one": 2324
+    }
+  },
+  {
+    "case": "norm_f32_f32_scale30",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "e7f22bca51a185a6f8d018bf82d35a25d5b43cbba8aa11b6dc4bd1c4e5c61ba4"
+    },
+    "output_sha256": "82cb9c906adc6ae4498cfcb95707b0e320edf5cbc3a5b557d4057c7d349bca90",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 25484,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 15405,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 4.2087226197957024e-08,
+          "max_relative_nonzero": 1.4833988521857065e-07,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 4.875610018365318e-08,
+          "max_relative_nonzero": 2.1440729087704482e-07,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.5908351167188408e-07,
+          "max_relative_nonzero": 5.293661603890089e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true,
+    "fp32_ulp_to_rounded_fp64": {
+      "maximum": 2,
+      "over_one": 265
+    },
+    "fp32_ulp_to_cpu_fp32": {
+      "maximum": 2,
+      "over_one": 3173
+    }
+  },
+  {
+    "case": "norm_f32_f32_scale1e+10",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "e60bcdd657e3d6880577ba46aee8aa53d32835dc03064c4c9ac0e317e2d7e31a"
+    },
+    "output_sha256": "d4a96437ebf9e4dce678d2bf5b6cbbc2038aa832d5f719e70332f47bdea49f0e",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 28433,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 17734,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 4.113061835863194e-08,
+          "max_relative_nonzero": 1.501093659889776e-07,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 4.8302932482877135e-08,
+          "max_relative_nonzero": 2.379397841029575e-07,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.5908351167188408e-07,
+          "max_relative_nonzero": 5.293661603890089e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true,
+    "fp32_ulp_to_rounded_fp64": {
+      "maximum": 2,
+      "over_one": 242
+    },
+    "fp32_ulp_to_cpu_fp32": {
+      "maximum": 3,
+      "over_one": 1570
+    }
+  },
+  {
+    "case": "norm_f32_f32_scale1e+18",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "a275c70136768cce3b82fb35cb28c3e292b46dd3b7d8335111e5e154e5097400"
+    },
+    "output_sha256": "04dcc71b44b0b3516a75eeef745c51573cc1fb32b1cf507448c138d6301c7f03",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 26185,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 13849,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance",
+    "fp32_ulp_to_rounded_fp64": {
+      "maximum": 2,
+      "over_one": 369
+    },
+    "fp32_ulp_to_cpu_fp32": {
+      "maximum": 2,
+      "over_one": 4717
+    }
+  },
+  {
+    "case": "norm_f32_f32_scale1e+20",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "a05944afe34e37e9f46789d32b9a3ca6fb8051a746ca071501c820d5d9b961ae"
+    },
+    "output_sha256": "3e75b0b4c545c3f16e8923ba88ae31c528dacc4df42bab2737f5789909fb0566",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 98304,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance",
+    "fp32_ulp_to_rounded_fp64": {
+      "maximum": 1054648829,
+      "over_one": 98304
+    },
+    "fp32_ulp_to_cpu_fp32": {
+      "maximum": 0,
+      "over_one": 0
+    }
+  },
+  {
+    "case": "norm_f32_f32_nonfinite",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "54a357a0296cde13eee72598edbb7c288a594c5285b8f132105578fe825d877f"
+    },
+    "output_sha256": "0228b0d3a736030460a2ea6e1a705bd674386e8b40f41a12b927c2207c4dcd01",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 382,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 382,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance",
+    "fp32_ulp_to_rounded_fp64": {
+      "maximum": 0,
+      "over_one": 0
+    },
+    "fp32_ulp_to_cpu_fp32": {
+      "maximum": 0,
+      "over_one": 0
+    }
+  },
+  {
+    "case": "gate_bf16_bf16_bf16_random",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "a98be4b0a7e4a3eb642c2f1c0861fce6b2a3d5ef7d2ae039d9e6cc56c4df4c86",
+      "alog": "256601ac1c690d3c45f8077c8b5145d33750316438ae43afa6f43483d5272927",
+      "bias": "6e1dfd618cdd75fe5625c587449bfb530d85c3448821821c2d49fc2045f0e48b"
+    },
+    "output_sha256": "3bb458e6c83a20cd89138e44fd25dd587322fb7f846880f8b8c74dfa98efa655",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 44620,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 1035,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 5.254205410037585e-08,
+          "max_relative_nonzero": 2.455695765151383e-07,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 4.407877003797739e-08,
+          "max_relative_nonzero": 3.262294691561455e-07,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.385770801461847e-07,
+          "max_relative_nonzero": 5.106379369265594e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "gate_bf16_bf16_bf16_threshold",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "e9c61a3f960d9bff8e17e070eb450ee017280f8d19345d2ba4244cd4a02cf79a",
+      "alog": "dc8a9191db43ccfe122d9e55dd32e0c3b449ab357f70d47157b4d872d4c4750a",
+      "bias": "e5a00aa9991ac8a5ee3109844d84a55583bd20572ad3ffcd42792f3c36b183ad"
+    },
+    "output_sha256": "bcc4d539b0db47788521d5dc1cc7170b7001901fe8773118f726a19aab23d86a",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 3.4590464513461694e-08,
+          "max_relative_nonzero": 1.0629753181516645e-07,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 0.0,
+          "max_relative_nonzero": 0.0,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.385770801461847e-07,
+          "max_relative_nonzero": 5.106379369265594e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "gate_bf16_bf16_bf16_subnormal",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "a693402ebc262d264e0bba381c49260ae4df2265a5e3612348c4e7e607c8f5c5",
+      "alog": "dc8a9191db43ccfe122d9e55dd32e0c3b449ab357f70d47157b4d872d4c4750a",
+      "bias": "e5a00aa9991ac8a5ee3109844d84a55583bd20572ad3ffcd42792f3c36b183ad"
+    },
+    "output_sha256": "f4e92044d8f11251dc26acd0f7ff02635bc2e9f6586c59a8c1881ebdeb496c90",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 61012,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 66560,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 66560,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance"
+  },
+  {
+    "case": "gate_bf16_bf16_bf16_alog_range",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "3056a3ceed8bc529edb7ca99250c8c86c028fb918fc52ea05784ddccf49c1e79",
+      "alog": "b0a961206c15856af84791a13fa3048627a4ffd292f3341d6c32889b6e5a93de",
+      "bias": "e5a00aa9991ac8a5ee3109844d84a55583bd20572ad3ffcd42792f3c36b183ad"
+    },
+    "output_sha256": "719ba74244f9f066683e99e4e161123a60299548a41cab007d49a7a300be96b6",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 89856,
+      "finite_differing_values": 9984,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 16640,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 89856,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 16640,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance"
+  },
+  {
+    "case": "gate_bf16_bf16_bf16_nonfinite",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "6b786114bd96e20adea2be925529c3d6aa26471e108dc26734664be7d8d677f9",
+      "alog": "dc8a9191db43ccfe122d9e55dd32e0c3b449ab357f70d47157b4d872d4c4750a",
+      "bias": "e5a00aa9991ac8a5ee3109844d84a55583bd20572ad3ffcd42792f3c36b183ad"
+    },
+    "output_sha256": "24577857077a49a0b19e9f5cce5f5cb5e657977be338f328cc1b31d82bb764cf",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 79872,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 79872,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance"
+  },
+  {
+    "case": "gate_bf16_bf16_f32_random",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "ab41d66c44dfdde7e04db9dda748ca0b2e47c0b79e19297854df00e3f8db38a6",
+      "alog": "256601ac1c690d3c45f8077c8b5145d33750316438ae43afa6f43483d5272927",
+      "bias": "f8798e4d292c0e0ae93ad89feab39c33efb750db6b33f63c364111c69a351b11"
+    },
+    "output_sha256": "eb5d0ee7f133440f66370d7777aa4212e5cab10958decebfe59be6448a1c8f65",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 44555,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 1068,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 5.6848912391605646e-08,
+          "max_relative_nonzero": 2.4810749727377935e-07,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 4.3984824534357164e-08,
+          "max_relative_nonzero": 3.981146484592913e-07,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.464126540337291e-07,
+          "max_relative_nonzero": 8.144640195580126e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "gate_bf16_bf16_f32_threshold",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "e9c61a3f960d9bff8e17e070eb450ee017280f8d19345d2ba4244cd4a02cf79a",
+      "alog": "dc8a9191db43ccfe122d9e55dd32e0c3b449ab357f70d47157b4d872d4c4750a",
+      "bias": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+    },
+    "output_sha256": "bcc4d539b0db47788521d5dc1cc7170b7001901fe8773118f726a19aab23d86a",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 3.4590464513461694e-08,
+          "max_relative_nonzero": 1.0629753181516645e-07,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 0.0,
+          "max_relative_nonzero": 0.0,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.464126540337291e-07,
+          "max_relative_nonzero": 8.144640195580126e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "gate_bf16_bf16_f32_subnormal",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "a693402ebc262d264e0bba381c49260ae4df2265a5e3612348c4e7e607c8f5c5",
+      "alog": "dc8a9191db43ccfe122d9e55dd32e0c3b449ab357f70d47157b4d872d4c4750a",
+      "bias": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+    },
+    "output_sha256": "f4e92044d8f11251dc26acd0f7ff02635bc2e9f6586c59a8c1881ebdeb496c90",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 61012,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 66560,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 66560,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance"
+  },
+  {
+    "case": "gate_bf16_bf16_f32_alog_range",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "3056a3ceed8bc529edb7ca99250c8c86c028fb918fc52ea05784ddccf49c1e79",
+      "alog": "b0a961206c15856af84791a13fa3048627a4ffd292f3341d6c32889b6e5a93de",
+      "bias": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+    },
+    "output_sha256": "719ba74244f9f066683e99e4e161123a60299548a41cab007d49a7a300be96b6",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 89856,
+      "finite_differing_values": 9984,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 16640,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 89856,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 16640,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance"
+  },
+  {
+    "case": "gate_bf16_bf16_f32_nonfinite",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "6b786114bd96e20adea2be925529c3d6aa26471e108dc26734664be7d8d677f9",
+      "alog": "dc8a9191db43ccfe122d9e55dd32e0c3b449ab357f70d47157b4d872d4c4750a",
+      "bias": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+    },
+    "output_sha256": "24577857077a49a0b19e9f5cce5f5cb5e657977be338f328cc1b31d82bb764cf",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 79872,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 79872,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance"
+  },
+  {
+    "case": "gate_bf16_f32_bf16_random",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "9f957d8e38d7298c684a586c9c4f40ea0c09470e60201220f3e41f032967972f",
+      "alog": "eb41e4ea052689b344bf5939ee74e45cb78c4f20bf97604aa971a0d39e0b7b07",
+      "bias": "6e1dfd618cdd75fe5625c587449bfb530d85c3448821821c2d49fc2045f0e48b"
+    },
+    "output_sha256": "15c4db8678357da356d1b9f72d90393153ee0e339c74cd0610457dbf317f56a5",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 54951,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 957,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 5.3398389631074527e-08,
+          "max_relative_nonzero": 2.455695765151383e-07,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 4.424041754927169e-08,
+          "max_relative_nonzero": 3.536247330796312e-07,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.3019290956223217e-07,
+          "max_relative_nonzero": 5.831864113937513e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "gate_bf16_f32_bf16_threshold",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "e9c61a3f960d9bff8e17e070eb450ee017280f8d19345d2ba4244cd4a02cf79a",
+      "alog": "b8e2707b19d7ceec4104a87bdc8890d595fb3f5ccf72e69a1a3d8bc80be37758",
+      "bias": "e5a00aa9991ac8a5ee3109844d84a55583bd20572ad3ffcd42792f3c36b183ad"
+    },
+    "output_sha256": "0a0026d828fe054c7a40aba0293e3b96789bb0578480e3eb44b112236d979f5a",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 16640,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 4.997635609263817e-08,
+          "max_relative_nonzero": 1.374949384002875e-07,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 3.315634618414989e-08,
+          "max_relative_nonzero": 1.5737898519984416e-07,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.3019290956223217e-07,
+          "max_relative_nonzero": 5.831864113937513e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "gate_bf16_f32_bf16_subnormal",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "a693402ebc262d264e0bba381c49260ae4df2265a5e3612348c4e7e607c8f5c5",
+      "alog": "b8e2707b19d7ceec4104a87bdc8890d595fb3f5ccf72e69a1a3d8bc80be37758",
+      "bias": "e5a00aa9991ac8a5ee3109844d84a55583bd20572ad3ffcd42792f3c36b183ad"
+    },
+    "output_sha256": "b5123ffbbb8c4e6d50e4f8dcb833280261a070751b660eb64c73e2d48de472ae",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 61013,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 66560,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 66560,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance"
+  },
+  {
+    "case": "gate_bf16_f32_bf16_alog_range",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "3056a3ceed8bc529edb7ca99250c8c86c028fb918fc52ea05784ddccf49c1e79",
+      "alog": "fa29ed9119219be4237723899ac2b0d4190e0edffb14ce41b595f88b01ed3603",
+      "bias": "e5a00aa9991ac8a5ee3109844d84a55583bd20572ad3ffcd42792f3c36b183ad"
+    },
+    "output_sha256": "9b1533c109e63611ca0ba4c4cd72c1920ce303db11eee096efea6a5409da0ce5",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 89856,
+      "finite_differing_values": 9984,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 16640,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 89856,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 16640,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance"
+  },
+  {
+    "case": "gate_bf16_f32_bf16_nonfinite",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "6b786114bd96e20adea2be925529c3d6aa26471e108dc26734664be7d8d677f9",
+      "alog": "b8e2707b19d7ceec4104a87bdc8890d595fb3f5ccf72e69a1a3d8bc80be37758",
+      "bias": "e5a00aa9991ac8a5ee3109844d84a55583bd20572ad3ffcd42792f3c36b183ad"
+    },
+    "output_sha256": "fa37b39c981f569721f304669ee3116c8592432f4d548a9e3cbfdd5e671bc3e1",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 79872,
+      "finite_differing_values": 6656,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 79872,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance"
+  },
+  {
+    "case": "gate_bf16_f32_f32_random",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "b23b1a5cd67f931efd41a15196df72d00e1d52e829517788121d7d514a546bf5",
+      "alog": "eb41e4ea052689b344bf5939ee74e45cb78c4f20bf97604aa971a0d39e0b7b07",
+      "bias": "f8798e4d292c0e0ae93ad89feab39c33efb750db6b33f63c364111c69a351b11"
+    },
+    "output_sha256": "bd94b4a0428b85168ca407f8c61d2f765991be88ee519f4071fe0d4115a071a2",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 54855,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 1013,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 5.4893880543384616e-08,
+          "max_relative_nonzero": 2.8619000499402076e-07,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 4.43722597041503e-08,
+          "max_relative_nonzero": 3.5734443769261984e-07,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.3734466048431782e-07,
+          "max_relative_nonzero": 7.298292393636251e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "gate_bf16_f32_f32_threshold",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "e9c61a3f960d9bff8e17e070eb450ee017280f8d19345d2ba4244cd4a02cf79a",
+      "alog": "b8e2707b19d7ceec4104a87bdc8890d595fb3f5ccf72e69a1a3d8bc80be37758",
+      "bias": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+    },
+    "output_sha256": "0a0026d828fe054c7a40aba0293e3b96789bb0578480e3eb44b112236d979f5a",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 16640,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 4.997635609263817e-08,
+          "max_relative_nonzero": 1.374949384002875e-07,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 3.315634618414989e-08,
+          "max_relative_nonzero": 1.5737898519984416e-07,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.3734466048431782e-07,
+          "max_relative_nonzero": 7.298292393636251e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "gate_bf16_f32_f32_subnormal",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "a693402ebc262d264e0bba381c49260ae4df2265a5e3612348c4e7e607c8f5c5",
+      "alog": "b8e2707b19d7ceec4104a87bdc8890d595fb3f5ccf72e69a1a3d8bc80be37758",
+      "bias": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+    },
+    "output_sha256": "b5123ffbbb8c4e6d50e4f8dcb833280261a070751b660eb64c73e2d48de472ae",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 61013,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 66560,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 66560,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance"
+  },
+  {
+    "case": "gate_bf16_f32_f32_alog_range",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "3056a3ceed8bc529edb7ca99250c8c86c028fb918fc52ea05784ddccf49c1e79",
+      "alog": "fa29ed9119219be4237723899ac2b0d4190e0edffb14ce41b595f88b01ed3603",
+      "bias": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+    },
+    "output_sha256": "9b1533c109e63611ca0ba4c4cd72c1920ce303db11eee096efea6a5409da0ce5",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 89856,
+      "finite_differing_values": 9984,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 16640,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 89856,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 16640,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance"
+  },
+  {
+    "case": "gate_bf16_f32_f32_nonfinite",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "6b786114bd96e20adea2be925529c3d6aa26471e108dc26734664be7d8d677f9",
+      "alog": "b8e2707b19d7ceec4104a87bdc8890d595fb3f5ccf72e69a1a3d8bc80be37758",
+      "bias": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+    },
+    "output_sha256": "fa37b39c981f569721f304669ee3116c8592432f4d548a9e3cbfdd5e671bc3e1",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 79872,
+      "finite_differing_values": 6656,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 79872,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance"
+  },
+  {
+    "case": "gate_f32_bf16_bf16_random",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "b18e491ea03801ab17018948a1d3961c9ec37cd55820219ef5de4a991dfab1a9",
+      "alog": "256601ac1c690d3c45f8077c8b5145d33750316438ae43afa6f43483d5272927",
+      "bias": "6e1dfd618cdd75fe5625c587449bfb530d85c3448821821c2d49fc2045f0e48b"
+    },
+    "output_sha256": "bbc82dd4cddaad00e526b486c9afae54e767aed6d28f7232060cd9fbf3069753",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 44717,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 995,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 5.2603319117940355e-08,
+          "max_relative_nonzero": 2.737863275359291e-07,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 4.28823710627171e-08,
+          "max_relative_nonzero": 2.9859888445447427e-07,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.3859049513332232e-07,
+          "max_relative_nonzero": 8.413248231707547e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "gate_f32_bf16_bf16_threshold",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "362c7bd9b02f81ca2952e9dcd10d9a2f3cc713692ce0d0fc1b3b2d4ab603ecb6",
+      "alog": "dc8a9191db43ccfe122d9e55dd32e0c3b449ab357f70d47157b4d872d4c4750a",
+      "bias": "e5a00aa9991ac8a5ee3109844d84a55583bd20572ad3ffcd42792f3c36b183ad"
+    },
+    "output_sha256": "699f92399b7acfc328cf3fb6745b8d6d111338087baa020f760d98678fe3005f",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 3.4630000914311146e-08,
+          "max_relative_nonzero": 1.0629753181516645e-07,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 0.0,
+          "max_relative_nonzero": 0.0,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.3859049513332232e-07,
+          "max_relative_nonzero": 8.413248231707547e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "gate_f32_bf16_bf16_subnormal",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "34e6577de15eab5f4581c1bb5f49cb7e5ab7a1672bdf06bb39f273e9a399df77",
+      "alog": "dc8a9191db43ccfe122d9e55dd32e0c3b449ab357f70d47157b4d872d4c4750a",
+      "bias": "e5a00aa9991ac8a5ee3109844d84a55583bd20572ad3ffcd42792f3c36b183ad"
+    },
+    "output_sha256": "f4e92044d8f11251dc26acd0f7ff02635bc2e9f6586c59a8c1881ebdeb496c90",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 61012,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 66560,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 66560,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance"
+  },
+  {
+    "case": "gate_f32_bf16_bf16_alog_range",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "5c48799eef94b7e675c3e8a9af77a73a6999e316f3b735365a57977e02c2a1b1",
+      "alog": "b0a961206c15856af84791a13fa3048627a4ffd292f3341d6c32889b6e5a93de",
+      "bias": "e5a00aa9991ac8a5ee3109844d84a55583bd20572ad3ffcd42792f3c36b183ad"
+    },
+    "output_sha256": "719ba74244f9f066683e99e4e161123a60299548a41cab007d49a7a300be96b6",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 89856,
+      "finite_differing_values": 9984,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 16640,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 89856,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 16640,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance"
+  },
+  {
+    "case": "gate_f32_bf16_bf16_nonfinite",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "6b3d9f93f4dd6207111479db020aa169c4ccfd7f9ed9d98129cab763b09980d3",
+      "alog": "dc8a9191db43ccfe122d9e55dd32e0c3b449ab357f70d47157b4d872d4c4750a",
+      "bias": "e5a00aa9991ac8a5ee3109844d84a55583bd20572ad3ffcd42792f3c36b183ad"
+    },
+    "output_sha256": "24577857077a49a0b19e9f5cce5f5cb5e657977be338f328cc1b31d82bb764cf",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 79872,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 79872,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance"
+  },
+  {
+    "case": "gate_f32_bf16_f32_random",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "1e31a78be0a8d183573e60f3da2da90ab43473b5a624911b027513cdbcebf418",
+      "alog": "256601ac1c690d3c45f8077c8b5145d33750316438ae43afa6f43483d5272927",
+      "bias": "f8798e4d292c0e0ae93ad89feab39c33efb750db6b33f63c364111c69a351b11"
+    },
+    "output_sha256": "7556bec39cef76a4fc0fbab80694644a4786d1fbb37b3123e2e4109e86d31c9e",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 44718,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 1014,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 5.548756410645509e-08,
+          "max_relative_nonzero": 2.697974856676679e-07,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 4.333138559856019e-08,
+          "max_relative_nonzero": 3.406528270778119e-07,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.4307970796651619e-07,
+          "max_relative_nonzero": 8.008841120856054e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "gate_f32_bf16_f32_threshold",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "362c7bd9b02f81ca2952e9dcd10d9a2f3cc713692ce0d0fc1b3b2d4ab603ecb6",
+      "alog": "dc8a9191db43ccfe122d9e55dd32e0c3b449ab357f70d47157b4d872d4c4750a",
+      "bias": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+    },
+    "output_sha256": "699f92399b7acfc328cf3fb6745b8d6d111338087baa020f760d98678fe3005f",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 3.4630000914311146e-08,
+          "max_relative_nonzero": 1.0629753181516645e-07,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 0.0,
+          "max_relative_nonzero": 0.0,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.4307970796651619e-07,
+          "max_relative_nonzero": 8.008841120856054e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "gate_f32_bf16_f32_subnormal",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "34e6577de15eab5f4581c1bb5f49cb7e5ab7a1672bdf06bb39f273e9a399df77",
+      "alog": "dc8a9191db43ccfe122d9e55dd32e0c3b449ab357f70d47157b4d872d4c4750a",
+      "bias": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+    },
+    "output_sha256": "f4e92044d8f11251dc26acd0f7ff02635bc2e9f6586c59a8c1881ebdeb496c90",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 61012,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 66560,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 66560,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance"
+  },
+  {
+    "case": "gate_f32_bf16_f32_alog_range",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "5c48799eef94b7e675c3e8a9af77a73a6999e316f3b735365a57977e02c2a1b1",
+      "alog": "b0a961206c15856af84791a13fa3048627a4ffd292f3341d6c32889b6e5a93de",
+      "bias": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+    },
+    "output_sha256": "719ba74244f9f066683e99e4e161123a60299548a41cab007d49a7a300be96b6",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 89856,
+      "finite_differing_values": 9984,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 16640,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 89856,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 16640,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance"
+  },
+  {
+    "case": "gate_f32_bf16_f32_nonfinite",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "6b3d9f93f4dd6207111479db020aa169c4ccfd7f9ed9d98129cab763b09980d3",
+      "alog": "dc8a9191db43ccfe122d9e55dd32e0c3b449ab357f70d47157b4d872d4c4750a",
+      "bias": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+    },
+    "output_sha256": "24577857077a49a0b19e9f5cce5f5cb5e657977be338f328cc1b31d82bb764cf",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 79872,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 79872,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance"
+  },
+  {
+    "case": "gate_f32_f32_bf16_random",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "cffb965c9874beedc1f9974741d199428ac47919806a60bb08a3002a06ab98f9",
+      "alog": "eb41e4ea052689b344bf5939ee74e45cb78c4f20bf97604aa971a0d39e0b7b07",
+      "bias": "6e1dfd618cdd75fe5625c587449bfb530d85c3448821821c2d49fc2045f0e48b"
+    },
+    "output_sha256": "6993793c61e7f9e07b65c4dfdbb2d93e77c2fbb3f531acb74b50802b1b3a1877",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 54796,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 1002,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 5.3959442680214026e-08,
+          "max_relative_nonzero": 3.680227415891652e-07,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 4.3877279954838155e-08,
+          "max_relative_nonzero": 3.4699133643597563e-07,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.3380063716264698e-07,
+          "max_relative_nonzero": 8.577936471171129e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "gate_f32_f32_bf16_threshold",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "362c7bd9b02f81ca2952e9dcd10d9a2f3cc713692ce0d0fc1b3b2d4ab603ecb6",
+      "alog": "b8e2707b19d7ceec4104a87bdc8890d595fb3f5ccf72e69a1a3d8bc80be37758",
+      "bias": "e5a00aa9991ac8a5ee3109844d84a55583bd20572ad3ffcd42792f3c36b183ad"
+    },
+    "output_sha256": "287fed8d67d1d17cd256c15f547716ea849e0dbe8a9fa2882dd5c3d9663d2ff5",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 16640,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 4.969554243689432e-08,
+          "max_relative_nonzero": 1.374949384002875e-07,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 3.3156346137222163e-08,
+          "max_relative_nonzero": 1.5737898519984416e-07,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.3380063716264698e-07,
+          "max_relative_nonzero": 8.577936471171129e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "gate_f32_f32_bf16_subnormal",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "34e6577de15eab5f4581c1bb5f49cb7e5ab7a1672bdf06bb39f273e9a399df77",
+      "alog": "b8e2707b19d7ceec4104a87bdc8890d595fb3f5ccf72e69a1a3d8bc80be37758",
+      "bias": "e5a00aa9991ac8a5ee3109844d84a55583bd20572ad3ffcd42792f3c36b183ad"
+    },
+    "output_sha256": "b5123ffbbb8c4e6d50e4f8dcb833280261a070751b660eb64c73e2d48de472ae",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 61013,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 66560,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 66560,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance"
+  },
+  {
+    "case": "gate_f32_f32_bf16_alog_range",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "5c48799eef94b7e675c3e8a9af77a73a6999e316f3b735365a57977e02c2a1b1",
+      "alog": "fa29ed9119219be4237723899ac2b0d4190e0edffb14ce41b595f88b01ed3603",
+      "bias": "e5a00aa9991ac8a5ee3109844d84a55583bd20572ad3ffcd42792f3c36b183ad"
+    },
+    "output_sha256": "9b1533c109e63611ca0ba4c4cd72c1920ce303db11eee096efea6a5409da0ce5",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 89856,
+      "finite_differing_values": 9984,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 16640,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 89856,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 16640,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance"
+  },
+  {
+    "case": "gate_f32_f32_bf16_nonfinite",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "6b3d9f93f4dd6207111479db020aa169c4ccfd7f9ed9d98129cab763b09980d3",
+      "alog": "b8e2707b19d7ceec4104a87bdc8890d595fb3f5ccf72e69a1a3d8bc80be37758",
+      "bias": "e5a00aa9991ac8a5ee3109844d84a55583bd20572ad3ffcd42792f3c36b183ad"
+    },
+    "output_sha256": "fa37b39c981f569721f304669ee3116c8592432f4d548a9e3cbfdd5e671bc3e1",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 79872,
+      "finite_differing_values": 6656,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 79872,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance"
+  },
+  {
+    "case": "gate_f32_f32_f32_random",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "46b02b9787de01576353420ba4b1ee9409b4a952139aacc0822febba05567147",
+      "alog": "eb41e4ea052689b344bf5939ee74e45cb78c4f20bf97604aa971a0d39e0b7b07",
+      "bias": "f8798e4d292c0e0ae93ad89feab39c33efb750db6b33f63c364111c69a351b11"
+    },
+    "output_sha256": "ae036762b828408e3cea54b0ed5eefd42a3b7173b7ce0a56d85f1f11f002c76c",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 54793,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 1021,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 5.5249204512671277e-08,
+          "max_relative_nonzero": 2.8960433316012617e-07,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 4.385512506883842e-08,
+          "max_relative_nonzero": 3.5247702642860995e-07,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.3941702837033546e-07,
+          "max_relative_nonzero": 7.166924504844789e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "gate_f32_f32_f32_threshold",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "362c7bd9b02f81ca2952e9dcd10d9a2f3cc713692ce0d0fc1b3b2d4ab603ecb6",
+      "alog": "b8e2707b19d7ceec4104a87bdc8890d595fb3f5ccf72e69a1a3d8bc80be37758",
+      "bias": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+    },
+    "output_sha256": "287fed8d67d1d17cd256c15f547716ea849e0dbe8a9fa2882dd5c3d9663d2ff5",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 16640,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 4.969554243689432e-08,
+          "max_relative_nonzero": 1.374949384002875e-07,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 3.3156346137222163e-08,
+          "max_relative_nonzero": 1.5737898519984416e-07,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.3941702837033546e-07,
+          "max_relative_nonzero": 7.166924504844789e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "gate_f32_f32_f32_subnormal",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "34e6577de15eab5f4581c1bb5f49cb7e5ab7a1672bdf06bb39f273e9a399df77",
+      "alog": "b8e2707b19d7ceec4104a87bdc8890d595fb3f5ccf72e69a1a3d8bc80be37758",
+      "bias": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+    },
+    "output_sha256": "b5123ffbbb8c4e6d50e4f8dcb833280261a070751b660eb64c73e2d48de472ae",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 61013,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 66560,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 133120,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 66560,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance"
+  },
+  {
+    "case": "gate_f32_f32_f32_alog_range",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "5c48799eef94b7e675c3e8a9af77a73a6999e316f3b735365a57977e02c2a1b1",
+      "alog": "fa29ed9119219be4237723899ac2b0d4190e0edffb14ce41b595f88b01ed3603",
+      "bias": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+    },
+    "output_sha256": "9b1533c109e63611ca0ba4c4cd72c1920ce303db11eee096efea6a5409da0ce5",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 89856,
+      "finite_differing_values": 9984,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 16640,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 89856,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 16640,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance"
+  },
+  {
+    "case": "gate_f32_f32_f32_nonfinite",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "6b3d9f93f4dd6207111479db020aa169c4ccfd7f9ed9d98129cab763b09980d3",
+      "alog": "b8e2707b19d7ceec4104a87bdc8890d595fb3f5ccf72e69a1a3d8bc80be37758",
+      "bias": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+    },
+    "output_sha256": "fa37b39c981f569721f304669ee3116c8592432f4d548a9e3cbfdd5e671bc3e1",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 79872,
+      "finite_differing_values": 6656,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 79872,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance"
+  },
+  {
+    "case": "beta_bf16_n1",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "7cb5b5ee40fb2060fad8412f07a523006af10cd40593569b3ac5424575e881ce"
+    },
+    "output_sha256": "bc6006872fcf35e9d4ee4ebe7f5bcf6cd5de1d8895e03c8a9c809c9920bd5341",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 1,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 1,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 2.5654287089913866e-08,
+          "max_relative_nonzero": 2.5654287089913866e-08,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 0.0,
+          "max_relative_nonzero": 0.0,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.1688584942602394e-07,
+          "max_relative_nonzero": 3.543025674180203e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "beta_bf16_n63",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "35458b6d119ce06dd42cac16f3d08762516a1c54e98d662e8a44970fd1ca83ca"
+    },
+    "output_sha256": "7422dbb744ac8a40c9f71bd2da13332f0e71dbbb9f0036597a23632fe573e047",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 63,
+      "finite_differing_values": 7,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 63,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 4.2980475435233104e-08,
+          "max_relative_nonzero": 9.579830716464342e-08,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 3.1824042468281974e-08,
+          "max_relative_nonzero": 1.3628943296236259e-07,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.1688584942602394e-07,
+          "max_relative_nonzero": 3.543025674180203e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "beta_bf16_n64",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "c39e745cdd2b42d2fa750a2d2af89ab964dadb91eb51d9d1d7025bdcadb11264"
+    },
+    "output_sha256": "576bda24c90316984e41b44c4a3325657ab242a2a8dfba0d05d18b898b6e1a1b",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 64,
+      "finite_differing_values": 10,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 64,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 3.340912377670328e-08,
+          "max_relative_nonzero": 8.681002978692644e-08,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 3.0755162896665027e-08,
+          "max_relative_nonzero": 9.802052451762875e-08,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.1688584942602394e-07,
+          "max_relative_nonzero": 3.543025674180203e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "beta_bf16_n65",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "ab0878785a7f5ec77ad230f7b2f3a48bdc044aea2a5e344fe5fb210847a365aa"
+    },
+    "output_sha256": "d336fd29e95d2db69b6515210ae429440367218868e7e02bda29893ed4e2b502",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 65,
+      "finite_differing_values": 7,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 65,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 3.468682718163087e-08,
+          "max_relative_nonzero": 1.2171401077424988e-07,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 2.653441245283218e-08,
+          "max_relative_nonzero": 1.4803937758620166e-07,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.1688584942602394e-07,
+          "max_relative_nonzero": 3.543025674180203e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "beta_bf16_n4095",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "4b4311974192a3e071da0450264af6bc32b1b5cf0aa234019ac96bb3f4565a96"
+    },
+    "output_sha256": "a511831f45613c10684c2c0a27789be97ef94ef008cd3570906473250f16d786",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 4095,
+      "finite_differing_values": 487,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 4095,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 4.0138872104596345e-08,
+          "max_relative_nonzero": 1.1843919097225457e-07,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 2.8999635021177343e-08,
+          "max_relative_nonzero": 1.604069331405456e-07,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.1688584942602394e-07,
+          "max_relative_nonzero": 3.543025674180203e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "beta_bf16_n4096",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "7b9f9845e8eeda9250aa5389d76821a94a9c0e690b80e912ba68e0ed01b68065"
+    },
+    "output_sha256": "737397ec985f3b1a291b30731177a88067ba5956d16fbf5a42e69fb5ecc08bae",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 4096,
+      "finite_differing_values": 485,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 4096,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 3.962916063540405e-08,
+          "max_relative_nonzero": 1.2171401077424988e-07,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 2.860374641529422e-08,
+          "max_relative_nonzero": 1.604069331405456e-07,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.1688584942602394e-07,
+          "max_relative_nonzero": 3.543025674180203e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "beta_bf16_n4097",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "685764801d8505aace338fedfe8b74223cf20b59580d0745e499608d401ae479"
+    },
+    "output_sha256": "ab6f4a6a8091fddf4078985a014b8fdb61226de773e42c6e9688ef556d2b0e95",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 4097,
+      "finite_differing_values": 497,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 4097,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 3.9981207141952884e-08,
+          "max_relative_nonzero": 1.2171401077424988e-07,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 2.956966953040747e-08,
+          "max_relative_nonzero": 1.604069331405456e-07,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.1688584942602394e-07,
+          "max_relative_nonzero": 3.543025674180203e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "beta_bf16_n8193",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "bb1d12bf64bbfeb66d5e0dd04e12301dc2b88fe9cd538788ed36f3d9bd8007d4"
+    },
+    "output_sha256": "92cfdf9f593cfbb9e18f25e1e3df501f1d9bff7891bedfd9431396025caeab6d",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 8193,
+      "finite_differing_values": 950,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 8193,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 4.045499692247073e-08,
+          "max_relative_nonzero": 1.2171401077424988e-07,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 2.8649900686624114e-08,
+          "max_relative_nonzero": 1.604069331405456e-07,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.1688584942602394e-07,
+          "max_relative_nonzero": 3.543025674180203e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "beta_bf16_saturation",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "68ef8dd6bc7bdd073d073980b76146abb757cbd510f9441869e1a349a8895b04"
+    },
+    "output_sha256": "905234400a19bd0523f467d6b2cfaf41c3c7749b726dbad7fbf26b40a5cd2627",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 14,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 1,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 14,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 1,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance"
+  },
+  {
+    "case": "beta_bf16_nonfinite",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "502b0781b0f6cdb2913aeef4fbd0504f6535de77ec69b635c0f71ccd26094442"
+    },
+    "output_sha256": "5ffa79038c3ca797567a4eacddc3dddcd7370efeda67b012b352fe60b0d16ead",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 3,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 3,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance"
+  },
+  {
+    "case": "beta_f32_n1",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "1a0242f5256f39e8937478f8615ffda72fdd18272f2f87c2ee7e5f604df92362"
+    },
+    "output_sha256": "f24ffaf735b1445cdeb9c789fda799a1c263a6abfd24f5228f78d65408f92f7c",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 1,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 1,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 3.124875946534357e-08,
+          "max_relative_nonzero": 3.124875946534357e-08,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 0.0,
+          "max_relative_nonzero": 0.0,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.1465413372516245e-07,
+          "max_relative_nonzero": 3.463000927174088e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "beta_f32_n63",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "d2d527bd4592687e2dedd2b4db9d05bed2490af941ef8ad878f5403ceb3d2e8d"
+    },
+    "output_sha256": "3b9ee73191684e61917d103dc4c957800e97a076ede833afc1a66b5a0bee453c",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 63,
+      "finite_differing_values": 7,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 63,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 4.611681036531264e-08,
+          "max_relative_nonzero": 9.449246571444294e-08,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 2.7556896940163836e-08,
+          "max_relative_nonzero": 1.296515575495389e-07,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.1465413372516245e-07,
+          "max_relative_nonzero": 3.463000927174088e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "beta_f32_n64",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "9ddadf6eca33f2e1fe5b750f0f05425f495ce8fa7d79d41aa1efabb523dc1ee9"
+    },
+    "output_sha256": "e2520b6cba231ef6d6d2cdc26b39c1dbfa79eab4fddb7cf1392db8ee8e6a51b8",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 64,
+      "finite_differing_values": 12,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 64,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 3.8808158707671003e-08,
+          "max_relative_nonzero": 9.465758422712663e-08,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 3.454722901938142e-08,
+          "max_relative_nonzero": 1.3062828285203342e-07,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.1465413372516245e-07,
+          "max_relative_nonzero": 3.463000927174088e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "beta_f32_n65",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "42f376580d2fc66bccc234f59b454b8f5509179ffeac81ac67c46e565be1b613"
+    },
+    "output_sha256": "8749fb7845ded1b806e9632cd21b496648833bab07cd3268b5d7dc7b553b44e2",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 65,
+      "finite_differing_values": 10,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 65,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 4.0463889077450177e-08,
+          "max_relative_nonzero": 1.09817738032339e-07,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 2.7867324430382623e-08,
+          "max_relative_nonzero": 9.415586769481107e-08,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.1465413372516245e-07,
+          "max_relative_nonzero": 3.463000927174088e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "beta_f32_n4095",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "c218473cd757761baff9e5d039a7872afb7d36bb2b86db22bc196c7f2662f853"
+    },
+    "output_sha256": "44f80ab37981002df43bdcc7c24ee720b746c6dccb43145f2b504ce691f37393",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 4095,
+      "finite_differing_values": 480,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 4095,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 3.978347733596471e-08,
+          "max_relative_nonzero": 1.2158985656265304e-07,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 2.7735724986721054e-08,
+          "max_relative_nonzero": 1.8111696279893809e-07,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.1465413372516245e-07,
+          "max_relative_nonzero": 3.463000927174088e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "beta_f32_n4096",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "8de0b7ca0ea4418e0a65cdd4fda5a19b6767bdc7122c5cd4953fa4d010abd4de"
+    },
+    "output_sha256": "a0a020017a42cea9b42ebf16dd2f9f4ff653eecdf303718696f67cbbfd42e701",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 4096,
+      "finite_differing_values": 484,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 4096,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 4.011962649744821e-08,
+          "max_relative_nonzero": 1.2729251664474562e-07,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 2.851999920832214e-08,
+          "max_relative_nonzero": 1.8325910932163343e-07,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.1465413372516245e-07,
+          "max_relative_nonzero": 3.463000927174088e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "beta_f32_n4097",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "450465a6f23c6084abe44eec7faab2f82cf392be5bc5807bc56810a726aa65e0"
+    },
+    "output_sha256": "757f94ecc3af1c29c64450734433dd5d02ae163dde25d806c251ced9f3ddacba",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 4097,
+      "finite_differing_values": 478,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 4097,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 4.011059643790312e-08,
+          "max_relative_nonzero": 1.2427724787094897e-07,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 2.8605718796409968e-08,
+          "max_relative_nonzero": 1.6371431099645289e-07,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.1465413372516245e-07,
+          "max_relative_nonzero": 3.463000927174088e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "beta_f32_n8193",
+    "block_dim": 1,
+    "numerical": true,
+    "source_sha256": {
+      "source": "e767f2b6ae31932e112fc8d6e7bcd97486b3479cdd9fd2e23c32745c9c1d5121"
+    },
+    "output_sha256": "16fd09988d2bdcdb220e3bf0c609819c8e5d2fcd9a2c1af3415829f7e2a835a9",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 8193,
+      "finite_differing_values": 981,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 8193,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "checks": {
+      "destination": {
+        "analytic_fp64": {
+          "finite": true,
+          "relative_l2": 4.023223433575806e-08,
+          "max_relative_nonzero": 1.2918642765606044e-07,
+          "zero_mismatch": 0
+        },
+        "cpu_fp32": {
+          "finite": true,
+          "relative_l2": 2.83602094757619e-08,
+          "max_relative_nonzero": 1.7933373571838434e-07,
+          "zero_mismatch": 0
+        },
+        "budget": {
+          "relative_l2": 1.1465413372516245e-07,
+          "max_relative_nonzero": 3.463000927174088e-07
+        },
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  {
+    "case": "beta_f32_saturation",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "a98d92fea2ac0393bb74587467561d5a7273423c4b3c1bdc52d7c3003921b371"
+    },
+    "output_sha256": "905234400a19bd0523f467d6b2cfaf41c3c7749b726dbad7fbf26b40a5cd2627",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 14,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 1,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 14,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 1,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance"
+  },
+  {
+    "case": "beta_f32_nonfinite",
+    "block_dim": 1,
+    "numerical": false,
+    "source_sha256": {
+      "source": "31ea341009aa8f78863b94f9a85e3294784bac48b496c82959f1f6bb3bc349ae"
+    },
+    "output_sha256": "5ffa79038c3ca797567a4eacddc3dddcd7370efeda67b012b352fe60b0d16ead",
+    "cpu_fp32_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 3,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "torch_npu_semantics": {
+      "nan_mask_equal": true,
+      "positive_infinity_mask_equal": true,
+      "negative_infinity_mask_equal": true,
+      "finite_count": 3,
+      "finite_differing_values": 0,
+      "finite_sign_differences": 0,
+      "expected_subnormal_count": 0,
+      "expected_subnormal_flushed_to_zero": 0
+    },
+    "passed": null,
+    "qualification": "endpoint observation; no automatic exception or cross-SoC acceptance"
+  }
+]

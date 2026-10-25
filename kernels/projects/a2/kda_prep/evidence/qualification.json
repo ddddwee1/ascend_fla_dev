@@ -1,0 +1,59 @@
+{
+  "stage": "forward_leaf_native_completed_with_precision_review_pending",
+  "native_full_cases": 28,
+  "native_contract_cases": 56,
+  "native_boundary_numerical_cases": 60,
+  "native_boundary_observation_cases": 40,
+  "block_dim": [
+    1,
+    2
+  ],
+  "cross_bd_full_pairs_bitwise": 14,
+  "cross_bd_contract_pairs_bitwise": 28,
+  "geometry": {
+    "physical_cube": 20,
+    "physical_vector": 40,
+    "vec_only_participants": {
+      "1": 1,
+      "2": 2
+    }
+  },
+  "models": {
+    "sim_selected_cases": 3,
+    "pipesim_selected_cases": 3
+  },
+  "open_reviews": [
+    "FP32 norm max 2 ULP versus rounded FP64 and 3 ULP versus CPU FP32; located native trace pending",
+    "A2 endpoint observations require scope review; A5 native qualifications are not inherited"
+  ],
+  "backward": {
+    "full_native_outputs": 56,
+    "contract_cases": 48,
+    "contract_outputs": 112,
+    "cross_bd_full_pairs": 28,
+    "cross_bd_contract_pairs": 24,
+    "cross_bd_contract_outputs": 56,
+    "gate_partial_pairs": 16,
+    "models_sim_selected": 3,
+    "models_pipesim_selected": 3,
+    "endpoint_boundary": {
+      "numeric_passed": 26,
+      "endpoint_observations": 16,
+      "candidate_only_nan": 0,
+      "qualification": "A2 endpoint review pending; no CPU accuracy pass claimed for endpoints"
+    }
+  },
+  "public_layer": {
+    "low_level_full_native_cases": 6,
+    "real_shapes": 3,
+    "block_dim": [
+      1,
+      2
+    ],
+    "cross_bd_returned_output_pairs": 24,
+    "cross_bd_cache_pairs": 27,
+    "original_layer_prefill_decode_bd1": "passed",
+    "full_layer_training": "pending autograd helper write-set approval",
+    "qualified": false
+  }
+}

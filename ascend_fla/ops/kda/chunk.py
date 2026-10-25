@@ -110,10 +110,10 @@ def _prepare_inputs(q, k, g, beta, *, A_log=None, dt_bias=None,
     return q, k, g, beta
 
 
-@functools.lru_cache(maxsize=1)
-def _prep_runtime():
-    path = pathlib.Path(__file__).resolve().parents[3] / "kernels/projects/a5/kda_prep/runtime.py"
-    spec = importlib.util.spec_from_file_location("_afla_kda_prep_runtime", path)
+@functools.lru_cache(maxsize=None)
+def _prep_runtime(device="a5"):
+    path = pathlib.Path(__file__).resolve().parents[3] / f"kernels/projects/{device}/kda_prep/runtime.py"
+    spec = importlib.util.spec_from_file_location(f"_afla_kda_prep_{device}_runtime", path)
     module = importlib.util.module_from_spec(spec)
     sys.modules[spec.name] = module
     spec.loader.exec_module(module)
@@ -133,7 +133,7 @@ def _prepare_kernel_inputs(q, k, g, beta, *, A_log=None, dt_bias=None,
     if not (use_qk_l2norm_in_kernel or use_gate_in_kernel or use_beta_sigmoid_in_kernel):
         return q, k, g, beta
     device = resolve_soc(device)
-    runtime = _prep_runtime()
+    runtime = (_prep_runtime(device) if device == "a2" else _prep_runtime())
     sources = []
     if use_qk_l2norm_in_kernel:
         if q.shape[-1] != HEAD_DIM or min(q.shape) <= 0:
@@ -248,10 +248,10 @@ def _kernels_root() -> pathlib.Path:
     )
 
 
-def _stable_kernels_root() -> pathlib.Path:
+def _stable_kernels_root(device="a5") -> pathlib.Path:
     """本仓自有单元 ``kernels/projects/a5/kda_fwd_stable`` 的位置。"""
     repo = pathlib.Path(__file__).resolve().parents[3]
-    root = repo / "kernels/projects/a5/kda_fwd_stable"
+    root = repo / f"kernels/projects/{device}/kda_fwd_stable"
     if not (root / "kernels").is_dir():
         raise FileNotFoundError(f"找不到本仓的 kda_fwd_stable 单元（试了 {root}）")
     return root
@@ -273,14 +273,27 @@ def _load_kernel(tag: str, pkg_dir: pathlib.Path, module_name: str, fn_name: str
     return getattr(mod, fn_name)
 
 
-@functools.lru_cache(maxsize=len(IMPLS))
-def kda_fwd_kernels(impl: str = "stable") -> dict[str, Any]:
+@functools.lru_cache(maxsize=None)
+def kda_fwd_kernels(impl: str = "stable", device: str = "a5") -> dict[str, Any]:
     """载入某一套实现的五个 kernel 定义。
 
     Stable selects local gate/scores/WY/recurrent; inverse stays upstream.
     """
     if impl not in IMPLS:
         raise ValueError(f"impl 只能是 {IMPLS}，收到 {impl!r}")
+    if device == "a2":
+        if impl != "stable":
+            raise ValueError("A2 KDA declares only impl='stable'")
+        directory = _stable_kernels_root(device) / "kernels"
+        entries = {
+            "gate": ("gate", "kda_sub1_gate_a2_kernel"),
+            "scores": ("intra", "kda_sub2_score_a2_kernel"),
+            "inverse": ("triangular_inverse", "tril_inverse64_a2_kernel"),
+            "wy": ("wy", "kda_sub3_wy_a2_kernel"),
+            "recurrent": ("recurrent", "kda_sub45_a2_kernel"),
+        }
+        return {stage: _load_kernel("a2_st", directory, module, name)
+                for stage, (module, name) in entries.items()}
     up_root = _kernels_root()
     if str(up_root) not in sys.path:
         sys.path.insert(0, str(up_root))
@@ -304,19 +317,24 @@ def _compiled_chain(device: str, block_dim: int, impl: str = "stable") -> dict[s
     """
     from ...runtime.compile import compile_kernel
 
-    _layout_runtime().prepare(device, block_dim)
-    _prep_runtime().prepare(device, block_dim, "chunk")
+    (_layout_runtime(device) if device == "a2" else _layout_runtime()).prepare(device, block_dim)
+    (_prep_runtime(device) if device == "a2" else _prep_runtime()).prepare(device, block_dim, "chunk")
     # A later training call in the same process cannot register new vendors
     # after an earlier inference launch has initialized CANN's operator lookup.
-    _prep_runtime().prepare_backward(device, block_dim)
+    (_prep_runtime(device) if device == "a2" else _prep_runtime()).prepare_backward(device, block_dim)
     return {name: compile_kernel(fn, device=device, block_dim=block_dim)
-            for name, fn in kda_fwd_kernels(impl).items()}
+            for name, fn in (kda_fwd_kernels(impl, device) if device == "a2" else kda_fwd_kernels(impl)).items()}
 
 
-def _check(q, k, v, g, beta, initial_state, block_dim, impl="stable") -> tuple[int, int, int, int]:
+def _check(q, k, v, g, beta, initial_state, block_dim, impl="stable", *, device="a5") -> tuple[int, int, int, int]:
     """门控。返回 ``(B, H, HV, C)``。任何不满足都报错，绝不静默降级。"""
     if impl not in IMPLS:
         raise ValueError(f"impl must be one of {IMPLS}, got {impl!r}")
+    if device == "a2":
+        if impl != "stable":
+            raise ValueError("A2 KDA declares only impl='stable'")
+        if block_dim not in capability(device)["supported_block_dim"]["chunk"]:
+            raise ValueError("A2 chunk block_dim must be one of (1, 2)")
     if block_dim not in SUPPORTED_BLOCK_DIM:
         raise ValueError(
             f"block_dim 只支持 {SUPPORTED_BLOCK_DIM}（ascriptor kda_fwd 契约声明的范围），"
@@ -397,11 +415,11 @@ def _check_recurrent_heads(b: int, hv: int, c: int, block_dim: int, impl: str) -
     )
 
 
-@functools.lru_cache(maxsize=1)
-def _layout_runtime():
+@functools.lru_cache(maxsize=None)
+def _layout_runtime(device="a5"):
     """Load the owned layout unit once; warm dispatch is an O(1) cache lookup."""
-    path = pathlib.Path(__file__).resolve().parents[3] / "kernels/projects/a5/kda_layout/runtime.py"
-    spec = importlib.util.spec_from_file_location("_afla_kda_layout_runtime", path)
+    path = pathlib.Path(__file__).resolve().parents[3] / f"kernels/projects/{device}/kda_layout/runtime.py"
+    spec = importlib.util.spec_from_file_location(f"_afla_kda_layout_{device}_runtime", path)
     module = importlib.util.module_from_spec(spec)
     sys.modules[spec.name] = module
     spec.loader.exec_module(module)
@@ -419,12 +437,12 @@ def _to_bhcld(x: torch.Tensor, heads: int, *, on_cpu: bool = False,
     if x.dim() == 3:
         shape = (b, heads, c, 1, L_PER_CHUNK)
         strides = (t*heads, 1, L_PER_CHUNK*heads, 0, heads)
-        result = _layout_runtime().move(x, shape, strides, device=device, block_dim=block_dim)
+        result = (_layout_runtime(device) if device == "a2" else _layout_runtime()).move(x, shape, strides, device=device, block_dim=block_dim)
         return result.view(b, heads, c, L_PER_CHUNK)
     if x.dim() != 4:
         raise ValueError(f"_to_bhcld requires rank3/4, got {tuple(x.shape)}")
     d = x.shape[-1]
-    return _layout_runtime().move(
+    return (_layout_runtime(device) if device == "a2" else _layout_runtime()).move(
         x, (b, heads, c, L_PER_CHUNK, d),
         (t*heads*d, d, L_PER_CHUNK*heads*d, heads*d, 1),
         device=device, block_dim=block_dim)
@@ -437,7 +455,7 @@ def _from_bhcld(x: torch.Tensor, *, on_cpu: bool = False, dtype=None,
         raise ValueError("CPU layout conversion is prohibited by D-PM-37")
     device = resolve_soc(device)
     b, hv, c, l, d = x.shape
-    result = _layout_runtime().move(
+    result = (_layout_runtime(device) if device == "a2" else _layout_runtime()).move(
         x, (b, c, l, hv, d), (hv*c*l*d, l*d, d, c*l*d, 1),
         dtype=dtype, device=device, block_dim=block_dim, multiply=multiply, factor=factor)
     return result.view(b, c*l, hv, d)
@@ -486,7 +504,7 @@ def _gate_span(g: torch.Tensor, c: int, *, on_cpu: bool) -> float:
 
 
 def _check_gate_range(g: torch.Tensor, c: int, *, on_cpu: bool, impl: str,
-                      path: str = "backward") -> None:
+                      path: str = "backward", device: str = "a5") -> None:
     """门控跨度超限就报错，绝不让 kernel 静默吐 NaN（AGENTS.md §7）。
 
     ⚠️ **这条限制比 contract 声明的输入域宽得多。** contract 的 ``input_generation`` 是
@@ -497,10 +515,14 @@ def _check_gate_range(g: torch.Tensor, c: int, *, on_cpu: bool, impl: str,
     """
     if path not in GATE_PATHS:
         raise ValueError(f"path 只能是 {GATE_PATHS}，收到 {path!r}")
-    limit = MAX_GATE_SPAN[impl][path]
+    limit = (capability(device)["max_gate_span"][impl][path]
+             if device == "a2" else MAX_GATE_SPAN[impl][path])
     span = _gate_span(g, c, on_cpu=on_cpu)
     if span <= limit:
         return
+    if device == "a2":
+        raise ValueError(f"A2 {impl} {path} gate span {span:.1f} exceeds {limit}; "
+                         "see CAPABILITIES[a2] and the qualified A2 unit contract")
     if impl == "upstream":
         why = "kernel 会在 fp32 下溢/上溢并输出 NaN"
         hint = (f"换 impl=\"stable\"（本仓的数值稳定实现，{path} 上限 "
@@ -532,6 +554,65 @@ def _resolve_layout(layout_device: str) -> bool:
     return False
 
 
+def _launch_a2(compiled, inputs, outputs, scalars):
+    """Bind the selected A2 HostSpec using tensor metadata only.
+
+    A2 entries declare token-major GM dimensions such as BT and HVK in
+    addition to their explicit scalar arguments. No tensor is copied or cast.
+    """
+    ins = dict(zip(compiled.input_names, inputs, strict=True))
+    outs = dict(zip(compiled.output_names, outputs, strict=True))
+    bindings = dict(scalars)
+    for entry, tensor in zip(compiled.spec.inputs + compiled.spec.outputs,
+                             (*inputs, *outputs), strict=True):
+        if len(entry["dims"]) != tensor.ndim:
+            raise ValueError(f"A2 {entry['name']} rank differs from its kernel ABI")
+        for symbol, extent in zip(entry["dims"], tensor.shape, strict=True):
+            if isinstance(symbol, str):
+                previous = bindings.setdefault(symbol, int(extent))
+                if previous != extent:
+                    raise ValueError(f"A2 ABI dimension {symbol}: {previous} != {extent}")
+            elif symbol != extent:
+                raise ValueError(f"A2 ABI dimension {symbol} != {extent}")
+    compiled(ins, {name: bindings[name] for name in compiled.scalar_names}, outs)
+
+
+def _run_chain_a2(q, k, v, g, beta, scale, initial_state, *, block_dim,
+                  b, h, hv, c, impl):
+    """Launch the existing five A2 entries on their token-major input ABI."""
+    compiled = _compiled_chain("a2", block_dim, impl)
+    t = c * L_PER_CHUNK
+    bhc = (b, hv, c, L_PER_CHUNK, HEAD_DIM)
+    sq = (b, hv, c, L_PER_CHUNK, L_PER_CHUNK)
+
+    def empty(shape, dtype=torch.bfloat16):
+        return torch.empty(shape, dtype=dtype, device=q.device)
+
+    q2, k2 = q.view(b*t, h*HEAD_DIM), k.view(b*t, h*HEAD_DIM)
+    v2, g2, beta2 = v.view(b*t, hv*VALUE_DIM), g.view(b*t, hv*HEAD_DIM), beta.view(b*t, hv)
+    state0 = initial_state
+    if state0 is None:
+        state0 = _layout_runtime("a2").zeros((b, hv, HEAD_DIM, VALUE_DIM),
+                                            torch.float32, q.device, block_dim=block_dim)
+    gc, eg = empty(bhc, torch.float32), empty(bhc, torch.float32)
+    common = dict(B=b, H=h, HV=hv, C=c)
+    _launch_a2(compiled["gate"], (g2,), (gc, eg), common)
+    aqk, strict = empty(sq), empty(sq, torch.float32)
+    _launch_a2(compiled["scores"], (q2, k2, gc, beta2), (aqk, strict),
+               {**common, "scale": scale})
+    akk = empty(sq)
+    _launch_a2(compiled["inverse"], (strict,), (akk,), common)
+    w, u, qg, kg = (empty(bhc) for _ in range(4))
+    _launch_a2(compiled["wy"], (q2, k2, v2, beta2, akk, gc), (w, u, qg, kg), common)
+    o = empty((b*t, hv*VALUE_DIM))
+    final_state = empty((b, hv, HEAD_DIM, VALUE_DIM), torch.float32)
+    _launch_a2(compiled["recurrent"], (q2, aqk, kg, w, u, eg, state0),
+               (o, final_state), {**common, "scale": scale})
+    return {"eg": eg, "g_cumsum": gc, "Aqk": aqk, "strict": strict, "Akk": akk,
+            "w": w, "u": u, "qg": qg, "kg": kg, "o": o.view(b, t, hv, VALUE_DIM),
+            "final_state": final_state, "initial_state": state0}
+
+
 def _run_chain(q, k, v, g, beta, scale, initial_state, *, device, block_dim,
                on_cpu, b, h, hv, c, impl="stable") -> dict[str, torch.Tensor]:
     """跑完五个前向 kernel，返回**全部** BHCLD 中间量。
@@ -541,6 +622,9 @@ def _run_chain(q, k, v, g, beta, scale, initial_state, *, device, block_dim,
     九个前向检查点。抽成一处是为了两条路径**共用同一次 kernel 调用**，不会因为实现
     漂移而给出不同的中间量。
     """
+    if device == "a2":
+        return _run_chain_a2(q, k, v, g, beta, scale, initial_state,
+                             block_dim=block_dim, b=b, h=h, hv=hv, c=c, impl=impl)
     dev = q.device
     compiled = _compiled_chain(device, block_dim, impl)
 
@@ -550,7 +634,7 @@ def _run_chain(q, k, v, g, beta, scale, initial_state, *, device, block_dim,
     qc, kc = _to_bhcld(q, h, device=device, block_dim=block_dim), _to_bhcld(k, h, device=device, block_dim=block_dim)
     vc, gc = _to_bhcld(v, hv, device=device, block_dim=block_dim), _to_bhcld(g, hv, device=device, block_dim=block_dim)
     bc = _to_bhcld(beta, hv, device=device, block_dim=block_dim)
-    state0 = initial_state if initial_state is not None else _layout_runtime().zeros(
+    state0 = initial_state if initial_state is not None else (_layout_runtime(device) if device == "a2" else _layout_runtime()).zeros(
         (b, hv, HEAD_DIM, VALUE_DIM), torch.float32, dev,
         device=device, block_dim=block_dim)
 
@@ -661,14 +745,16 @@ def chunk_kda_fwd(
     """
     device = resolve_soc(device)
     require_qualified(device)
-    b, h, hv, c = _check(q, k, v, g, beta, initial_state, block_dim, impl)
+    b, h, hv, c = _check(q, k, v, g, beta, initial_state, block_dim, impl, device=device)
     on_cpu = _resolve_layout(layout_device)
     if check_gate_range:
-        _check_gate_range(g, c, on_cpu=on_cpu, impl=impl, path="forward")
+        _check_gate_range(g, c, on_cpu=on_cpu, impl=impl, path="forward",
+                          **({"device": device} if device == "a2" else {}))
     scale = HEAD_DIM ** -0.5 if scale is None else float(scale)
     chain = _run_chain(q, k, v, g, beta, scale, initial_state, device=device,
                        block_dim=block_dim, on_cpu=on_cpu, b=b, h=h, hv=hv, c=c, impl=impl)
-    o = _from_bhcld(chain["o"], device=device, block_dim=block_dim)
+    o = (chain["o"] if device == "a2" else
+         _from_bhcld(chain["o"], device=device, block_dim=block_dim))
     return o, (chain["final_state"] if output_final_state else None)
 
 
@@ -764,7 +850,7 @@ def chunk_kda_fwd_with_caches(
     """
     device = resolve_soc(device)
     require_qualified(device)
-    b, h_q, hv, c = _check(q, k, v, g, beta, initial_state, block_dim, impl)
+    b, h_q, hv, c = _check(q, k, v, g, beta, initial_state, block_dim, impl, device=device)
     on_cpu = _resolve_layout(layout_device)
     # ⚠️ 门控必须在编译**之前**查。两个理由：
     #   ① 注定要被拒的调用不该先付一次完整编译的代价（十几个 kernel，分钟级）；
@@ -774,7 +860,8 @@ def chunk_kda_fwd_with_caches(
     #      排查时一路看的是 opp 路径而不是真正的原因。
     if check_gate_range:
         # 这是训练入口（产检查点就是为了跑反向），所以用反向那条更严的闸
-        _check_gate_range(g, c, on_cpu=on_cpu, impl=impl, path="backward")
+        _check_gate_range(g, c, on_cpu=on_cpu, impl=impl, path="backward",
+                          **({"device": device} if device == "a2" else {}))
     # 反向链要在**首次 aclnn 调用之前**注册完 vendor 树，否则它的算子解析不到
     # （见 runtime/binding.py 的 register_custom_opp_path）。要缓存的唯一理由就是
     # 接着跑反向，所以在这里一并编译好。编译有两级缓存，重复调用不花钱。
@@ -795,7 +882,12 @@ def chunk_kda_fwd_with_caches(
     # preserving its rounded constant and materialization before BF16 RNE.
     # Upstream log2 remains a registered legacy arithmetic exception.
     if chain["g_cumsum"] is not None:
-        g_cum_log2 = tok(chain["g_cumsum"], multiply=True)
+        if device == "a2":
+            g_cum_log2 = _from_bhcld(chain["g_cumsum"], dtype=torch.float32,
+                                    device=device, block_dim=block_dim, multiply=True,
+                                    factor=1.0 / math.log(2.0))
+        else:
+            g_cum_log2 = tok(chain["g_cumsum"], multiply=True)
     else:
         g_cum_log2 = tok(chain["eg"].log2())
     caches = {
@@ -812,5 +904,6 @@ def chunk_kda_fwd_with_caches(
     missing = set(BWD_CACHE_NAMES) ^ set(caches)
     if missing:
         raise RuntimeError(f"检查点名字与 kda_bwd 的声明不符，差异 {sorted(missing)}")
-    o = _from_bhcld(chain["o"], device=device, block_dim=block_dim)
+    o = (chain["o"] if device == "a2" else
+         _from_bhcld(chain["o"], device=device, block_dim=block_dim))
     return o, chain["final_state"], caches

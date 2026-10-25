@@ -1,0 +1,1580 @@
+{
+  "schema": "ascriptor.kernel-unit/1",
+  "id": "a2.kda_layout",
+  "kind": "kernel",
+  "description": "A2 strided copies, exact BF16/FP32 conversion, gate multiplier and zero fill",
+  "inputs": {
+    "source": {
+      "description": "BF16 or FP32 source allocation; case source and strides define the view"
+    }
+  },
+  "outputs": {
+    "destination": {
+      "shape": [
+        1,
+        "N"
+      ],
+      "description": "Contiguous case destination dtype, compared byte for byte"
+    }
+  },
+  "domain": {
+    "block_dim": [
+      1,
+      2
+    ],
+    "qualification": "Layout leaf native cases passed at bd1/2; no public-layer or performance qualification",
+    "layout": "Five positive dimensions, last dimension divisible by64; nonnegative int32 strides and addresses; disjoint destination",
+    "ownership": "Vec-only;64 output elements per work; all physical gather lanes have owned backing",
+    "precision": "Copy preserves bits, widening exact, narrowing ties-to-even, optional FP32 multiply before conversion"
+  },
+  "dependencies": {
+    "python": ">=3.10",
+    "ascriptor": "==0.1.0",
+    "host": [
+      "torch",
+      "numpy"
+    ]
+  },
+  "comparison": {
+    "default": {
+      "mode": "bitwise",
+      "reason": "Exact layout and conversion boundary; no tolerance"
+    }
+  },
+  "cases": [
+    {
+      "id": "full_head_bf16_bf16_bd1",
+      "seed": 20261016,
+      "block_dim": 1,
+      "parameters": {
+        "shape": [
+          1,
+          32,
+          64,
+          64,
+          128
+        ],
+        "strides": [
+          16777216,
+          128,
+          262144,
+          4096,
+          1
+        ],
+        "source": "bf16",
+        "destination": "bf16",
+        "N": 16777216
+      }
+    },
+    {
+      "id": "full_head_bf16_f32_bd1",
+      "seed": 20261016,
+      "block_dim": 1,
+      "parameters": {
+        "shape": [
+          1,
+          32,
+          64,
+          64,
+          128
+        ],
+        "strides": [
+          16777216,
+          128,
+          262144,
+          4096,
+          1
+        ],
+        "source": "bf16",
+        "destination": "f32",
+        "N": 16777216
+      }
+    },
+    {
+      "id": "full_head_f32_bf16_bd1",
+      "seed": 20261016,
+      "block_dim": 1,
+      "parameters": {
+        "shape": [
+          1,
+          32,
+          64,
+          64,
+          128
+        ],
+        "strides": [
+          16777216,
+          128,
+          262144,
+          4096,
+          1
+        ],
+        "source": "f32",
+        "destination": "bf16",
+        "N": 16777216
+      }
+    },
+    {
+      "id": "full_head_f32_f32_bd1",
+      "seed": 20261016,
+      "block_dim": 1,
+      "parameters": {
+        "shape": [
+          1,
+          32,
+          64,
+          64,
+          128
+        ],
+        "strides": [
+          16777216,
+          128,
+          262144,
+          4096,
+          1
+        ],
+        "source": "f32",
+        "destination": "f32",
+        "N": 16777216
+      }
+    },
+    {
+      "id": "full_token_bf16_bf16_bd1",
+      "seed": 20261016,
+      "block_dim": 1,
+      "parameters": {
+        "shape": [
+          1,
+          64,
+          64,
+          32,
+          128
+        ],
+        "strides": [
+          16777216,
+          8192,
+          128,
+          524288,
+          1
+        ],
+        "source": "bf16",
+        "destination": "bf16",
+        "N": 16777216
+      }
+    },
+    {
+      "id": "full_token_bf16_f32_bd1",
+      "seed": 20261016,
+      "block_dim": 1,
+      "parameters": {
+        "shape": [
+          1,
+          64,
+          64,
+          32,
+          128
+        ],
+        "strides": [
+          16777216,
+          8192,
+          128,
+          524288,
+          1
+        ],
+        "source": "bf16",
+        "destination": "f32",
+        "N": 16777216
+      }
+    },
+    {
+      "id": "full_token_f32_bf16_bd1",
+      "seed": 20261016,
+      "block_dim": 1,
+      "parameters": {
+        "shape": [
+          1,
+          64,
+          64,
+          32,
+          128
+        ],
+        "strides": [
+          16777216,
+          8192,
+          128,
+          524288,
+          1
+        ],
+        "source": "f32",
+        "destination": "bf16",
+        "N": 16777216
+      }
+    },
+    {
+      "id": "full_token_f32_f32_bd1",
+      "seed": 20261016,
+      "block_dim": 1,
+      "parameters": {
+        "shape": [
+          1,
+          64,
+          64,
+          32,
+          128
+        ],
+        "strides": [
+          16777216,
+          8192,
+          128,
+          524288,
+          1
+        ],
+        "source": "f32",
+        "destination": "f32",
+        "N": 16777216
+      }
+    },
+    {
+      "id": "beta_bf16_bf16_bd1",
+      "seed": 20261016,
+      "block_dim": 1,
+      "parameters": {
+        "shape": [
+          1,
+          32,
+          64,
+          1,
+          64
+        ],
+        "strides": [
+          131072,
+          1,
+          2048,
+          0,
+          32
+        ],
+        "source": "bf16",
+        "destination": "bf16",
+        "N": 131072
+      }
+    },
+    {
+      "id": "beta_bf16_f32_bd1",
+      "seed": 20261016,
+      "block_dim": 1,
+      "parameters": {
+        "shape": [
+          1,
+          32,
+          64,
+          1,
+          64
+        ],
+        "strides": [
+          131072,
+          1,
+          2048,
+          0,
+          32
+        ],
+        "source": "bf16",
+        "destination": "f32",
+        "N": 131072
+      }
+    },
+    {
+      "id": "beta_f32_bf16_bd1",
+      "seed": 20261016,
+      "block_dim": 1,
+      "parameters": {
+        "shape": [
+          1,
+          32,
+          64,
+          1,
+          64
+        ],
+        "strides": [
+          131072,
+          1,
+          2048,
+          0,
+          32
+        ],
+        "source": "f32",
+        "destination": "bf16",
+        "N": 131072
+      }
+    },
+    {
+      "id": "beta_f32_f32_bd1",
+      "seed": 20261016,
+      "block_dim": 1,
+      "parameters": {
+        "shape": [
+          1,
+          32,
+          64,
+          1,
+          64
+        ],
+        "strides": [
+          131072,
+          1,
+          2048,
+          0,
+          32
+        ],
+        "source": "f32",
+        "destination": "f32",
+        "N": 131072
+      }
+    },
+    {
+      "id": "strided_bf16_bf16_bd1",
+      "seed": 20261016,
+      "block_dim": 1,
+      "parameters": {
+        "shape": [
+          1,
+          1,
+          1,
+          2,
+          128
+        ],
+        "strides": [
+          0,
+          0,
+          0,
+          256,
+          2
+        ],
+        "source": "bf16",
+        "destination": "bf16",
+        "N": 256
+      }
+    },
+    {
+      "id": "strided_bf16_f32_bd1",
+      "seed": 20261016,
+      "block_dim": 1,
+      "parameters": {
+        "shape": [
+          1,
+          1,
+          1,
+          2,
+          128
+        ],
+        "strides": [
+          0,
+          0,
+          0,
+          256,
+          2
+        ],
+        "source": "bf16",
+        "destination": "f32",
+        "N": 256
+      }
+    },
+    {
+      "id": "strided_f32_bf16_bd1",
+      "seed": 20261016,
+      "block_dim": 1,
+      "parameters": {
+        "shape": [
+          1,
+          1,
+          1,
+          2,
+          128
+        ],
+        "strides": [
+          0,
+          0,
+          0,
+          256,
+          2
+        ],
+        "source": "f32",
+        "destination": "bf16",
+        "N": 256
+      }
+    },
+    {
+      "id": "strided_f32_f32_bd1",
+      "seed": 20261016,
+      "block_dim": 1,
+      "parameters": {
+        "shape": [
+          1,
+          1,
+          1,
+          2,
+          128
+        ],
+        "strides": [
+          0,
+          0,
+          0,
+          256,
+          2
+        ],
+        "source": "f32",
+        "destination": "f32",
+        "N": 256
+      }
+    },
+    {
+      "id": "broadcast_bf16_bf16_bd1",
+      "seed": 20261016,
+      "block_dim": 1,
+      "parameters": {
+        "shape": [
+          2,
+          2,
+          2,
+          1,
+          128
+        ],
+        "strides": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "source": "bf16",
+        "destination": "bf16",
+        "N": 1024
+      }
+    },
+    {
+      "id": "broadcast_bf16_f32_bd1",
+      "seed": 20261016,
+      "block_dim": 1,
+      "parameters": {
+        "shape": [
+          2,
+          2,
+          2,
+          1,
+          128
+        ],
+        "strides": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "source": "bf16",
+        "destination": "f32",
+        "N": 1024
+      }
+    },
+    {
+      "id": "broadcast_f32_bf16_bd1",
+      "seed": 20261016,
+      "block_dim": 1,
+      "parameters": {
+        "shape": [
+          2,
+          2,
+          2,
+          1,
+          128
+        ],
+        "strides": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "source": "f32",
+        "destination": "bf16",
+        "N": 1024
+      }
+    },
+    {
+      "id": "broadcast_f32_f32_bd1",
+      "seed": 20261016,
+      "block_dim": 1,
+      "parameters": {
+        "shape": [
+          2,
+          2,
+          2,
+          1,
+          128
+        ],
+        "strides": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "source": "f32",
+        "destination": "f32",
+        "N": 1024
+      }
+    },
+    {
+      "id": "tail_bf16_bf16_bd1",
+      "seed": 20261016,
+      "block_dim": 1,
+      "parameters": {
+        "shape": [
+          1,
+          1,
+          1,
+          1,
+          4160
+        ],
+        "strides": [
+          0,
+          0,
+          0,
+          0,
+          1
+        ],
+        "source": "bf16",
+        "destination": "bf16",
+        "N": 4160
+      }
+    },
+    {
+      "id": "tail_bf16_f32_bd1",
+      "seed": 20261016,
+      "block_dim": 1,
+      "parameters": {
+        "shape": [
+          1,
+          1,
+          1,
+          1,
+          4160
+        ],
+        "strides": [
+          0,
+          0,
+          0,
+          0,
+          1
+        ],
+        "source": "bf16",
+        "destination": "f32",
+        "N": 4160
+      }
+    },
+    {
+      "id": "tail_f32_bf16_bd1",
+      "seed": 20261016,
+      "block_dim": 1,
+      "parameters": {
+        "shape": [
+          1,
+          1,
+          1,
+          1,
+          4160
+        ],
+        "strides": [
+          0,
+          0,
+          0,
+          0,
+          1
+        ],
+        "source": "f32",
+        "destination": "bf16",
+        "N": 4160
+      }
+    },
+    {
+      "id": "tail_f32_f32_bd1",
+      "seed": 20261016,
+      "block_dim": 1,
+      "parameters": {
+        "shape": [
+          1,
+          1,
+          1,
+          1,
+          4160
+        ],
+        "strides": [
+          0,
+          0,
+          0,
+          0,
+          1
+        ],
+        "source": "f32",
+        "destination": "f32",
+        "N": 4160
+      }
+    },
+    {
+      "id": "gate_multiplier_bf16_bd1",
+      "seed": 20261016,
+      "block_dim": 1,
+      "parameters": {
+        "shape": [
+          1,
+          64,
+          64,
+          32,
+          128
+        ],
+        "strides": [
+          16777216,
+          8192,
+          128,
+          524288,
+          1
+        ],
+        "source": "f32",
+        "destination": "bf16",
+        "multiply": true,
+        "N": 16777216
+      }
+    },
+    {
+      "id": "zero_tail_bf16_bd1",
+      "seed": 20261016,
+      "block_dim": 1,
+      "parameters": {
+        "shape": [
+          1,
+          1,
+          1,
+          1,
+          4160
+        ],
+        "strides": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "source": "bf16",
+        "destination": "bf16",
+        "zero": true,
+        "N": 4160
+      }
+    },
+    {
+      "id": "gate_multiplier_f32_bd1",
+      "seed": 20261016,
+      "block_dim": 1,
+      "parameters": {
+        "shape": [
+          1,
+          64,
+          64,
+          32,
+          128
+        ],
+        "strides": [
+          16777216,
+          8192,
+          128,
+          524288,
+          1
+        ],
+        "source": "f32",
+        "destination": "f32",
+        "multiply": true,
+        "N": 16777216
+      }
+    },
+    {
+      "id": "zero_tail_f32_bd1",
+      "seed": 20261016,
+      "block_dim": 1,
+      "parameters": {
+        "shape": [
+          1,
+          1,
+          1,
+          1,
+          4160
+        ],
+        "strides": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "source": "f32",
+        "destination": "f32",
+        "zero": true,
+        "N": 4160
+      }
+    },
+    {
+      "id": "full_head_bf16_bf16_bd2",
+      "seed": 20261016,
+      "block_dim": 2,
+      "parameters": {
+        "shape": [
+          1,
+          32,
+          64,
+          64,
+          128
+        ],
+        "strides": [
+          16777216,
+          128,
+          262144,
+          4096,
+          1
+        ],
+        "source": "bf16",
+        "destination": "bf16",
+        "N": 16777216
+      }
+    },
+    {
+      "id": "full_head_bf16_f32_bd2",
+      "seed": 20261016,
+      "block_dim": 2,
+      "parameters": {
+        "shape": [
+          1,
+          32,
+          64,
+          64,
+          128
+        ],
+        "strides": [
+          16777216,
+          128,
+          262144,
+          4096,
+          1
+        ],
+        "source": "bf16",
+        "destination": "f32",
+        "N": 16777216
+      }
+    },
+    {
+      "id": "full_head_f32_bf16_bd2",
+      "seed": 20261016,
+      "block_dim": 2,
+      "parameters": {
+        "shape": [
+          1,
+          32,
+          64,
+          64,
+          128
+        ],
+        "strides": [
+          16777216,
+          128,
+          262144,
+          4096,
+          1
+        ],
+        "source": "f32",
+        "destination": "bf16",
+        "N": 16777216
+      }
+    },
+    {
+      "id": "full_head_f32_f32_bd2",
+      "seed": 20261016,
+      "block_dim": 2,
+      "parameters": {
+        "shape": [
+          1,
+          32,
+          64,
+          64,
+          128
+        ],
+        "strides": [
+          16777216,
+          128,
+          262144,
+          4096,
+          1
+        ],
+        "source": "f32",
+        "destination": "f32",
+        "N": 16777216
+      }
+    },
+    {
+      "id": "full_token_bf16_bf16_bd2",
+      "seed": 20261016,
+      "block_dim": 2,
+      "parameters": {
+        "shape": [
+          1,
+          64,
+          64,
+          32,
+          128
+        ],
+        "strides": [
+          16777216,
+          8192,
+          128,
+          524288,
+          1
+        ],
+        "source": "bf16",
+        "destination": "bf16",
+        "N": 16777216
+      }
+    },
+    {
+      "id": "full_token_bf16_f32_bd2",
+      "seed": 20261016,
+      "block_dim": 2,
+      "parameters": {
+        "shape": [
+          1,
+          64,
+          64,
+          32,
+          128
+        ],
+        "strides": [
+          16777216,
+          8192,
+          128,
+          524288,
+          1
+        ],
+        "source": "bf16",
+        "destination": "f32",
+        "N": 16777216
+      }
+    },
+    {
+      "id": "full_token_f32_bf16_bd2",
+      "seed": 20261016,
+      "block_dim": 2,
+      "parameters": {
+        "shape": [
+          1,
+          64,
+          64,
+          32,
+          128
+        ],
+        "strides": [
+          16777216,
+          8192,
+          128,
+          524288,
+          1
+        ],
+        "source": "f32",
+        "destination": "bf16",
+        "N": 16777216
+      }
+    },
+    {
+      "id": "full_token_f32_f32_bd2",
+      "seed": 20261016,
+      "block_dim": 2,
+      "parameters": {
+        "shape": [
+          1,
+          64,
+          64,
+          32,
+          128
+        ],
+        "strides": [
+          16777216,
+          8192,
+          128,
+          524288,
+          1
+        ],
+        "source": "f32",
+        "destination": "f32",
+        "N": 16777216
+      }
+    },
+    {
+      "id": "beta_bf16_bf16_bd2",
+      "seed": 20261016,
+      "block_dim": 2,
+      "parameters": {
+        "shape": [
+          1,
+          32,
+          64,
+          1,
+          64
+        ],
+        "strides": [
+          131072,
+          1,
+          2048,
+          0,
+          32
+        ],
+        "source": "bf16",
+        "destination": "bf16",
+        "N": 131072
+      }
+    },
+    {
+      "id": "beta_bf16_f32_bd2",
+      "seed": 20261016,
+      "block_dim": 2,
+      "parameters": {
+        "shape": [
+          1,
+          32,
+          64,
+          1,
+          64
+        ],
+        "strides": [
+          131072,
+          1,
+          2048,
+          0,
+          32
+        ],
+        "source": "bf16",
+        "destination": "f32",
+        "N": 131072
+      }
+    },
+    {
+      "id": "beta_f32_bf16_bd2",
+      "seed": 20261016,
+      "block_dim": 2,
+      "parameters": {
+        "shape": [
+          1,
+          32,
+          64,
+          1,
+          64
+        ],
+        "strides": [
+          131072,
+          1,
+          2048,
+          0,
+          32
+        ],
+        "source": "f32",
+        "destination": "bf16",
+        "N": 131072
+      }
+    },
+    {
+      "id": "beta_f32_f32_bd2",
+      "seed": 20261016,
+      "block_dim": 2,
+      "parameters": {
+        "shape": [
+          1,
+          32,
+          64,
+          1,
+          64
+        ],
+        "strides": [
+          131072,
+          1,
+          2048,
+          0,
+          32
+        ],
+        "source": "f32",
+        "destination": "f32",
+        "N": 131072
+      }
+    },
+    {
+      "id": "strided_bf16_bf16_bd2",
+      "seed": 20261016,
+      "block_dim": 2,
+      "parameters": {
+        "shape": [
+          1,
+          1,
+          1,
+          2,
+          128
+        ],
+        "strides": [
+          0,
+          0,
+          0,
+          256,
+          2
+        ],
+        "source": "bf16",
+        "destination": "bf16",
+        "N": 256
+      }
+    },
+    {
+      "id": "strided_bf16_f32_bd2",
+      "seed": 20261016,
+      "block_dim": 2,
+      "parameters": {
+        "shape": [
+          1,
+          1,
+          1,
+          2,
+          128
+        ],
+        "strides": [
+          0,
+          0,
+          0,
+          256,
+          2
+        ],
+        "source": "bf16",
+        "destination": "f32",
+        "N": 256
+      }
+    },
+    {
+      "id": "strided_f32_bf16_bd2",
+      "seed": 20261016,
+      "block_dim": 2,
+      "parameters": {
+        "shape": [
+          1,
+          1,
+          1,
+          2,
+          128
+        ],
+        "strides": [
+          0,
+          0,
+          0,
+          256,
+          2
+        ],
+        "source": "f32",
+        "destination": "bf16",
+        "N": 256
+      }
+    },
+    {
+      "id": "strided_f32_f32_bd2",
+      "seed": 20261016,
+      "block_dim": 2,
+      "parameters": {
+        "shape": [
+          1,
+          1,
+          1,
+          2,
+          128
+        ],
+        "strides": [
+          0,
+          0,
+          0,
+          256,
+          2
+        ],
+        "source": "f32",
+        "destination": "f32",
+        "N": 256
+      }
+    },
+    {
+      "id": "broadcast_bf16_bf16_bd2",
+      "seed": 20261016,
+      "block_dim": 2,
+      "parameters": {
+        "shape": [
+          2,
+          2,
+          2,
+          1,
+          128
+        ],
+        "strides": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "source": "bf16",
+        "destination": "bf16",
+        "N": 1024
+      }
+    },
+    {
+      "id": "broadcast_bf16_f32_bd2",
+      "seed": 20261016,
+      "block_dim": 2,
+      "parameters": {
+        "shape": [
+          2,
+          2,
+          2,
+          1,
+          128
+        ],
+        "strides": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "source": "bf16",
+        "destination": "f32",
+        "N": 1024
+      }
+    },
+    {
+      "id": "broadcast_f32_bf16_bd2",
+      "seed": 20261016,
+      "block_dim": 2,
+      "parameters": {
+        "shape": [
+          2,
+          2,
+          2,
+          1,
+          128
+        ],
+        "strides": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "source": "f32",
+        "destination": "bf16",
+        "N": 1024
+      }
+    },
+    {
+      "id": "broadcast_f32_f32_bd2",
+      "seed": 20261016,
+      "block_dim": 2,
+      "parameters": {
+        "shape": [
+          2,
+          2,
+          2,
+          1,
+          128
+        ],
+        "strides": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "source": "f32",
+        "destination": "f32",
+        "N": 1024
+      }
+    },
+    {
+      "id": "tail_bf16_bf16_bd2",
+      "seed": 20261016,
+      "block_dim": 2,
+      "parameters": {
+        "shape": [
+          1,
+          1,
+          1,
+          1,
+          4160
+        ],
+        "strides": [
+          0,
+          0,
+          0,
+          0,
+          1
+        ],
+        "source": "bf16",
+        "destination": "bf16",
+        "N": 4160
+      }
+    },
+    {
+      "id": "tail_bf16_f32_bd2",
+      "seed": 20261016,
+      "block_dim": 2,
+      "parameters": {
+        "shape": [
+          1,
+          1,
+          1,
+          1,
+          4160
+        ],
+        "strides": [
+          0,
+          0,
+          0,
+          0,
+          1
+        ],
+        "source": "bf16",
+        "destination": "f32",
+        "N": 4160
+      }
+    },
+    {
+      "id": "tail_f32_bf16_bd2",
+      "seed": 20261016,
+      "block_dim": 2,
+      "parameters": {
+        "shape": [
+          1,
+          1,
+          1,
+          1,
+          4160
+        ],
+        "strides": [
+          0,
+          0,
+          0,
+          0,
+          1
+        ],
+        "source": "f32",
+        "destination": "bf16",
+        "N": 4160
+      }
+    },
+    {
+      "id": "tail_f32_f32_bd2",
+      "seed": 20261016,
+      "block_dim": 2,
+      "parameters": {
+        "shape": [
+          1,
+          1,
+          1,
+          1,
+          4160
+        ],
+        "strides": [
+          0,
+          0,
+          0,
+          0,
+          1
+        ],
+        "source": "f32",
+        "destination": "f32",
+        "N": 4160
+      }
+    },
+    {
+      "id": "gate_multiplier_bf16_bd2",
+      "seed": 20261016,
+      "block_dim": 2,
+      "parameters": {
+        "shape": [
+          1,
+          64,
+          64,
+          32,
+          128
+        ],
+        "strides": [
+          16777216,
+          8192,
+          128,
+          524288,
+          1
+        ],
+        "source": "f32",
+        "destination": "bf16",
+        "multiply": true,
+        "N": 16777216
+      }
+    },
+    {
+      "id": "zero_tail_bf16_bd2",
+      "seed": 20261016,
+      "block_dim": 2,
+      "parameters": {
+        "shape": [
+          1,
+          1,
+          1,
+          1,
+          4160
+        ],
+        "strides": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "source": "bf16",
+        "destination": "bf16",
+        "zero": true,
+        "N": 4160
+      }
+    },
+    {
+      "id": "gate_multiplier_f32_bd2",
+      "seed": 20261016,
+      "block_dim": 2,
+      "parameters": {
+        "shape": [
+          1,
+          64,
+          64,
+          32,
+          128
+        ],
+        "strides": [
+          16777216,
+          8192,
+          128,
+          524288,
+          1
+        ],
+        "source": "f32",
+        "destination": "f32",
+        "multiply": true,
+        "N": 16777216
+      }
+    },
+    {
+      "id": "zero_tail_f32_bd2",
+      "seed": 20261016,
+      "block_dim": 2,
+      "parameters": {
+        "shape": [
+          1,
+          1,
+          1,
+          1,
+          4160
+        ],
+        "strides": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "source": "f32",
+        "destination": "f32",
+        "zero": true,
+        "N": 4160
+      }
+    }
+  ],
+  "provenance": {
+    "task": "A2-15",
+    "semantic_source": "a5.kda_layout in this repository",
+    "implementation": "New A2 padded DMA and UB vector operations; no A5 VF dependency",
+    "library": "90cfcdc720bbcd66e8bd4361c4dd4fbc1a2a57b5"
+  },
+  "support": [
+    {
+      "device": "a2",
+      "backend": "cce",
+      "stage": "reference",
+      "status": "passed",
+      "scope": "All56 contract cases; reference generated at execution time"
+    },
+    {
+      "device": "a2",
+      "backend": "cce",
+      "stage": "emit",
+      "status": "passed",
+      "scope": "All six entries at bd1/2; native aclnn bridge"
+    },
+    {
+      "device": "a2",
+      "backend": "cce",
+      "stage": "compile",
+      "status": "passed",
+      "scope": "All six entries at bd1/2; native aclnn bridge"
+    },
+    {
+      "device": "a2",
+      "backend": "cce",
+      "stage": "board",
+      "status": "passed",
+      "scope": "56/56 contract cases plus58 additional checks; native aclnn bridge"
+    },
+    {
+      "device": "a2",
+      "backend": "cce",
+      "stage": "sim",
+      "status": "passed",
+      "scope": "strided_bf16_bf16_bd1 only; all other cases untested on this stage",
+      "cases": [
+        "strided_bf16_bf16_bd1"
+      ]
+    },
+    {
+      "device": "a2",
+      "backend": "cce",
+      "stage": "sim",
+      "status": "untested",
+      "cases": [
+        "full_head_bf16_bf16_bd1",
+        "full_head_bf16_f32_bd1",
+        "full_head_f32_bf16_bd1",
+        "full_head_f32_f32_bd1",
+        "full_token_bf16_bf16_bd1",
+        "full_token_bf16_f32_bd1",
+        "full_token_f32_bf16_bd1",
+        "full_token_f32_f32_bd1",
+        "beta_bf16_bf16_bd1",
+        "beta_bf16_f32_bd1",
+        "beta_f32_bf16_bd1",
+        "beta_f32_f32_bd1",
+        "strided_bf16_f32_bd1",
+        "strided_f32_bf16_bd1",
+        "strided_f32_f32_bd1",
+        "broadcast_bf16_bf16_bd1",
+        "broadcast_bf16_f32_bd1",
+        "broadcast_f32_bf16_bd1",
+        "broadcast_f32_f32_bd1",
+        "tail_bf16_bf16_bd1",
+        "tail_bf16_f32_bd1",
+        "tail_f32_bf16_bd1",
+        "tail_f32_f32_bd1",
+        "gate_multiplier_bf16_bd1",
+        "zero_tail_bf16_bd1",
+        "gate_multiplier_f32_bd1",
+        "zero_tail_f32_bd1",
+        "full_head_bf16_bf16_bd2",
+        "full_head_bf16_f32_bd2",
+        "full_head_f32_bf16_bd2",
+        "full_head_f32_f32_bd2",
+        "full_token_bf16_bf16_bd2",
+        "full_token_bf16_f32_bd2",
+        "full_token_f32_bf16_bd2",
+        "full_token_f32_f32_bd2",
+        "beta_bf16_bf16_bd2",
+        "beta_bf16_f32_bd2",
+        "beta_f32_bf16_bd2",
+        "beta_f32_f32_bd2",
+        "strided_bf16_bf16_bd2",
+        "strided_bf16_f32_bd2",
+        "strided_f32_bf16_bd2",
+        "strided_f32_f32_bd2",
+        "broadcast_bf16_bf16_bd2",
+        "broadcast_bf16_f32_bd2",
+        "broadcast_f32_bf16_bd2",
+        "broadcast_f32_f32_bd2",
+        "tail_bf16_bf16_bd2",
+        "tail_bf16_f32_bd2",
+        "tail_f32_bf16_bd2",
+        "tail_f32_f32_bd2",
+        "gate_multiplier_bf16_bd2",
+        "zero_tail_bf16_bd2",
+        "gate_multiplier_f32_bd2",
+        "zero_tail_f32_bd2"
+      ]
+    },
+    {
+      "device": "a2",
+      "backend": "cce",
+      "stage": "pipesim",
+      "status": "passed",
+      "scope": "strided_bf16_bf16_bd1 only; all other cases untested on this stage",
+      "cases": [
+        "strided_bf16_bf16_bd1"
+      ]
+    },
+    {
+      "device": "a2",
+      "backend": "cce",
+      "stage": "pipesim",
+      "status": "untested",
+      "cases": [
+        "full_head_bf16_bf16_bd1",
+        "full_head_bf16_f32_bd1",
+        "full_head_f32_bf16_bd1",
+        "full_head_f32_f32_bd1",
+        "full_token_bf16_bf16_bd1",
+        "full_token_bf16_f32_bd1",
+        "full_token_f32_bf16_bd1",
+        "full_token_f32_f32_bd1",
+        "beta_bf16_bf16_bd1",
+        "beta_bf16_f32_bd1",
+        "beta_f32_bf16_bd1",
+        "beta_f32_f32_bd1",
+        "strided_bf16_f32_bd1",
+        "strided_f32_bf16_bd1",
+        "strided_f32_f32_bd1",
+        "broadcast_bf16_bf16_bd1",
+        "broadcast_bf16_f32_bd1",
+        "broadcast_f32_bf16_bd1",
+        "broadcast_f32_f32_bd1",
+        "tail_bf16_bf16_bd1",
+        "tail_bf16_f32_bd1",
+        "tail_f32_bf16_bd1",
+        "tail_f32_f32_bd1",
+        "gate_multiplier_bf16_bd1",
+        "zero_tail_bf16_bd1",
+        "gate_multiplier_f32_bd1",
+        "zero_tail_f32_bd1",
+        "full_head_bf16_bf16_bd2",
+        "full_head_bf16_f32_bd2",
+        "full_head_f32_bf16_bd2",
+        "full_head_f32_f32_bd2",
+        "full_token_bf16_bf16_bd2",
+        "full_token_bf16_f32_bd2",
+        "full_token_f32_bf16_bd2",
+        "full_token_f32_f32_bd2",
+        "beta_bf16_bf16_bd2",
+        "beta_bf16_f32_bd2",
+        "beta_f32_bf16_bd2",
+        "beta_f32_f32_bd2",
+        "strided_bf16_bf16_bd2",
+        "strided_bf16_f32_bd2",
+        "strided_f32_bf16_bd2",
+        "strided_f32_f32_bd2",
+        "broadcast_bf16_bf16_bd2",
+        "broadcast_bf16_f32_bd2",
+        "broadcast_f32_bf16_bd2",
+        "broadcast_f32_f32_bd2",
+        "tail_bf16_bf16_bd2",
+        "tail_bf16_f32_bd2",
+        "tail_f32_bf16_bd2",
+        "tail_f32_f32_bd2",
+        "gate_multiplier_bf16_bd2",
+        "zero_tail_bf16_bd2",
+        "gate_multiplier_f32_bd2",
+        "zero_tail_f32_bd2"
+      ]
+    }
+  ]
+}

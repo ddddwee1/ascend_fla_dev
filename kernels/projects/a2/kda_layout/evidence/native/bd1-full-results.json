@@ -1,0 +1,357 @@
+[
+  {
+    "case": "full_to_head_bf16_bf16",
+    "shape": [
+      1,
+      32,
+      64,
+      64,
+      128
+    ],
+    "source_dtype": "torch.bfloat16",
+    "dtype": "torch.bfloat16",
+    "bitwise": true,
+    "seconds": 0.6077882861718535,
+    "elements": 16777216
+  },
+  {
+    "case": "full_to_head_bf16_f32",
+    "shape": [
+      1,
+      32,
+      64,
+      64,
+      128
+    ],
+    "source_dtype": "torch.bfloat16",
+    "dtype": "torch.float32",
+    "bitwise": true,
+    "seconds": 0.04380900599062443,
+    "elements": 16777216
+  },
+  {
+    "case": "full_to_head_f32_bf16",
+    "shape": [
+      1,
+      32,
+      64,
+      64,
+      128
+    ],
+    "source_dtype": "torch.float32",
+    "dtype": "torch.bfloat16",
+    "bitwise": true,
+    "seconds": 0.04675032664090395,
+    "elements": 16777216
+  },
+  {
+    "case": "full_to_head_f32_f32",
+    "shape": [
+      1,
+      32,
+      64,
+      64,
+      128
+    ],
+    "source_dtype": "torch.float32",
+    "dtype": "torch.float32",
+    "bitwise": true,
+    "seconds": 0.04753286764025688,
+    "elements": 16777216
+  },
+  {
+    "case": "full_to_token_bf16",
+    "shape": [
+      1,
+      64,
+      64,
+      32,
+      128
+    ],
+    "source_dtype": "torch.float32",
+    "dtype": "torch.bfloat16",
+    "bitwise": true,
+    "seconds": 0.04820157773792744,
+    "elements": 16777216
+  },
+  {
+    "case": "full_to_token_f32",
+    "shape": [
+      1,
+      64,
+      64,
+      32,
+      128
+    ],
+    "source_dtype": "torch.float32",
+    "dtype": "torch.float32",
+    "bitwise": true,
+    "seconds": 0.048044148832559586,
+    "elements": 16777216
+  },
+  {
+    "case": "beta_strided_bf16_bf16",
+    "shape": [
+      1,
+      32,
+      64,
+      1,
+      64
+    ],
+    "source_dtype": "torch.bfloat16",
+    "dtype": "torch.bfloat16",
+    "bitwise": true,
+    "seconds": 0.0015688911080360413,
+    "elements": 131072
+  },
+  {
+    "case": "offset_stride2_bf16_bf16",
+    "shape": [
+      1,
+      1,
+      1,
+      2,
+      128
+    ],
+    "source_dtype": "torch.bfloat16",
+    "dtype": "torch.bfloat16",
+    "bitwise": true,
+    "seconds": 0.0004438897594809532,
+    "elements": 256
+  },
+  {
+    "case": "broadcast_bf16_bf16",
+    "shape": [
+      2,
+      2,
+      2,
+      1,
+      128
+    ],
+    "source_dtype": "torch.bfloat16",
+    "dtype": "torch.bfloat16",
+    "bitwise": true,
+    "seconds": 0.0003967098891735077,
+    "elements": 1024
+  },
+  {
+    "case": "beta_strided_bf16_f32",
+    "shape": [
+      1,
+      32,
+      64,
+      1,
+      64
+    ],
+    "source_dtype": "torch.bfloat16",
+    "dtype": "torch.float32",
+    "bitwise": true,
+    "seconds": 0.001359640620648861,
+    "elements": 131072
+  },
+  {
+    "case": "offset_stride2_bf16_f32",
+    "shape": [
+      1,
+      1,
+      1,
+      2,
+      128
+    ],
+    "source_dtype": "torch.bfloat16",
+    "dtype": "torch.float32",
+    "bitwise": true,
+    "seconds": 0.00039353035390377045,
+    "elements": 256
+  },
+  {
+    "case": "broadcast_bf16_f32",
+    "shape": [
+      2,
+      2,
+      2,
+      1,
+      128
+    ],
+    "source_dtype": "torch.bfloat16",
+    "dtype": "torch.float32",
+    "bitwise": true,
+    "seconds": 0.0003941301256418228,
+    "elements": 1024
+  },
+  {
+    "case": "zero_bf16_64",
+    "bitwise": true,
+    "elements": 64
+  },
+  {
+    "case": "zero_bf16_4096",
+    "bitwise": true,
+    "elements": 4096
+  },
+  {
+    "case": "zero_bf16_4160",
+    "bitwise": true,
+    "elements": 4160
+  },
+  {
+    "case": "zero_bf16_16777216",
+    "bitwise": true,
+    "elements": 16777216
+  },
+  {
+    "case": "beta_strided_f32_bf16",
+    "shape": [
+      1,
+      32,
+      64,
+      1,
+      64
+    ],
+    "source_dtype": "torch.float32",
+    "dtype": "torch.bfloat16",
+    "bitwise": true,
+    "seconds": 0.0012084413319826126,
+    "elements": 131072
+  },
+  {
+    "case": "offset_stride2_f32_bf16",
+    "shape": [
+      1,
+      1,
+      1,
+      2,
+      128
+    ],
+    "source_dtype": "torch.float32",
+    "dtype": "torch.bfloat16",
+    "bitwise": true,
+    "seconds": 0.0006968304514884949,
+    "elements": 256
+  },
+  {
+    "case": "broadcast_f32_bf16",
+    "shape": [
+      2,
+      2,
+      2,
+      1,
+      128
+    ],
+    "source_dtype": "torch.float32",
+    "dtype": "torch.bfloat16",
+    "bitwise": true,
+    "seconds": 0.00047475099563598633,
+    "elements": 1024
+  },
+  {
+    "case": "beta_strided_f32_f32",
+    "shape": [
+      1,
+      32,
+      64,
+      1,
+      64
+    ],
+    "source_dtype": "torch.float32",
+    "dtype": "torch.float32",
+    "bitwise": true,
+    "seconds": 0.000987941399216652,
+    "elements": 131072
+  },
+  {
+    "case": "offset_stride2_f32_f32",
+    "shape": [
+      1,
+      1,
+      1,
+      2,
+      128
+    ],
+    "source_dtype": "torch.float32",
+    "dtype": "torch.float32",
+    "bitwise": true,
+    "seconds": 0.0004169102758169174,
+    "elements": 256
+  },
+  {
+    "case": "broadcast_f32_f32",
+    "shape": [
+      2,
+      2,
+      2,
+      1,
+      128
+    ],
+    "source_dtype": "torch.float32",
+    "dtype": "torch.float32",
+    "bitwise": true,
+    "seconds": 0.00041322968900203705,
+    "elements": 1024
+  },
+  {
+    "case": "zero_f32_64",
+    "bitwise": true,
+    "elements": 64
+  },
+  {
+    "case": "zero_f32_4096",
+    "bitwise": true,
+    "elements": 4096
+  },
+  {
+    "case": "zero_f32_4160",
+    "bitwise": true,
+    "elements": 4160
+  },
+  {
+    "case": "zero_f32_16777216",
+    "bitwise": true,
+    "elements": 16777216
+  },
+  {
+    "case": "round_to_even",
+    "shape": [
+      1,
+      1,
+      1,
+      2,
+      64
+    ],
+    "source_dtype": "torch.float32",
+    "dtype": "torch.bfloat16",
+    "bitwise": true,
+    "seconds": 0.0006607994437217712,
+    "elements": 128
+  },
+  {
+    "case": "copy_special_torch.bfloat16",
+    "shape": [
+      1,
+      1,
+      1,
+      2,
+      64
+    ],
+    "source_dtype": "torch.bfloat16",
+    "dtype": "torch.bfloat16",
+    "bitwise": true,
+    "seconds": 0.0004317993298172951,
+    "elements": 128
+  },
+  {
+    "case": "copy_special_torch.float32",
+    "shape": [
+      1,
+      1,
+      1,
+      2,
+      64
+    ],
+    "source_dtype": "torch.float32",
+    "dtype": "torch.float32",
+    "bitwise": true,
+    "seconds": 0.0004082098603248596,
+    "elements": 128
+  }
+]

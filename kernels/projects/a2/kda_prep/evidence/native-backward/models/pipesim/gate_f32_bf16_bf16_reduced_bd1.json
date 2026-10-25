@@ -1,0 +1,209 @@
+{
+  "backend": "cce",
+  "cases": [
+    {
+      "block_dim": 1,
+      "comparison": {
+        "da": {
+          "comparison": {
+            "atol": 0,
+            "max_relative_l2": 0.01,
+            "mode": "allclose",
+            "reason": "Structural envelope from the largest existing budget. execute additionally enforces every unchanged per-dtype FP64 budget and applicable BF16 ULP limit.",
+            "rtol": 0.011673560132354462
+          },
+          "max_abs_error": 0.0,
+          "passed": true,
+          "relative_l2_error": 0.0
+        },
+        "db": {
+          "comparison": {
+            "atol": 0,
+            "max_relative_l2": 0.01,
+            "mode": "allclose",
+            "reason": "Structural envelope from the largest existing budget. execute additionally enforces every unchanged per-dtype FP64 budget and applicable BF16 ULP limit.",
+            "rtol": 0.011673560132354462
+          },
+          "max_abs_error": 0.0,
+          "passed": true,
+          "relative_l2_error": 0.0
+        },
+        "destination": {
+          "comparison": {
+            "atol": 0,
+            "max_relative_l2": 0.01,
+            "mode": "allclose",
+            "reason": "Structural envelope from the largest existing budget. execute additionally enforces every unchanged per-dtype FP64 budget and applicable BF16 ULP limit.",
+            "rtol": 0.011673560132354462
+          },
+          "max_abs_error": 2.384185791015625e-07,
+          "passed": true,
+          "relative_l2_error": 6.083249216284289e-08
+        }
+      },
+      "execution_evidence": [
+        {
+          "backend_executed": false,
+          "block_dim": 1,
+          "deadlock": null,
+          "device": "a2",
+          "event_balance": [],
+          "hazards": [],
+          "kernel": "kda_prep_a2_backward_gate_f32_bf16_bf16_kernel",
+          "launcher": "pipesim",
+          "model": "lowered events and hazards",
+          "model_cycles": 3428620,
+          "requested_backend": "cce",
+          "sim_processes": "threads",
+          "stage": "pipesim"
+        },
+        {
+          "backend_executed": false,
+          "block_dim": 1,
+          "deadlock": null,
+          "device": "a2",
+          "event_balance": [],
+          "hazards": [],
+          "kernel": "kda_prep_a2_backward_gate_f32_bf16_bf16_kernel",
+          "launcher": "pipesim",
+          "model": "lowered events and hazards",
+          "model_cycles": 3428620,
+          "requested_backend": "cce",
+          "sim_processes": "threads",
+          "stage": "pipesim"
+        },
+        {
+          "backend_executed": false,
+          "block_dim": 1,
+          "deadlock": null,
+          "device": "a2",
+          "event_balance": [],
+          "hazards": [],
+          "kernel": "kda_prep_a2_backward_gate_reduce_bf16_bf16_kernel",
+          "launcher": "pipesim",
+          "model": "lowered events and hazards",
+          "model_cycles": 19863,
+          "requested_backend": "cce",
+          "sim_processes": "threads",
+          "stage": "pipesim"
+        }
+      ],
+      "id": "gate_f32_bf16_bf16_reduced_bd1",
+      "parameters": {
+        "N": 8192,
+        "backward": true,
+        "kind": "gate",
+        "shape": [
+          1,
+          32,
+          2,
+          128
+        ],
+        "types": "f32_bf16_bf16"
+      },
+      "passed": true,
+      "reference": {
+        "da": {
+          "comparison": {
+            "atol": 0,
+            "max_relative_l2": 0.01,
+            "mode": "allclose",
+            "reason": "Structural envelope from the largest existing budget. execute additionally enforces every unchanged per-dtype FP64 budget and applicable BF16 ULP limit.",
+            "rtol": 0.011673560132354462
+          },
+          "dtype": "bfloat16",
+          "sha256": "4b5020eff07ef055567b0a44e5239d861a14887f7ae1299824ed681e978ea932",
+          "shape": [
+            2
+          ]
+        },
+        "db": {
+          "comparison": {
+            "atol": 0,
+            "max_relative_l2": 0.01,
+            "mode": "allclose",
+            "reason": "Structural envelope from the largest existing budget. execute additionally enforces every unchanged per-dtype FP64 budget and applicable BF16 ULP limit.",
+            "rtol": 0.011673560132354462
+          },
+          "dtype": "bfloat16",
+          "sha256": "278d3fa217a07de25158e7a2bd4458ce43af6c7c4a4123c240bb5624dc392564",
+          "shape": [
+            256
+          ]
+        },
+        "destination": {
+          "comparison": {
+            "atol": 0,
+            "max_relative_l2": 0.01,
+            "mode": "allclose",
+            "reason": "Structural envelope from the largest existing budget. execute additionally enforces every unchanged per-dtype FP64 budget and applicable BF16 ULP limit.",
+            "rtol": 0.011673560132354462
+          },
+          "dtype": "float32",
+          "sha256": "079ed00a7a413edde46fa30cc1ffcced4ba61a9c8e1a158b92708aeb8f3d3a43",
+          "shape": [
+            1,
+            8192
+          ]
+        }
+      },
+      "seed": 20261016,
+      "stage_comparison": {
+        "partial_sums": {
+          "comparison": {
+            "atol": 0,
+            "max_relative_l2": 0.01,
+            "mode": "allclose",
+            "reason": "Structural envelope from the largest existing budget. execute additionally enforces every unchanged per-dtype FP64 budget and applicable BF16 ULP limit.",
+            "rtol": 0.011673560132354462
+          },
+          "max_abs_error": 0.0,
+          "passed": true,
+          "relative_l2_error": 0.0
+        }
+      },
+      "stage_reference": {
+        "partial_sums": {
+          "comparison": {
+            "atol": 0,
+            "max_relative_l2": 0.01,
+            "mode": "allclose",
+            "reason": "Structural envelope from the largest existing budget. execute additionally enforces every unchanged per-dtype FP64 budget and applicable BF16 ULP limit.",
+            "rtol": 0.011673560132354462
+          },
+          "dtype": "float32",
+          "sha256": "c9857cc7bacd69e9edb1d9d9e2963499db82f844cbe4ebe9e5cfc59b57fbcd02",
+          "shape": [
+            2,
+            2,
+            128
+          ]
+        }
+      }
+    }
+  ],
+  "command": "check",
+  "contract_sha256": "738a72908eec43d3dd7f3123fc540cf878a3f7edd9b5a18f32bfe587d733f138",
+  "device": "a2",
+  "dsl_imported": true,
+  "imports": {
+    "ascriptor": "<private-workspace>/tmp/PK-03/workspace/library/ascriptor/__init__.py",
+    "ascriptor.a2": "<private-workspace>/tmp/PK-03/workspace/library/ascriptor/a2.py",
+    "unit": "<private-run>/repo/kernels/projects/a2/kda_prep/backward/gate/unit.py"
+  },
+  "kernel_imported": false,
+  "launcher": "pipesim",
+  "passed": true,
+  "runner_sha256": "8e91d95ed0294ddbfc204957b8bf77606a79123655fc096963b94658b633566b",
+  "schema": "ascriptor.unit-result/1",
+  "simulator_imported": true,
+  "stage": "pipesim",
+  "started_at": "2026-10-16T08:35:01.731703+00:00",
+  "unit": "a2.kda_prep.backward.gate",
+  "versions": {
+    "ascriptor": null,
+    "numpy": "1.26.4",
+    "python": "3.11.15",
+    "torch": "2.10.0+cpu"
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "rows": [
+    {
+      "shape": "long_context",
+      "dimensions": {
+        "B": 1,
+        "H": 16,
+        "HV": 32,
+        "T": 4096
+      },
+      "median_baseline_ms": 47.55990682169795,
+      "median_forward_ms": 64.83675241470337,
+      "median_checked_forward_ms": 65.13640275225043,
+      "median_cached_forward_ms": 367.77829695492983,
+      "median_forward_speedup": 0.7335331436327853
+    },
+    {
+      "shape": "kimi_linear_layer",
+      "dimensions": {
+        "B": 1,
+        "H": 32,
+        "HV": 32,
+        "T": 1024
+      },
+      "median_baseline_ms": 22.463478473946452,
+      "median_forward_ms": 16.028929967433214,
+      "median_checked_forward_ms": 16.47070227190852,
+      "median_cached_forward_ms": 84.75741501897573,
+      "median_forward_speedup": 1.4014334406343179
+    },
+    {
+      "shape": "qwen3_next_layer",
+      "dimensions": {
+        "B": 1,
+        "H": 16,
+        "HV": 32,
+        "T": 1024
+      },
+      "median_baseline_ms": 21.338167414069176,
+      "median_forward_ms": 16.03751601651311,
+      "median_checked_forward_ms": 16.498167347162962,
+      "median_cached_forward_ms": 86.05255614966154,
+      "median_forward_speedup": 1.3296886098000174
+    }
+  ],
+  "scope": "Operator forward and cached-forward; no training or complete layer timing",
+  "timing_order": [
+    "Torch NPU baseline",
+    "forward without gate check",
+    "forward with gate check",
+    "cached-forward",
+    "Torch NPU baseline"
+  ],
+  "speedup": "Median of the three per-round baseline sandwich means divided by forward time",
+  "all_65_vendor_signatures_match_full_public_acceptance": true,
+  "qualified_changed_in_committed_source": false
+}

@@ -1,0 +1,30 @@
+{"stage": "compile_start", "entry": "bf16_bf16", "bd": 2}
+{"stage": "compile_start", "entry": "bf16_f32", "bd": 2}
+{"stage": "compile_start", "entry": "f32_bf16", "bd": 2}
+{"stage": "compile_start", "entry": "f32_f32", "bd": 2}
+{"stage": "compile_start", "entry": "zero_bf16", "bd": 2}
+{"stage": "compile_start", "entry": "zero_f32", "bd": 2}
+{"stage": "compile_start", "entry": "geometry", "bd": 2}
+{"stage": "all_layout_vendors_ready", "count": 7}
+{"case": "full_to_head_bf16_bf16", "shape": [1, 32, 64, 64, 128], "source_dtype": "torch.bfloat16", "dtype": "torch.bfloat16", "bitwise": true, "seconds": 0.6106372997164726, "elements": 16777216}
+{"case": "full_to_head_bf16_f32", "shape": [1, 32, 64, 64, 128], "source_dtype": "torch.bfloat16", "dtype": "torch.float32", "bitwise": true, "seconds": 0.022535172291100025, "elements": 16777216}
+{"case": "full_to_head_f32_bf16", "shape": [1, 32, 64, 64, 128], "source_dtype": "torch.float32", "dtype": "torch.bfloat16", "bitwise": true, "seconds": 0.024451974779367447, "elements": 16777216}
+{"case": "full_to_head_f32_f32", "shape": [1, 32, 64, 64, 128], "source_dtype": "torch.float32", "dtype": "torch.float32", "bitwise": true, "seconds": 0.024639095179736614, "elements": 16777216}
+{"case": "full_to_token_bf16", "shape": [1, 64, 64, 32, 128], "source_dtype": "torch.float32", "dtype": "torch.bfloat16", "bitwise": true, "seconds": 0.02440232504159212, "elements": 16777216}
+{"case": "full_to_token_f32", "shape": [1, 64, 64, 32, 128], "source_dtype": "torch.float32", "dtype": "torch.float32", "bitwise": true, "seconds": 0.023967904038727283, "elements": 16777216}
+{"case": "beta_strided_bf16_bf16", "shape": [1, 32, 64, 1, 64], "source_dtype": "torch.bfloat16", "dtype": "torch.bfloat16", "bitwise": true, "seconds": 0.0011789612472057343, "elements": 131072}
+{"case": "offset_stride2_bf16_bf16", "shape": [1, 1, 1, 2, 128], "source_dtype": "torch.bfloat16", "dtype": "torch.bfloat16", "bitwise": true, "seconds": 0.0004527997225522995, "elements": 256}
+{"case": "broadcast_bf16_bf16", "shape": [2, 2, 2, 1, 128], "source_dtype": "torch.bfloat16", "dtype": "torch.bfloat16", "bitwise": true, "seconds": 0.0003992496058344841, "elements": 1024}
+{"case": "beta_strided_bf16_f32", "shape": [1, 32, 64, 1, 64], "source_dtype": "torch.bfloat16", "dtype": "torch.float32", "bitwise": true, "seconds": 0.0009600808843970299, "elements": 131072}
+{"case": "offset_stride2_bf16_f32", "shape": [1, 1, 1, 2, 128], "source_dtype": "torch.bfloat16", "dtype": "torch.float32", "bitwise": true, "seconds": 0.000407160259783268, "elements": 256}
+{"case": "broadcast_bf16_f32", "shape": [2, 2, 2, 1, 128], "source_dtype": "torch.bfloat16", "dtype": "torch.float32", "bitwise": true, "seconds": 0.0003998102620244026, "elements": 1024}
+{"case": "beta_strided_f32_bf16", "shape": [1, 32, 64, 1, 64], "source_dtype": "torch.float32", "dtype": "torch.bfloat16", "bitwise": true, "seconds": 0.0009567495435476303, "elements": 131072}
+{"case": "offset_stride2_f32_bf16", "shape": [1, 1, 1, 2, 128], "source_dtype": "torch.float32", "dtype": "torch.bfloat16", "bitwise": true, "seconds": 0.0008848309516906738, "elements": 256}
+{"case": "broadcast_f32_bf16", "shape": [2, 2, 2, 1, 128], "source_dtype": "torch.float32", "dtype": "torch.bfloat16", "bitwise": true, "seconds": 0.00048778019845485687, "elements": 1024}
+{"case": "beta_strided_f32_f32", "shape": [1, 32, 64, 1, 64], "source_dtype": "torch.float32", "dtype": "torch.float32", "bitwise": true, "seconds": 0.0007385313510894775, "elements": 131072}
+{"case": "offset_stride2_f32_f32", "shape": [1, 1, 1, 2, 128], "source_dtype": "torch.float32", "dtype": "torch.float32", "bitwise": true, "seconds": 0.0003935201093554497, "elements": 256}
+{"case": "broadcast_f32_f32", "shape": [2, 2, 2, 1, 128], "source_dtype": "torch.float32", "dtype": "torch.float32", "bitwise": true, "seconds": 0.0003903396427631378, "elements": 1024}
+{"case": "round_to_even", "shape": [1, 1, 1, 2, 64], "source_dtype": "torch.float32", "dtype": "torch.bfloat16", "bitwise": true, "seconds": 0.0006486494094133377, "elements": 128}
+{"case": "copy_special_torch.bfloat16", "shape": [1, 1, 1, 2, 64], "source_dtype": "torch.bfloat16", "dtype": "torch.bfloat16", "bitwise": true, "seconds": 0.00042181089520454407, "elements": 128}
+{"case": "copy_special_torch.float32", "shape": [1, 1, 1, 2, 64], "source_dtype": "torch.float32", "dtype": "torch.float32", "bitwise": true, "seconds": 0.00040748994797468185, "elements": 128}
+{"stage": "complete", "cases": 29, "geometry": {"observed_vec_num": [2, 2], "observed_vec_idx": [0, 1], "block_dim": 2, "mode": "vec"}}
