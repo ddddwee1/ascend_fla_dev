@@ -4225,6 +4225,10 @@
         {
           "at": "2026-10-16T16:15",
           "summary": "ACK（comment 6215637432）+ BLOCKED（comment 6219404659，draft PR #144，1 文件/402 行/0 删除，与写集一致）。阻塞原因是纯基础设施：之前核验过的 A5 host/容器 SSH 入口多次连接超时，备用入口也超时，另一个可连的入口没有 npu-smi 无法确认设备健康——按 D-PM-28 机器/卡归 agent 自己管，PM 不仲裁、不提供/索要访问证据，仅记录。当前只有CPU-only host harness 测试结果（64 passed/1 skipped），没有真机数字，PR 仍 draft，没有 DONE/合入请求。"
+        },
+        {
+          "at": "2026-10-20T07:47",
+          "summary": "SSH 恢复后的长真机验证周期（2026-10-20T01:59~07:47Z，13 条评论，session 01a143b7-9f20-7801-a064-45acfb513a2a，PR #144 draft，head 从 1e0b11e → 6168b4c → f857003）：\n1) FP32：12 契约 case × bd1/2/4/8 全通过、跨 bd 逐位一致；真实 95B checkpoint 端到端（chunk prefill→CCE decode）FP32 整网 365 张量全部 <=1e-3；T1024/T4096 正式三明治 candidate约快 16-17x / 29.9-30x（vs torch_npu 组合基线）。\n2) RISK（class=silent-wrong-result，comment 6281644590）：BF16 整网同一组 365 张量中 192 项超本任务 1e-2 预算（最差 logits relL2=0.0229），根因未定位，不归因于某个具体算子；已确认不是 decode 交接才开始坏（BF16 prefill 本身已超预算）；18 层单层对照与 narrowing 均未命中明确根因。\n3) BLOCKED（comment 6281877672）：申领人据此请求 PM 安排后续定位/修复范围，当前仅允许benchmark 写集，不能靠放宽预算结束任务。\n4) 申领人随后开 REQUEST #146，提案把模型级质量评测（WikiText-2 PPL 退化<=1%、HellaSwag acc_norm 退化<=0.5pp，配对 bootstrap 单侧95%上界）作为 BF16 整网的补充/替代主判据，理由是现有张量 L2 超预算不能直接等价于任务质量受损；写集申请新增 benchmarks/eval_gdn2_quality.py + tests/test_gdn2_quality_eval.py。\n5) 申领人的 RISK（class=write-set-expansion，comment 6282139628）称此方案已获『当前聊天用户』明确同意（'同意，就按 #146 的方案推进...'）——这是另一会话的自述，PM 未独立核实，按write-set-expansion + 验收判据变更，仍需本会话用户确认才正式同步进规格/看板。\n6) 此后 C 组（BF16 chunk+CCE）WikiText/HellaSwag 全量评测已 complete=true（PPL ctx1024=11.079/ctx4096=10.060，HellaSwag acc_norm=0.5394）；B 组（Torch BF16）随后也 complete=true，与 C 配对的两个 context 的 PPL 几乎相同（ctx1024 B=11.0793 vs C=11.0790，ctx4096 B≈10.060 两者）；A 组（Torch FP32）在最后一条 STATUS（07:45:58Z）时仍在跑，formal_complete=false，三组齐全前不算质量验收通过。\n7) 此后再无新评论（截至本轮轮询 2026-10-25，已对 GitHub 当前状态复核确认）——A 组结果、正式 B→C/A→B/A→C 配对判定、以及 #146 的正式规格同步均未完成，任务保持 assigned，PR #144 保持 draft，未发 DONE。\nPM 已将 RISK 与 REQUEST #146 上报用户决定，未单方面同步验收标准或写集。"
         }
       ],
       "result": null
