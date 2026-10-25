@@ -6315,7 +6315,7 @@
       "wave": "W0",
       "soc": "a5",
       "priority": "P2",
-      "status": "assigned",
+      "status": "done",
       "model": [],
       "kernel": [
         "gdr_chunk_fwd_bwd_pypto_pro"
@@ -6357,9 +6357,25 @@
         {
           "at": "2026-10-25T11:05",
           "summary": "隔离 worktree 子代理独立复核，verdict ACCEPT-WITH-NOTES（无阻塞项，但有需要如实记录的发现）：\n1) 范围/安全：复核一致，干净。\n2) CPU 可跑部分：`tests/validate_against_fla.py` 真跑通过——强声明（chunk vs naive_chunk、recurrent state vs naive_recurrent）精确复现为 0.000e+00；弱声明（近似比较）量级一致但与文档引用区间不完全重合（可能是 float32 累加顺序随环境波动，非编造）。9 个 `*_golden_cpu.py` 中 7 个在自带的交叉校验 import（硬编码指向另一个仓库才有的子目录布局）处崩溃——这是开发时遗留的死代码，不影响真正的验收路径（`test_*.py` 只 import 干净的参考函数），但直接与 README 的'自包含、拷到哪都能跑'的说法矛盾。\n3) 本机真机access：有 NPU 但是 A2/910B3，不是这个 PR 的目标 A5；系统上的 `pypto` 0.2.0 没有 `pl.jit`/`pl.vector_function`，不是 PyPTO-Pro，装不了真正的 `pypto_pro`——因此**无法独立复现 PR 自己的硬件数字**，这些数字完全是申领人自述。作为旁证，子代理在真实 A2 硬件上跑了第二 oracle 脚本 `tests/fla_npu_baseline.py`（不需要 pypto_pro），复现出与文档一致的 peak 值，确认 oracle 机制是真的，不是摆设。\n4) **门控纪律与文档不符（AGENTS.md §7 相关，有实质内容）**：README 声称的域约束（B=1、K/V 为 64 的倍数且≤128、H≤32）'不满足就报错'，但代码核查发现：V 的'64 的倍数'从未被任何 assert/raise 校验过（且与 PR 自己验证通过的 case V=96 矛盾）；B=1 只在 9 个 kernel 里的 1 个（`gdr_bwd_dqkw`，链上第 5 个）靠静态 shape 类型标注生效，其余 7 个训练 kernel 对 B 没有任何限制，B>1 会先跑掉链上前 4 个 kernel、到第 5 个才用不友好的类型报错失败，不是 README 说的'任何 kernel 启动前就拒绝'；独立推理前向 kernel（第 9 个）**完全没有任何域校验**。`VALIDATION.md` 自己的措辞比 README 更准确（明确把 B=1 限定在 `gdr_bwd_dqkw` 这一个 kernel 上）。这是文档过度承诺、不是代码会悄悄算错——但确实意味着实际的门控比文档描述的弱。\n5) 双 oracle 机制确认是真代码，不是摆设。\n6) `docs/PERFORMANCE.md` 的四条自我限定（naive 基线弱、比例随形状缩小、仅测前向、host dispatch 占比高）逐字核实存在且确实被当真使用，披露诚实、好于平均水平。\n7) **许可证头不一致**：50 个新文件里 23 个带 'Copyright (c) PyPTO Contributors ... CANN Open Software License Agreement Version 2.0 ... See LICENSE in the root directory' 的头，但本仓没有根级 LICENSE 文件、pyproject.toml 没有 license 字段、仓内其它任何文件都没有这类头——这个模式只出现在这个 PR 里，指向一份本仓不存在的许可证文本和另一个版权主体。PM 已把这一条明确上报用户（见对话），不是 PM 自行放行的。"
+        },
+        {
+          "at": "2026-10-25T11:08",
+          "summary": "用户批准后合入：PR #145 → f16c1225（squash，2026-10-25T11:08:42Z）。assigned → done。"
         }
       ],
-      "result": null
+      "result": {
+        "commits": [
+          "f16c1225"
+        ],
+        "merged_commit": "f16c122588b2949c3037092a5a35f53aaa24a797",
+        "merged_at": "2026-10-25T11:08:42Z",
+        "pr": 145,
+        "head_sha_reviewed_and_merged": "fbe4b1ba21ae3d63634ce186254c1b812725f52c",
+        "diff_stat": "50 files changed, 17614 insertions(+), 0 deletions(-); all ADDED, confined to kernels/projects/a5/gdr_chunk_fwd_bwd_pypto_pro/",
+        "summary": "外部贡献（无 APPLY，PR 自述），用户直接批准追溯建单+合入。九个 PyPTO-Pro kernel （八个组成 DeltaNet/gated_delta_rule 训练 forward+backward，一个独立推理 forward），不是 ascriptor 单元、不接入本仓任何现有公开 API，纯新增、零耦合。",
+        "review": "PM 自己扫描：范围/安全干净（50 文件全增、全在新目录、无新依赖、无 .github 改动、无二进制、无网络/凭据/eval/exec 代码）。隔离 worktree 子代理独立复核，verdict ACCEPT-WITH-NOTES：\n- CPU 可跑部分（tests/validate_against_fla.py）真跑通过，强声明（chunk vs naive_chunk、recurrent state vs naive_recurrent）精确复现 0.000e+00；弱声明量级一致但与文档引用区间略有出入（可能是 float32 累加顺序环境差异）。\n- 7/9 个 *_golden_cpu.py 自测脚本的交叉校验 import 指向另一仓库的目录布局，是开发时遗留死代码，崩溃但不影响实际验收路径（test_*.py 只 import 干净的参考函数）；与 README 的'自包含、拷到哪都能跑'说法矛盾，应如实记录。\n- 本机无 A5/pypto_pro，无法独立复现 PR 自己的硬件正确性与性能数字——这些数字完全是申领人自述；第二 oracle 脚本（不需要 pypto_pro）在真实 A2 硬件上跑通，确认 oracle 机制真实，但不是对这个 PR 自己 A5 kernel 的复现。\n- 门控纪律与 README 文档不完全一致（AGENTS.md §7 相关）：V 的'64 的倍数'约束未被任何代码校验，且与 PR 自己验证通过的 V=96 case 矛盾；B=1 只在 9 个 kernel 中 1 个（gdr_bwd_dqkw）靠静态 shape 生效，其余 7 个训练 kernel 对 B 无限制，B>1 会先跑掉链上前 4 个 kernel 才在第 5 个失败（不是 README 说的'任何 kernel 启动前就拒绝'）；第 9 个独立推理 kernel 完全没有域校验。VALIDATION.md 自己的措辞比 README 更准确。这些是文档过度承诺，不是代码静默算错——因为代码未接入任何调用链，不构成当前风险，但记录在案供后续跟进。\n- 许可证头不一致：23 个文件带 'Copyright (c) PyPTO Contributors ... CANN Open Software License Agreement Version 2.0 ... See LICENSE in the root directory' 的头，本仓没有根级 LICENSE 文件、没有 license 字段、其它文件都没有这类头——指向一份本仓不存在的许可证文本和不同的版权主体。PM 已上报用户；用户知情后仍批准合入。\n- `docs/PERFORMANCE.md` 的自我限定（naive 基线弱、比例随形状缩小、仅测前向、host dispatch 占比高）逐字核实真实存在，披露诚实。\n双 oracle 机制（CPU fla naive + NPU 下同一 naive 实现）确认是真代码，不是摆设。",
+        "known_gaps_not_blocking": "V 的域约束未被代码校验（仅 K、H 有）；B>1 的拒绝发生在链路中段而非入口；独立推理 kernel 零域校验；许可证头指向本仓不存在的文件。均因代码未接入任何调用链而不构成当前风险，接入 ascend_fla 公开 API 前需要重新审视。"
+      }
     }
   ],
   "label_github_login": "ascend-fla-pm-bot",
