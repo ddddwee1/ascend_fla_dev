@@ -28,7 +28,7 @@ fla 系列线性注意力算子在昇腾 NPU 上的高效实现库。后端用
 |---|---|---|---|---|
 | KDA（Kimi Delta Attention） | `kda` | 可申领 | 7 | 15/23 |
 | GDN（Gated DeltaNet） | `gated_delta_rule` | 可申领 | 4 | 9/10 |
-| DeltaNet | `delta_rule` | 尚未排任务 | 2 | 2/2 单元有验证记录 |
+| DeltaNet | `delta_rule` | 可申领 | 3 | 0/1 |
 | GDN-2（Gated DeltaNet 2） | `gdn2` | 仓主轨道 | 6 | 4/5 |
 | 整网融合算子（模块 / 层级） | `fusion` | 可申领 | 4 | 1/4 |
 | Mamba-1/2/3 | `mamba` | 未排期 (G4) | — | — |
@@ -173,14 +173,23 @@ _Qwen3-Next 用它，六项 ABI 缺口待补（第四期，与本条无关）。
 
 </details>
 
-<details><summary><b>DeltaNet —— 2 个 kernel</b></summary>
+<details><summary><b>DeltaNet —— 3 个 kernel，0/1 完成</b></summary>
 
-_上游单元已存在，本仓尚未排任务_
+_上游 ascriptor 单元（delta_rule_fwd/bwd）仍未排任务；DR-01 是另一条实现路径（PyPTO-Pro，外部贡献），两者并存不冲突_
 
 | kernel | 归属 | BF16 | FP32 | 进度 | 下一步 |
 |---|---|---|---|---|---|
 | `delta_rule_fwd` | 尚未排任务 | ✅ 原生 · A5 真机 | — | 7/9 passed | _上游单元已存在，本仓尚未排任务_ |
 | `delta_rule_bwd` | 尚未排任务 | ✅ 原生 · A5 真机 | — | 7/9 passed | _上游单元已存在，本仓尚未排任务_ |
+| `gdr_chunk_fwd_bwd_pypto_pro` | 可申领 | ✅ 原生 · A5 真机 | ✅ 原生 · A5 真机 | 0/1 | — DR-01 |
+
+<details><summary>gdr_chunk_fwd_bwd_pypto_pro —— 0/1 完成，起点 DR-01</summary>
+
+| 任务 | issue | SoC | dtype | 状态 | 说明 |
+|---|---|---|---|---|---|
+| DR-01 | — | `a5` | fp32、bf16 | 🔵 assigned | ★ 起点 |
+
+</details>
 
 </details>
 
@@ -364,8 +373,8 @@ _未排期：属 gated epic G4（窄切片原则 —— 没有目标模型就不
 
 | dtype | 归属 | 涉及任务 | 说明 |
 |---|---|---|---|
-| `bf16` | 可申领 | 47 | 当前 ABI：q/k/v/o 与多数中间量 |
-| `fp32` | 可申领 | 46 | 当前 ABI：state、门控累加、精度判定一律 fp32 |
+| `bf16` | 可申领 | 48 | 当前 ABI：q/k/v/o 与多数中间量 |
+| `fp32` | 可申领 | 47 | 当前 ABI：state、门控累加、精度判定一律 fp32 |
 | `fp16` | 未排期 (G3) | — | 契约明确拒绝（见 ops.json 的 no-tail-path 一条） |
 | `int8` | 未排期 (G3) | 1 | 未排期；state 累积漂移需先有方案 |
 | `mxfp8` | 未排期 (G3) | 1 | 未排期；950 原生解码待核实 |

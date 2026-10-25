@@ -6308,6 +6308,58 @@
         }
       ],
       "result": null
+    },
+    {
+      "id": "DR-01",
+      "title": "DeltaNet（gated_delta_rule）chunk 前向+反向：PyPTO-Pro 实现，A5（外部贡献，追溯建单）",
+      "wave": "W0",
+      "soc": "a5",
+      "priority": "P2",
+      "status": "assigned",
+      "model": [],
+      "kernel": [
+        "gdr_chunk_fwd_bwd_pypto_pro"
+      ],
+      "dtype": [
+        "fp32",
+        "bf16"
+      ],
+      "deps": [],
+      "write_set": [
+        "kernels/projects/a5/gdr_chunk_fwd_bwd_pypto_pro/**"
+      ],
+      "needs": {
+        "npu": true,
+        "ascriptor": false,
+        "fla": true,
+        "pypto_pro": true
+      },
+      "spec": "docs/pm/tasks/DR-01.md",
+      "issue": null,
+      "pr": 145,
+      "assignee": "MikejR2904",
+      "assignee_caps": {
+        "agent": "unknown（未走 APPLY 协议，身份信息来自 PR 作者账号）",
+        "session": null,
+        "socs": "a5"
+      },
+      "branch": "a5/gdr-chunk-fwd-bwd",
+      "timebox_h": null,
+      "origin": {
+        "kind": "user",
+        "note": "用户直接指令：先指示把 PR #145 的处理决定（是否接受 PyPTO-Pro 工具链、未派单 PR 如何处理）上报后，明确批复'加一个任务给PR145，然后合入'——这是追溯建单，不是先立项再派工。"
+      },
+      "reports": [
+        {
+          "at": "2026-10-25T10:10",
+          "summary": "追溯建单。PM 自己先扫描确认：50 个改动文件全部是新增（status A），全部在 kernels/projects/a5/gdr_chunk_fwd_bwd_pypto_pro/ 一个新目录下，不碰 pyproject.toml/.github/，无新依赖，无二进制文件（本地跑测试产生的 __pycache__ 已确认不在提交树里），无网络/凭据/eval/exec 代码。"
+        },
+        {
+          "at": "2026-10-25T11:05",
+          "summary": "隔离 worktree 子代理独立复核，verdict ACCEPT-WITH-NOTES（无阻塞项，但有需要如实记录的发现）：\n1) 范围/安全：复核一致，干净。\n2) CPU 可跑部分：`tests/validate_against_fla.py` 真跑通过——强声明（chunk vs naive_chunk、recurrent state vs naive_recurrent）精确复现为 0.000e+00；弱声明（近似比较）量级一致但与文档引用区间不完全重合（可能是 float32 累加顺序随环境波动，非编造）。9 个 `*_golden_cpu.py` 中 7 个在自带的交叉校验 import（硬编码指向另一个仓库才有的子目录布局）处崩溃——这是开发时遗留的死代码，不影响真正的验收路径（`test_*.py` 只 import 干净的参考函数），但直接与 README 的'自包含、拷到哪都能跑'的说法矛盾。\n3) 本机真机access：有 NPU 但是 A2/910B3，不是这个 PR 的目标 A5；系统上的 `pypto` 0.2.0 没有 `pl.jit`/`pl.vector_function`，不是 PyPTO-Pro，装不了真正的 `pypto_pro`——因此**无法独立复现 PR 自己的硬件数字**，这些数字完全是申领人自述。作为旁证，子代理在真实 A2 硬件上跑了第二 oracle 脚本 `tests/fla_npu_baseline.py`（不需要 pypto_pro），复现出与文档一致的 peak 值，确认 oracle 机制是真的，不是摆设。\n4) **门控纪律与文档不符（AGENTS.md §7 相关，有实质内容）**：README 声称的域约束（B=1、K/V 为 64 的倍数且≤128、H≤32）'不满足就报错'，但代码核查发现：V 的'64 的倍数'从未被任何 assert/raise 校验过（且与 PR 自己验证通过的 case V=96 矛盾）；B=1 只在 9 个 kernel 里的 1 个（`gdr_bwd_dqkw`，链上第 5 个）靠静态 shape 类型标注生效，其余 7 个训练 kernel 对 B 没有任何限制，B>1 会先跑掉链上前 4 个 kernel、到第 5 个才用不友好的类型报错失败，不是 README 说的'任何 kernel 启动前就拒绝'；独立推理前向 kernel（第 9 个）**完全没有任何域校验**。`VALIDATION.md` 自己的措辞比 README 更准确（明确把 B=1 限定在 `gdr_bwd_dqkw` 这一个 kernel 上）。这是文档过度承诺、不是代码会悄悄算错——但确实意味着实际的门控比文档描述的弱。\n5) 双 oracle 机制确认是真代码，不是摆设。\n6) `docs/PERFORMANCE.md` 的四条自我限定（naive 基线弱、比例随形状缩小、仅测前向、host dispatch 占比高）逐字核实存在且确实被当真使用，披露诚实、好于平均水平。\n7) **许可证头不一致**：50 个新文件里 23 个带 'Copyright (c) PyPTO Contributors ... CANN Open Software License Agreement Version 2.0 ... See LICENSE in the root directory' 的头，但本仓没有根级 LICENSE 文件、pyproject.toml 没有 license 字段、仓内其它任何文件都没有这类头——这个模式只出现在这个 PR 里，指向一份本仓不存在的许可证文本和另一个版权主体。PM 已把这一条明确上报用户（见对话），不是 PM 自行放行的。"
+        }
+      ],
+      "result": null
     }
   ],
   "label_github_login": "ascend-fla-pm-bot",
@@ -6335,7 +6387,8 @@
       "pgdn_chunk_bwd",
       "pgdn_fused_recurrent",
       "kda_layout",
-      "kda_prep"
+      "kda_prep",
+      "gdr_chunk_fwd_bwd_pypto_pro"
     ],
     "dtype": [
       "bf16",
@@ -6655,6 +6708,17 @@
           "bf16": "native@a5",
           "fp32": "native@a5"
         }
+      },
+      {
+        "id": "gdr_chunk_fwd_bwd_pypto_pro",
+        "family": "delta_rule",
+        "track": "agent",
+        "note_zh": "外部贡献（PR #145），不是 ascriptor 单元——写集与方法见 DR-01",
+        "note_en": "External contribution (PR #145), not an ascriptor unit — see DR-01",
+        "dtype_status": {
+          "bf16": "native@a5",
+          "fp32": "native@a5"
+        }
       }
     ]
   },
@@ -6681,9 +6745,9 @@
         "id": "delta_rule",
         "label_zh": "DeltaNet",
         "label_en": "DeltaNet",
-        "track": "none",
-        "note_zh": "上游单元已存在，本仓尚未排任务",
-        "note_en": "Upstream units exist; no task scheduled here yet"
+        "track": "agent",
+        "note_zh": "上游 ascriptor 单元（delta_rule_fwd/bwd）仍未排任务；DR-01 是另一条实现路径（PyPTO-Pro，外部贡献），两者并存不冲突",
+        "note_en": "Upstream ascriptor units (delta_rule_fwd/bwd) still unscheduled; DR-01 is a separate implementation path (PyPTO-Pro, external contribution) coexisting with them"
       },
       {
         "id": "gdn2",
