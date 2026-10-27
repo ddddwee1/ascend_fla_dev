@@ -6275,6 +6275,10 @@
         {
           "at": "2026-10-27T11:20",
           "summary": "用户指示加快脚步、继续管理子 agent 链条。真机 A5 访问已就位，上一轮搁置的理由（无法用真机校验中间设计选择）已解除，这轮尝试把 scores/wy/scan/output 迁到 cube matmul。open -> assigned。"
+        },
+        {
+          "at": "2026-10-27T13:30",
+          "summary": "用户直接给出新的标准验收线，记入 AGENTS.md §6 与 docs/pm/tasks/PK-07.md（适用于本任务及之后所有性能优化任务）：① 开始优化前先把工具链升级到最新 PyPTO-Pro 框架 + 官方插件 pypto-pro-op-orchestrator（cann/pypto-gym 仓库，不是 cann/cannbot 社区版——两者容易混，按仓库路径区分）；② 量化停止线：每个 kernel 要达到计算 bound 或搬运 bound，对应资源的真机 PipeUtilization ≥85%，不是'比基线快很多'就算完。\n**当前已在跑的第二轮（cube port）没有带着这条新线出发**——派发时这条线还没定。子 session 交回报告时会按这条新线复核（如果没打到 85%，不直接当作本轮验收通过，按差多少决定续第三轮还是如实记录物理上限）；工具链升级（pypto_pro + 官方插件）从下一轮开始落实，不回头打断当前子 session。"
         }
       ],
       "result": null
