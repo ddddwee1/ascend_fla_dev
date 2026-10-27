@@ -896,13 +896,29 @@
       "status_note": "2026-09-28：PM 记账（AGENTS.md §6.5 步骤①），已转告用户是否批准新建这个 A2 派生 backward 单元 / 纳入 kernel 批次；用户决定前 A2-13 不动 kernel、不填 backward 能力值、不翻 qualified，可以按\"资格化未通过+根因已定位\"的方式收尾（待 PM/用户对 A2-13 收尾方式的后续裁定）。\n2026-10-07（D-PM-60）：用户已批准申领人提议的方案——新建 A2 派生 `kda_bwd_stable_fp32gc` 反向单元修复这四个消费者，现有 BF16 `kda_bwd_stable` 单元保持不动。A2-13（issue #40）写集已扩大为含 `kernels/projects/a2/kda_bwd_stable_fp32gc/**`，状态由 blocked 回到 in_progress。`requires_kernel_change` 仍为 true（描述的是技术需求本身，不因批准而改变），但现在已获批，不再是\"记账待批\"。",
       "requires_kernel_change": true,
       "kernel_change_note": "只改本仓 A2 派生单元（`kernels/projects/a2/kda_bwd_stable/**`），不碰 A5 源码、不碰上游 ascriptor：新建派生单元（不是原地改现有冻结单元），四个消费者 `unit.py:112/121/135/149/172` 的 `gc2` 输入类型从 BF16 改 FP32（GM/UB 声明 + 载入/转换），`scan_fused`/`inverse_epilogue`/`finalize_pre`/`finalize_post` 四个 kernel 跟着改，其余五个 kernel 与其余 8 项缓存不动。需要新 UB/ABI/同步 preflight、全部 vendor 预编译、完整真机验收。属 kernel 批次候选，要用户批准（同 `a2-splitk-fp32-cube`/`kda-bwd-scan-dh0-nondeterministic` 的先例）。"
+    },
+    {
+      "id": "a5-fp32-cube-matmul-inherits-hf32",
+      "title": "【P0·静默错误·仓库级】A5 上任何 FP32 cube matmul 都没有显式设置 HF32 舍入位，在共享卡上会继承前一个租户的设置，精度静默降到 HF32",
+      "category": "correctness",
+      "severity": "P0",
+      "applies_to": [
+        "kda"
+      ],
+      "evidence": "**发现于 PK-07 第二轮（PKDA output 阶段 cube port，真机复现，不是推断）。** 一次真机运行（tails-cand2-bd4 第一个 case）里 `o` 相对 L2 突然 3.06e-04，超预算 1e-04 约 3 倍；同一份 build 的另外 20+ 次执行同一 case 都是 3.86e-07。诊断（按 AGENTS.md §6.5 的顺序，先定因不定症）：\n① 该次运行的 13 个输入阶段输出与正常运行逐位相同 → 问题出在 output kernel 内部，不是上游数据。\n② 错误均匀分布在全部 32768 行输出上，逐元素相对误差中位数 2.9e-04 ≈ 2^-11.75 → 是降精度算术，不是竞态。\n③ **决定性复现**：显式 `set_hf32(True)` 的 build，复现那次失败运行的 `o` SHA256 （`ba6c99c5...`）与其 max_abs 误差 `2.1152198314666748e-05`，6/6 次全中；显式 `set_hf32(False)` 的 build，给出正确 SHA256（`0a7745cf...`），30/30 次全对。\n**根因**：FP32 cube `matmul` 的精度服从 AI core 的 HF32 舍入位，kernel 发射不会重置这个位，不显式设置就会继承**这块核上一次跑的随便什么进程**留下的状态——在共享卡（本仓库所有真机验证都在共享卡上做）上，这意味着别的租户的进程可能悄悄把你的 FP32 精度降到 HF32，没有报错、没有 NaN、数值量级完全正常，只有相对 L2 变大。",
+      "impact": "**这是仓库级暴露，不是 PKDA 一个单元的事。** 扫过 `kernels/projects/` 的 FP32 cube matmul 调用点，没有一处显式设置 HF32 位：`kda_fwd_stable/kernels/{intra,wy}.py`、`kda_bwd_stable`、`kda_scan_diag` 全部暴露，而这些单元现在都在 docs/matrix/ops.json 里挂着真机实测的 FP32 精度数字（例如 kda_fwd_stable 的 board/native 验收）。这些数字本身不一定是错的——是否真的踩到取决于同一块核之前跑了什么——但**这意味着任何一次历史真机验收，如果恰好赶上共享卡被别的租户设成 HF32，测出来的精度数字会比真实值差，而报告上完全看不出来**。反过来，已经通过预算的历史记录也不能倒推'HF32 位肯定是对的'，因为预算本身留了裕度，HF32 的降级幅度（约 2^-11.75 相对误差量级）未必每次都会把原本通过的 case 顶出预算——这正是'静默'的意思：会不会触发全凭当时共享卡的状态，复现与否都不能证明这个缺口不存在。",
+      "blocks": [],
+      "proposed_action": "① **立即**：PK-07 的 PKDA output cube port 已经在自己的改动范围里加了 `set_hf32(False)`（`cube_scope()` 内一次性设置），真机确认设置前后 `o` SHA 相同（原来就是 off，这次只是不再依赖'原来是 off'这个未声明的前提）、各 shape 耗时差在 0.1% 内——修复本身零代价。\n② **要做（本仓侧，不改 ascriptor 仓，按 AGENTS.md §3）**：给 `kda_fwd_stable/kernels/{intra,wy}.py`、`kda_bwd_stable`、`kda_scan_diag` 里每一处 FP32 cube matmul 补 `set_hf32(False)`，和 PKDA 这次的改法一样——这些都是本仓自建的派生单元，不受 §3『不改 ascriptor 仓』的限制。\n③ **要做（静态守卫）**：加一条和 `tests/test_a2_accumulate_barriers.py`（A2 split-K barrier 守卫）同类的静态检查——凡是 A5 kernel 里对 FP32 操作数的 `matmul` 调用，同一 `cube_scope()` 内必须先出现 `set_hf32(False)`，否则测试失败。这样下一个新写的 FP32 cube matmul 不会重新踩这个坑。\n④ **留给用户决定**：历史上已经'通过'的 A5 FP32 真机精度记录（kda_fwd_stable 等）要不要重新跑一遍来确认当时测到的数字没有被 HF32 污染——这些任务当年都已经 done，按仓库纪律『已 done 的纯主机任务不追溯』，但这次不是主机任务，是真机数字，而且污染机制是这次才发现的，是否追溯、追溯到哪些任务，PM 不自行决定。",
+      "status_note": "方法论上这是 AGENTS.md §7『门控：不满足就报错』的一个新实例，但更隐蔽——这次没有'契约 case 没覆盖到的形状角落'，而是'硬件寄存器状态跨进程/跨租户残留，没有任何声明式契约能描述'。静态守卫是唯一能稳定堵住它的办法，运行时检查做不到（读不到也不该读其它租户进程设的位）。",
+      "requires_kernel_change": true,
+      "kernel_change_note": "本仓自建派生单元需要补 `set_hf32(False)`：`kernels/projects/a5/kda_fwd_stable/kernels/{intra.py,wy.py}`、`kernels/projects/a5/kda_bwd_stable/**`、`kernels/projects/a5/kda_scan_diag/**`（具体文件以 PK-07 round2 commit `12a6f66c`『pin the cube's HF32 bit off, and say why』为参照模板）。`pkda_chunk_fwd` 的 output 阶段已经修（PK-07 round2，待合入）。"
     }
   ],
   "summary": {
-    "P0": 2,
+    "P0": 3,
     "P1": 24,
     "P2": 16,
-    "total": 55,
+    "total": 56,
     "first_milestone": "第一期五项已全部有结论，并补齐了同机性能对比：aclnn 编译、runtime 桥、kda_fwd 接线、KDA 本地基线均实测通过；自编译算子在 block_dim=4 下比 torch_npu 组合快 4.43x（kimi_linear_layer）/ 2.38x（long_context T=4096）/ 19.7x（smoke）。过程中修掉两个自己的 bug（bridge-per-call-overhead、op-name-collision-in-process），它们先后让 block_dim 的效果被完全掩盖。当前最大的性能项是 block-dim-ceiling（已升 P1）：扩展性一路线性到契约上限 4，而硬件有 28 cube。第二期的前置障碍 kda-fwd-bwd-dtype-mismatch 已量化（降 P2）。",
     "second_milestone": "第二期已完成：kda_bwd 九 kernel 链 + 九个前向检查点 + autograd + KDA layer（含 2 modules），训练步在 bd=4 下比 torch_npu 组合版快 4.83x~5.67x。\n过程中发现并根治了第二期最关键的一个缺口：**按 fla 的默认初始化（chunk 内门控跨度 ~94），上游 kernel 在前向与反向各有一处量程失效，方向相反** —— 前向在 87.3 下溢、反向在 88.72 上溢。两处都在本仓建了派生单元（kda_fwd_stable / kda_bwd_stable），把成对衰减分解的锚点从区间端点改到中点，数学同义。\n门控闸因此做成二维 `{impl: {forward, backward}}`：前向 155（受有限性约束，到 155.97 精度完全不退化）、反向 100（受**精度**约束，它先于有限性到来 —— 梯度到 169.8 都有限但 dq 在 130 处超预算）。**「不吐 NaN」不等于「能用」，两者要分别测、闸按更严的定。**\n剩一项端到端确认（默认初始化下整层反向的精度）卡在机器可用性上 —— 算子层面的同一件事已由 test_kda_bwd_deep_npu.py 在跨度 94 测过，六项梯度全在契约预算内。\n当前最大的性能项仍是 block-dim-ceiling（P1）。",
     "recommended_first_target": "KDA（Kimi-Linear / fla-kda-default 形状）。其 ABI 已是 token-major BTHK、GQA 原生支持、initial_state 与 final_state 均为 FP32、backward 产出 dh0 —— 上述多数 ABI 缺口对它都不适用。唯一需要前置补齐的是本地验证证据（kda-no-local-evidence）。",
@@ -921,7 +937,7 @@
       ]
     },
     "resolved": 13,
-    "kernel_fix_policy": "**kernel 源码层面的问题统一修一轮，不零散改。** 这是 2026-09-11 定的：发现一条就去改一条，会在 ascriptor 侧留下一串互相干扰的小改动，而且每改一次都要重跑全部 case。做法：发现时把它记进本表并打 `requires_kernel_change`，本仓侧先按 AGENTS.md §7 **装闸报错或记为声明限制**，保证不静默出错；等攒够一批再统一进 ascriptor 侧（§3：本仓不改那个仓，要改走那一侧的流程或建本仓派生单元）。当前队列 28 项，见下表。",
+    "kernel_fix_policy": "**kernel 源码层面的问题统一修一轮，不零散改。** 这是 2026-09-11 定的：发现一条就去改一条，会在 ascriptor 侧留下一串互相干扰的小改动，而且每改一次都要重跑全部 case。做法：发现时把它记进本表并打 `requires_kernel_change`，本仓侧先按 AGENTS.md §7 **装闸报错或记为声明限制**，保证不静默出错；等攒够一批再统一进 ascriptor 侧（§3：本仓不改那个仓，要改走那一侧的流程或建本仓派生单元）。当前队列 29 项，见下表。",
     "kernel_fix_queue": [
       "c1-multihead-o-corrupt",
       "decode-call-overhead",
@@ -950,7 +966,8 @@
       "kda-bwd-inverse-mm-mutex-over-budget",
       "a2-splitk-fp32-cube",
       "kda-bwd-scan-dh0-nondeterministic",
-      "a2-kda-bwd-gcumsum-bf16-precision"
+      "a2-kda-bwd-gcumsum-bf16-precision",
+      "a5-fp32-cube-matmul-inherits-hf32"
     ]
   }
 }

@@ -208,7 +208,7 @@ kimi_linear_layer / bd=4 的拆分（ms）：fwd_kernels 1.314 · caches_host_si
 
 ## 缺口
 
-P0 2 项 · P1 24 项 · P2 16 项 · 已解决 13 项 · 共 55 项
+P0 3 项 · P1 24 项 · P2 16 项 · 已解决 13 项 · 共 56 项
 
 **第一期里程碑**：第一期五项已全部有结论，并补齐了同机性能对比：aclnn 编译、runtime 桥、kda_fwd 接线、KDA 本地基线均实测通过；自编译算子在 block_dim=4 下比 torch_npu 组合快 4.43x（kimi_linear_layer）/ 2.38x（long_context T=4096）/ 19.7x（smoke）。过程中修掉两个自己的 bug（bridge-per-call-overhead、op-name-collision-in-process），它们先后让 block_dim 的效果被完全掩盖。当前最大的性能项是 block-dim-ceiling（已升 P1）：扩展性一路线性到契约上限 4，而硬件有 28 cube。第二期的前置障碍 kda-fwd-bwd-dtype-mismatch 已量化（降 P2）。
 
@@ -237,17 +237,18 @@ P0 2 项 · P1 24 项 · P2 16 项 · 已解决 13 项 · 共 55 项
 
 | 算子族 | P0 | P1 | P2 |
 |---|---|---|---|
-| KDA | `c1-multihead-o-corrupt`<br>`ascriptor-gm-transfer-two-slice-row-gap` | `decode-call-overhead`<br>`decode-layer-overhead`<br>`fused-recurrent-missing`<br>`no-varlen`<br>`no-tail-path`<br>`block-dim-ceiling`<br>`qk-l2norm-not-in-kernel`<br>`state-layout-k-first`<br>`kda-bwd-inverse-mm-mutex-over-budget`<br>`a2-splitk-fp32-cube`<br>`a2-splitk-bf16-fp16-unsettled`<br>`a2-cast-blkstride-sim-blind`<br>`kda-bwd-scan-dh0-nondeterministic`<br>`kda-prep-backward-training-step-slowdown`<br>`a2-kda-bwd-gcumsum-bf16-precision` | `kda-fwd-bwd-dtype-mismatch`<br>`npu-builtin-ops-missing`<br>`fixed-kv-128`<br>`asymmetric-kv-dim`<br>`kernel-nd2nz-suboptimal`<br>`fwd-caches-not-emitted`<br>`modules-are-torch-not-kernels`<br>`stable-unit-no-harness`<br>`gate-span-still-bounded`<br>`a2-sim-vs-toolchain-blind-spots`<br>`a2-autosync-missing-cross-pipe-guards`<br>`a2-kda-bwd-pair-checkpoint-thin-margin`<br>`kda-prep-nearzero-output-underflow`<br>`kda-prep-backward-endpoint-disclosures`<br>`pkda-fp32-host-domain-validation-unregistered`<br>`soc-defaults-a5-outside-kda` |
+| KDA | `c1-multihead-o-corrupt`<br>`ascriptor-gm-transfer-two-slice-row-gap`<br>`a5-fp32-cube-matmul-inherits-hf32` | `decode-call-overhead`<br>`decode-layer-overhead`<br>`fused-recurrent-missing`<br>`no-varlen`<br>`no-tail-path`<br>`block-dim-ceiling`<br>`qk-l2norm-not-in-kernel`<br>`state-layout-k-first`<br>`kda-bwd-inverse-mm-mutex-over-budget`<br>`a2-splitk-fp32-cube`<br>`a2-splitk-bf16-fp16-unsettled`<br>`a2-cast-blkstride-sim-blind`<br>`kda-bwd-scan-dh0-nondeterministic`<br>`kda-prep-backward-training-step-slowdown`<br>`a2-kda-bwd-gcumsum-bf16-precision` | `kda-fwd-bwd-dtype-mismatch`<br>`npu-builtin-ops-missing`<br>`fixed-kv-128`<br>`asymmetric-kv-dim`<br>`kernel-nd2nz-suboptimal`<br>`fwd-caches-not-emitted`<br>`modules-are-torch-not-kernels`<br>`stable-unit-no-harness`<br>`gate-span-still-bounded`<br>`a2-sim-vs-toolchain-blind-spots`<br>`a2-autosync-missing-cross-pipe-guards`<br>`a2-kda-bwd-pair-checkpoint-thin-margin`<br>`kda-prep-nearzero-output-underflow`<br>`kda-prep-backward-endpoint-disclosures`<br>`pkda-fp32-host-domain-validation-unregistered`<br>`soc-defaults-a5-outside-kda` |
 | GDN | `ascriptor-gm-transfer-two-slice-row-gap` | `gdn-no-gqa`<br>`layout-not-token-major`<br>`nonzero-initial-state`<br>`d-initial-state-absent`<br>`state-dtype-bf16`<br>`fused-recurrent-missing`<br>`no-varlen`<br>`scale-param-no-slot`<br>`no-tail-path`<br>`block-dim-ceiling`<br>`a2-splitk-fp32-cube`<br>`a2-splitk-bf16-fp16-unsettled` | `npu-builtin-ops-missing`<br>`fixed-kv-128`<br>`asymmetric-kv-dim`<br>`soc-defaults-a5-outside-kda` |
 | GDN-2 | `ascriptor-gm-transfer-two-slice-row-gap` | `no-varlen`<br>`no-tail-path`<br>`gdn2-abi-not-gdn`<br>`gdn2-chunk-gate-range`<br>`gdn2-decode-fragmentation` | `npu-builtin-ops-missing`<br>`fixed-kv-128`<br>`asymmetric-kv-dim`<br>`modules-are-torch-not-kernels`<br>`soc-defaults-a5-outside-kda` |
 | DeltaNet | `ascriptor-gm-transfer-two-slice-row-gap` | `layout-not-token-major`<br>`nonzero-initial-state`<br>`d-initial-state-absent`<br>`fused-recurrent-missing`<br>`no-varlen`<br>`scale-param-no-slot`<br>`no-tail-path` | `npu-builtin-ops-missing`<br>`fixed-kv-128`<br>`asymmetric-kv-dim` |
 
 ### 待统一修复的 kernel 问题
 
-> **kernel 源码层面的问题统一修一轮，不零散改。** 这是 2026-09-11 定的：发现一条就去改一条，会在 ascriptor 侧留下一串互相干扰的小改动，而且每改一次都要重跑全部 case。做法：发现时把它记进本表并打 `requires_kernel_change`，本仓侧先按 AGENTS.md §7 **装闸报错或记为声明限制**，保证不静默出错；等攒够一批再统一进 ascriptor 侧（§3：本仓不改那个仓，要改走那一侧的流程或建本仓派生单元）。当前队列 28 项，见下表。
+> **kernel 源码层面的问题统一修一轮，不零散改。** 这是 2026-09-11 定的：发现一条就去改一条，会在 ascriptor 侧留下一串互相干扰的小改动，而且每改一次都要重跑全部 case。做法：发现时把它记进本表并打 `requires_kernel_change`，本仓侧先按 AGENTS.md §7 **装闸报错或记为声明限制**，保证不静默出错；等攒够一批再统一进 ascriptor 侧（§3：本仓不改那个仓，要改走那一侧的流程或建本仓派生单元）。当前队列 29 项，见下表。
 
 | 缺口 | 级别 | 要在 kernel 侧改什么 |
 |---|---|---|
+| `a5-fp32-cube-matmul-inherits-hf32` | P0 | 本仓自建派生单元需要补 `set_hf32(False)`：`kernels/projects/a5/kda_fwd_stable/kernels/{intra.py,wy.py}`、`kernels/projects/a5/kda_bwd_stable/**`、`kernels/projects/a5/kda_scan_diag/**`（具体文件以 PK-07 round2 commit `12a6f66c`『pin the cube's HF32 bit off, and say why』为参照模板）。`pkda_chunk_fwd` 的 output 阶段已经修（PK-07 round2，待合入）。 |
 | `c1-multihead-o-corrupt` | P0 | **根因已定位**（A2-04 / PR #60，joshjms 诊断，PM 独立复算）：`kda_fwd/kernels/recurrent.py` 的 `Aqk` L1 交接是**两信用配固定槽** —— `aqk_l1_valid = DEvent(Pipe.MTE1, Pipe.MTE2, preset=True)`（:130）给两个信用，而槽是 `aqk_slot = Var(c_idx % 2)`（:243 写、:373 读），按 chunk 取。一个头最后一个 chunk 的槽是 `(C-1)%2`，下一个头第一个 chunk 的槽是 `0` —— **当且仅当 C 为奇数时两者相撞**，写方领先一周期踩进还没被读走的槽（:245 的 MTE2 写 与 :398 的 MTE1 读无序）。每核最后一个头后面没有写，所以恰好是对的。**不是漏了某次 DEvent/Mutex 调用**，是信用数与实际轮转的槽数不匹配 —— 与 ascriptor `library/docs/defects/M10-076-mutex-credits-and-handoff-slots.md` 同型（那一条在 autosync 里已修成『depth <= j 才算有序』，但本 kernel 是手写同步，不过 autosync）。**修法**：让槽按每核周期序号轮转 `((pair_idx - pair_begin) * C + c_idx) % 2`，两信用配两槽；或把两个 DEvent 降成 SEvent（少一周期 run-ahead）。 **补充（来自 A2-04 的 delta）**：`l1_Aqk` 是两槽 `DBuff`（:146）。备选修法是把 `aqk_l1_valid`/`aqk_l1_ready` 改 `SEvent`（去掉一拍 run-ahead，**性能未测**）。落地按 AGENTS.md §3 走本仓派生单元、进 kernel 批次。A5 上的硬判据：失效表 12 格全对、偶数 C 与未修版逐位相同、bd=1 与 bd=4 逐位相同。 **2026-09-19**：本仓派生单元已落地并接入公开调度（见 proposed_action）；上游 ascriptor 的 `kda_fwd/kernels/recurrent.py` 源码仍未改，`requires_kernel_change` 因此保持 true（指上游）。 |
 | `a2-kda-bwd-gcumsum-bf16-precision` | P1 | 只改本仓 A2 派生单元（`kernels/projects/a2/kda_bwd_stable/**`），不碰 A5 源码、不碰上游 ascriptor：新建派生单元（不是原地改现有冻结单元），四个消费者 `unit.py:112/121/135/149/172` 的 `gc2` 输入类型从 BF16 改 FP32（GM/UB 声明 + 载入/转换），`scan_fused`/`inverse_epilogue`/`finalize_pre`/`finalize_post` 四个 kernel 跟着改，其余五个 kernel 与其余 8 项缓存不动。需要新 UB/ABI/同步 preflight、全部 vendor 预编译、完整真机验收。属 kernel 批次候选，要用户批准（同 `a2-splitk-fp32-cube`/`kda-bwd-scan-dh0-nondeterministic` 的先例）。 |
 | `a2-splitk-fp32-cube` | P1 | 只改 A2 派生单元（A2-03 前向 + decode 与 A2-09 反向的 `kernels/projects/a2/**`），A5 源码不动：`kda_fwd/kernels/triangular_inverse.py:273/279/284-285`、`gdn_fwd/kernels/inverse.py:306/312/317-318`、`gdn_bwd/kernels/finalize.py:205/217/226/235/244` 的 FP32 `is_init=False` matmul 之前补 `barrier(Pipe.M)`；`kda_fwd_stable/kernels/recurrent.py:401`、`gdn_bwd/kernels/wu.py:206` 的 BF16 累加链同样补（不分 dtype，A2-01 的 W4）。以 a2 lint 0 trap 作闸，验证按 `benchmarks/a2/README.md` §8 的 W2。属 kernel 批次 A2-K1，要用户批准。 |
@@ -335,6 +336,20 @@ PM 在权威 workspace 上独立跑了 `benchmarks/diag_c1_multihead.py`，**上
 - **建议** 本仓侧（AGENTS.md §3：不改 ascriptor 仓）：在自己的派生单元里，遇到这个 4 维双切片模式一律换成显式的 `gm_to_ub_pad(..., 正确的 gap)`，不依赖库的隐式推断。GDA-01 已经验证这条绕法：`qn/kn/bk/wv` 换成显式 gap 后与 CPU 参考完全一致，event balance/hazards 均空、无死锁。
 仓库所有者侧：这是 ascriptor 库本身的缺陷，不是本仓能修的范围，建议原样报给 ascriptor 的维护方。
 待办：扫一遍本仓现有 kernel（kda_fwd_stable、gdn2_chunk_fwd 等）里有没有已经踩中这个模式但还没被测出来的地方——形状够小或凑巧连续时（比如 H=1）这个 bug 不会触发，容易被现有测试漏过。
+
+#### `a5-fp32-cube-matmul-inherits-hf32` — 【P0·静默错误·仓库级】A5 上任何 FP32 cube matmul 都没有显式设置 HF32 舍入位，在共享卡上会继承前一个租户的设置，精度静默降到 HF32
+
+- **类别** correctness · **适用于** KDA · **阻塞** —
+- **依据** **发现于 PK-07 第二轮（PKDA output 阶段 cube port，真机复现，不是推断）。** 一次真机运行（tails-cand2-bd4 第一个 case）里 `o` 相对 L2 突然 3.06e-04，超预算 1e-04 约 3 倍；同一份 build 的另外 20+ 次执行同一 case 都是 3.86e-07。诊断（按 AGENTS.md §6.5 的顺序，先定因不定症）：
+① 该次运行的 13 个输入阶段输出与正常运行逐位相同 → 问题出在 output kernel 内部，不是上游数据。
+② 错误均匀分布在全部 32768 行输出上，逐元素相对误差中位数 2.9e-04 ≈ 2^-11.75 → 是降精度算术，不是竞态。
+③ **决定性复现**：显式 `set_hf32(True)` 的 build，复现那次失败运行的 `o` SHA256 （`ba6c99c5...`）与其 max_abs 误差 `2.1152198314666748e-05`，6/6 次全中；显式 `set_hf32(False)` 的 build，给出正确 SHA256（`0a7745cf...`），30/30 次全对。
+**根因**：FP32 cube `matmul` 的精度服从 AI core 的 HF32 舍入位，kernel 发射不会重置这个位，不显式设置就会继承**这块核上一次跑的随便什么进程**留下的状态——在共享卡（本仓库所有真机验证都在共享卡上做）上，这意味着别的租户的进程可能悄悄把你的 FP32 精度降到 HF32，没有报错、没有 NaN、数值量级完全正常，只有相对 L2 变大。
+- **影响** **这是仓库级暴露，不是 PKDA 一个单元的事。** 扫过 `kernels/projects/` 的 FP32 cube matmul 调用点，没有一处显式设置 HF32 位：`kda_fwd_stable/kernels/{intra,wy}.py`、`kda_bwd_stable`、`kda_scan_diag` 全部暴露，而这些单元现在都在 docs/matrix/ops.json 里挂着真机实测的 FP32 精度数字（例如 kda_fwd_stable 的 board/native 验收）。这些数字本身不一定是错的——是否真的踩到取决于同一块核之前跑了什么——但**这意味着任何一次历史真机验收，如果恰好赶上共享卡被别的租户设成 HF32，测出来的精度数字会比真实值差，而报告上完全看不出来**。反过来，已经通过预算的历史记录也不能倒推'HF32 位肯定是对的'，因为预算本身留了裕度，HF32 的降级幅度（约 2^-11.75 相对误差量级）未必每次都会把原本通过的 case 顶出预算——这正是'静默'的意思：会不会触发全凭当时共享卡的状态，复现与否都不能证明这个缺口不存在。
+- **建议** ① **立即**：PK-07 的 PKDA output cube port 已经在自己的改动范围里加了 `set_hf32(False)`（`cube_scope()` 内一次性设置），真机确认设置前后 `o` SHA 相同（原来就是 off，这次只是不再依赖'原来是 off'这个未声明的前提）、各 shape 耗时差在 0.1% 内——修复本身零代价。
+② **要做（本仓侧，不改 ascriptor 仓，按 AGENTS.md §3）**：给 `kda_fwd_stable/kernels/{intra,wy}.py`、`kda_bwd_stable`、`kda_scan_diag` 里每一处 FP32 cube matmul 补 `set_hf32(False)`，和 PKDA 这次的改法一样——这些都是本仓自建的派生单元，不受 §3『不改 ascriptor 仓』的限制。
+③ **要做（静态守卫）**：加一条和 `tests/test_a2_accumulate_barriers.py`（A2 split-K barrier 守卫）同类的静态检查——凡是 A5 kernel 里对 FP32 操作数的 `matmul` 调用，同一 `cube_scope()` 内必须先出现 `set_hf32(False)`，否则测试失败。这样下一个新写的 FP32 cube matmul 不会重新踩这个坑。
+④ **留给用户决定**：历史上已经'通过'的 A5 FP32 真机精度记录（kda_fwd_stable 等）要不要重新跑一遍来确认当时测到的数字没有被 HF32 污染——这些任务当年都已经 done，按仓库纪律『已 done 的纯主机任务不追溯』，但这次不是主机任务，是真机数字，而且污染机制是这次才发现的，是否追溯、追溯到哪些任务，PM 不自行决定。
 
 ### P1
 
