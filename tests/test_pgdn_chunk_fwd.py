@@ -101,6 +101,90 @@ def test_using_preconditioned_key_for_read_correction_is_detectably_wrong():
     assert not torch.equal(read, write)
 
 
+# --- PK-08 traversal invariants -------------------------------------------
+# `output_vf` runs the full constant j trip count with no `j <= i` guard, and
+# `scores_vf` walks the causal triangle as BLK x BLK blocks. Both rewrites are
+# bitwise-neutral only while the invariants below hold, and both are the silent
+# kind of defect if an invariant is ever broken: the output would stay finite
+# and correctly shaped. These tests pin them, AGENTS.md section 6.5 step 2.
+BLK_UNITS = ('pgdn_chunk_fwd', 'pgdn_chunk_fwd_bf16')
+
+
+def stage_block_edge(unit):
+    """BLK as written in the unit's kernel source, read without importing ascriptor."""
+    import ast
+    source = (ROOT.parent / unit / 'kernels/stages.py').read_text()
+    for node in ast.parse(source).body:
+        if isinstance(node, ast.Assign) and getattr(node.targets[0], 'id', None) == 'BLK':
+            return int(ast.literal_eval(node.value))
+    raise AssertionError(f'{unit}: kernels/stages.py declares no BLK')
+
+
+@pytest.mark.parametrize('unit', BLK_UNITS)
+def test_scores_block_edge_divides_the_chunk(unit):
+    assert 64 % stage_block_edge(unit) == 0
+
+
+@pytest.mark.parametrize('unit', BLK_UNITS)
+def test_blocked_traversal_covers_the_causal_triangle_exactly(unit):
+    """Replay `scores_vf`'s loop nest in Python: same coverage, fewer iterations."""
+    blk = stage_block_edge(unit)
+    score_pairs, lower_pairs, executed, guarded = [], [], 0, 0
+    for ibase in range(0, 64, blk):
+        for ii in range(blk):
+            i = ibase + ii
+            for jbase in range(0, ibase, blk):          # sub-diagonal: unguarded
+                for jj in range(blk):
+                    executed += 1
+                    j = jbase + jj
+                    score_pairs.append((i, j))
+                    lower_pairs.append((i, j))          # j < i holds by construction
+            for jj in range(blk):                       # diagonal block: guarded
+                executed += 1
+                guarded += 1
+                if jj <= ii:
+                    score_pairs.append((i, ibase + jj))
+                    if jj < ii:
+                        lower_pairs.append((i, ibase + jj))
+    assert sorted(score_pairs) == sorted((i, j) for i in range(64) for j in range(64) if j <= i)
+    assert sorted(lower_pairs) == sorted((i, j) for i in range(64) for j in range(64) if j < i)
+    assert len(score_pairs) == len(set(score_pairs))    # every entry written once
+    assert len(lower_pairs) == len(set(lower_pairs))
+    for pairs in (score_pairs, lower_pairs):            # per row, j still increases
+        for row in range(64):
+            columns = [j for i, j in pairs if i == row]
+            assert columns == sorted(columns)
+    # The whole point of the rewrite: the flat guarded form executed 64*64.
+    assert executed == 64 * blk * (64 // blk - 1) // 2 + 64 * blk
+    assert executed < 64 * 64
+    assert guarded == 64 * blk
+
+
+@pytest.mark.parametrize('time,hv', [(64, 1), (64, 2), (128, 2), (192, 4)])
+def test_acausal_scores_are_exact_zero_so_output_needs_no_guard(time, hv):
+    """`output_vf` sums all 64 columns; the acausal ones must contribute nothing."""
+    stages = ref.reference_stages(data(time, h=1, hv=hv, gate_scale=1.0))
+    acausal = ~torch.ones(64, 64, dtype=torch.bool).tril()
+    score, lower, delta = stages['score'], stages['lower'], stages['delta']
+    assert torch.equal(score[..., acausal], torch.zeros_like(score[..., acausal]))
+    assert torch.equal(lower[..., ~torch.ones(64, 64, dtype=torch.bool).tril(-1)],
+                       torch.zeros_like(lower[..., ~torch.ones(64, 64, dtype=torch.bool).tril(-1)]))
+    assert bool(torch.isfinite(delta).all()), 'a non-finite delta would turn 0*delta into NaN'
+    # Replay the unguarded accumulation against the guarded one, bit for bit.
+    flat_score = score.reshape(-1, 64, 64)
+    flat_delta = delta.reshape(-1, 64, 128)
+    for tile in range(flat_score.shape[0]):
+        for row in range(64):
+            guarded = torch.zeros(128)
+            unguarded = torch.zeros(128)
+            for col in range(64):
+                term = flat_delta[tile, col] * flat_score[tile, row, col]
+                unguarded = unguarded + term
+                if col <= row:
+                    guarded = guarded + term
+            assert torch.equal(guarded, unguarded)
+
+
 @pytest.mark.parametrize('norm', [0., 1e-6, 1e-4, 1e-2])
 def test_normalization_fork_quantified(norm):
     inputs = data(h=1, hv=1, norm=norm)
