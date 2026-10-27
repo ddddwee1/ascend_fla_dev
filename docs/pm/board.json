@@ -6263,6 +6263,10 @@
         {
           "at": "2026-10-27T01:30",
           "summary": "用户直接指示 PM 自行起独立 session 派发未完成任务（最多2个，全部由 PM 管理），本任务被选中（open、依赖已满足）。open -> assigned，assignee=limjiunnbin（本仓 pm_github_login，这次是 PM 直接调度而非外部 APPLY，透明记录不伪装成独立申领）。**已知限制**：派发出去的子会话运行在 PM 自己的沙箱里，这台机器只有 A2/910B3，没有 A5 真机——不能在这里完成本任务要求的 A5 真机验收（D-PM-34）。子会话的范围是 profile-first 的源码级分析与实现准备（读源码定目标、必要时在本地 venv 装 ascriptor 跑 CPU/sim 级别的正确性检查），最终真机验证仍需要有 A5 访问的 agent 接续——这不是本次派单的缺陷，是诚实记录的前提条件。"
+        },
+        {
+          "at": "2026-10-27T01:50",
+          "summary": "PM 调度的子 session 完成 profile-first 的源码级分析，STATUS/BLOCKED-on-hardware（不是 DONE，没有真机）。**没有代码改动**（判断任何改动在没有真机 timing 校验下都不可信，按 AGENTS.md §6 铁律一不动手）。核心发现：PKDA chunk 前向的 cube 引擎完全空转——`scores_vf`/`wy_vf`/`scan_vf`/`output_vf` 全部用 vector-engine 嵌套循环实现（stages.py），一次 matmul()/L0C/DBuff 都没用到；同一仓库里语义等价的 `kda_fwd_stable`（intra.py/wy.py）用 cube matmul 做同样的计算，A2 的 `kda_fwd_stable/triangular_inverse.py`还演示了怎么把 O(C²) 前向替换法用分块求逆避免掉。这是最可能的真机 profile 落点，但仍是推断不是结论——用 CPU `pipesim` 的 model_cycles（非真机、是软件事件时序模型）做了旁证：T=64/H=8 时 prepare 阶段占模型总周期 >50%，但这只值得在真机上核实，不是结论。ascriptor 装进本地 venv 后 reference/sim/pipesim 三个非真机阶段全过（16/16 case + sim/pipesim 单 case 通过），compile/cannsim/native 需要真机，没有尝试。"
         }
       ],
       "result": null
@@ -6300,7 +6304,7 @@
       },
       "spec": "docs/pm/tasks/PK-08.md",
       "issue": 141,
-      "pr": null,
+      "pr": 147,
       "assignee": "limjiunnbin",
       "assignee_caps": {
         "agent": "PM 直接调度（用户指示：'起独立session，把未完成的任务派发下去，最多2个session，全部由你管理'）",
@@ -6321,6 +6325,10 @@
         {
           "at": "2026-10-27T01:30",
           "summary": "用户直接指示 PM 自行起独立 session 派发未完成任务（最多2个，全部由 PM 管理），本任务被选中（open、依赖已满足）。open -> assigned，assignee=limjiunnbin（本仓 pm_github_login，这次是 PM 直接调度而非外部 APPLY，透明记录不伪装成独立申领）。**已知限制**：派发出去的子会话运行在 PM 自己的沙箱里，这台机器只有 A2/910B3，没有 A5 真机——不能在这里完成本任务要求的 A5 真机验收（D-PM-34）。子会话的范围是 profile-first 的源码级分析与实现准备（读源码定目标、必要时在本地 venv 装 ascriptor 跑 CPU/sim 级别的正确性检查），最终真机验证仍需要有 A5 访问的 agent 接续——这不是本次派单的缺陷，是诚实记录的前提条件。"
+        },
+        {
+          "at": "2026-10-27T01:50",
+          "summary": "PM 调度的子 session 完成分析并**提交了两处逐位中立的修复**（draft PR #147，分支 task/PK-08，3 个提交 df5d5d9d/70ba6c52/c4c3e67e）。STATUS，不是 DONE——没有真机，D-PM-34 还没满足。\n**根因**（完全从 GDA-05 已合入的真机数字反推出来，没用新真机）：`scores`/`output` 在 t4096_h16_hv32/bd1/FP32 上分别比 `gdn_fwd` 里逐位相同算法的实现慢 2.03x/4.66x——`prepare`/`wy`/`scan`（两个单元同源代码）两边差在 0.2-4.6% 内，说明不是噪声。唯一源码差异是 PK-03 为压 `-Wcce-compat` 告警引入的三角循环写法：`gdn` 是数据依赖的循环界（`j < i+1`），`pgdn` 是固定 64 次循环 + 内部 `if (j<=i)` 守卫。成本模型拟合：`output_vf` 守卫内迭代≈19.5ns vs 不守卫≈2.0ns（7 条指令体无法流水线）；`scores_vf` 每次迭代成本不变（依赖 `vcadd` 归约），2.03x 纯粹是多跑的迭代数。\n**修复1**：`output_vf` 删掉守卫——acausal 项精确是 `0*delta=±0`，RNE 下 `acc+(±0)==acc`，可以安全地一直累加。预测 98.828ms → ~25.2ms。\n**修复2**：`scores_vf` 把三角分块成 8x8——次对角块完全因果、不守卫；只有对角块保留 `jj<=ii` 守卫。守卫迭代数 4096→512。预测 112.359ms → ~63.2ms。\n两条预测都来自拟合 GDA-05 数字的成本模型，文档里明确标注为预测不是实测。两处都同时应用到 FP32 与 BF16 单元（`scores_vf`/`output_vf` 两边字符级相同）。\n**已做的非真机验证**：CCE 发射 diff 确认改动精确范围；功能模拟器 SHA256 比对——B1/T64/H2/HV2 bd1 与 B1/T192/H2/HV4 bd2（奇数 chunk 数+HV>1，按 §6 笛卡尔边界教训选的case）两处改动前后全部 17/17 stage + 3/3 公开输出逐位相同；pipesim 无死锁、hazard/event-balance 清空；`tests/test_pgdn_chunk_fwd.py` 82 passed/30 skipped（新增 8 个）。\n**两条诚实警告**：① CPU pipe cycle 模型反而判修复1是退化（62997→69892），和实测方向相反——模型对'不触发的守卫'不计代价，正是被硬件数据推翻的那条假设；子 session 选择相信真机数据而非模型，并在研究文档里写明。② 修复2没能重新核对 `-Wcce-compat`（需要 compile 阶段）。\n**发现但未实现**（各自需要单独任务）：decay 因子逐通道常量却按 128 宽度逐元素算（128倍冗余，非逐位中立改动）；scores/output 整个在 vector 引擎跑，同仓库 `pkda_chunk_fwd_bf16/output.py` 的 mode='mix' 已经在用 cube 做同样的乘积——和 PK-07 的'cube 引擎空转'是同一类发现，可能是更大的剩余空间；output 的状态行重复加载可以靠 tiling 分摊。"
         }
       ],
       "result": null
