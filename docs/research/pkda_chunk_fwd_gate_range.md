@@ -315,3 +315,228 @@ execution. Neither alone substitutes for `suite`. Compare all input and stage
 hashes between suite summaries. The `perf` mode also runs the full workload
 before its synchronized measurements. The unchanged canonical runner is for
 reference/model checks; native acceptance uses `verify_native.py`.
+
+## Cube port of the output stage (PK-07)
+
+PK-07 round 1 profiled the accepted PK-04 implementation on real A5 hardware
+and found `aic_mac_time = 0.0 us`, `aic_mac_ratio = 0.000` and
+`cube_utilization <= 0.007%` for all five FP32 kernels at two real shapes and
+at both `block_dim 1` and `4`: `prepare` is MTE2-bound and the other four
+stages ran entirely as vector loops (`aiv_vec_ratio` 0.89-0.98). The matrix
+unit was idle. Round 2 ported one stage.
+
+### Why `output` first
+
+`output` is the only stage that is already nothing but two GEMMs,
+
+    o = (qn * exp(gc)) @ states + score @ delta
+
+with `[64,128] @ [128,128]` and `[64,64] @ [64,128]`, and this repository's own
+BF16 sibling `pkda_chunk_fwd_bf16/kernels/output.py` — native-qualified on
+Ascend950PR — already computes exactly that on the cube for the same kernel
+family. Structure, buffer sizing and the vector -> cube -> vector hand-off come
+from it. The FP32 differences:
+
+* `splitk=64` on the `q @ states` product. An FP32 `[128,128]` L0B tile is
+  64 KB, the whole of L0B, which leaves the compiler no room to rotate slots.
+  `kda_fwd_stable/kernels/intra.py` sizes its FP32 cube products the same way.
+* no casts, so `weighted_query` writes FP32 straight out and the L0C drain is
+  copied by a plain vector move.
+* no casts also means `score`, `states` and `delta` are used verbatim and can
+  be loaded GM -> L1 with one `gm_to_l1_nd2nz` each on the cube side, never
+  touching UB. The BF16 sibling cannot do this because it casts them.
+
+The A2 blocked-inverse technique in `kernels/projects/a2/kda_fwd_stable/
+kernels/triangular_inverse.py` was read and **not** used: it addresses the
+triangular solve, which in PKDA is `wy`, not `output`. `output` has no solve.
+
+No masking is needed. `prepare` writes exact zeros into `qn`/`bk`/`wv` beyond
+the live token count, `scores` and `scan` zero-fill every `score`/`delta` row
+and column they do not compute, and `gc` carries the last live prefix on padded
+rows, so both products are exactly zero on padded rows and `exp(gc)` stays
+finite there. Only live rows reach `o`. The gate-range analysis above is
+unchanged: `output` still evaluates `exp(gc)` directly, never a pairwise
+difference, so it needs no decomposition and acquires no new span limit.
+
+### HF32: an FP32 cube matmul inherits the rounding bit
+
+This is the finding worth carrying to every other FP32 cube kernel in the
+repository. One real-device run of `t4096_h8` at `block_dim 4` came back at
+
+    o relative L2 3.06e-04   (budget 1e-04),  max abs 2.1152198314666748e-05
+
+while the same case passed at 3.86e-07 in more than twenty other executions of
+the same build. All 13 input stages of the failing run hash **bitwise
+identically** to the passing runs, so the corruption was inside the output
+kernel, and the error was uniform — every one of the 32768 output rows was off,
+median elementwise relative error 2.9e-04, which is reduced-precision
+arithmetic (2^-11.75), not a race.
+
+A build with `set_hf32(True)` reproduces that run's `o` SHA-256
+(`ba6c99c50ba3fb28ba860b672df739b3d5d5d6f324613cb5bf9e96b2d8f322cc`) and its
+maximum absolute error to the last digit, six times out of six. A build with
+`set_hf32(False)` gives the correct SHA-256
+(`0a7745cfae45e8f30001acd9b6ac69d98b506ee21bcb5011c14664d83e9c7735`) thirty
+times out of thirty. The cause is therefore settled: an FP32 cube `matmul`
+obeys the AI core's HF32 rounding bit, a kernel launch does not reset it, and a
+kernel that does not set it inherits whatever ran on that core before — on a
+shared card, including another tenant's process. The symptom is a silent,
+intermittent precision downgrade of about 790x, three times over the budget,
+with no error and no warning: exactly what AGENTS.md section 7 forbids.
+
+The kernel therefore calls `set_hf32(False)` once, in a `cube_scope()`, before
+its work loop.
+
+**Open gap, and the cost of the fix.** The pinned Ascriptor reference
+interpreter has no implementation for `core.set_hf32` (`SimError: the reference
+interpreter does not implement core.set_hf32`), so with this kernel the `sim`
+and `pipesim` launchers can no longer execute the unit at all. `reference` is
+unaffected (it is CPU math), and native/device execution is unaffected. The
+pre-change revision was checked through both model launchers before
+`set_hf32` was added, and the only source difference between that revision and
+this one is the single `set_hf32(False)` call, which the hardware shows does
+not change a bit of the result when HF32 was already off. Two ways out, in
+preference order:
+
+1. the Ascriptor side implements `core.set_hf32` in the reference interpreter
+   (it is a rounding-mode toggle, and the model computes in FP64/FP32 anyway,
+   so a no-op implementation would restore both launchers);
+2. CANN or the generated op host pins the mode outside the kernel body, if such
+   a per-op control exists.
+
+Shipping without `set_hf32` is **not** one of them. The two host tests that
+need a model launcher skip on exactly that message and nothing else, so they
+resume by themselves once the gap closes.
+
+The same exposure applies unchanged to every other FP32 cube matmul in this
+repository — `kda_fwd_stable/kernels/{intra,wy}.py`, `kda_bwd_stable`,
+`kda_scan_diag` — none of which sets the bit. That is not a PK-07 finding about
+PKDA; it is a repository-wide one.
+
+### Measured, real A5
+
+Ascend950PR V100, npu name 957b, chip version V100, firmware 9.0.0.100.200,
+driver / npu-smi 25.7.rc1, CANN 9.1.0 (`compiler/version.info` Version=9.1.0,
+`opp/version.info` Version=9.1.0), `opp/built-in/op_impl/ai_core/tbe/kernel/`
+carries `ascend950`, Python 3.12.14, Torch 2.12.0, torch_npu 2.12.0, Ascriptor
+0.1.0 at pin `90cfcdc720bbcd66e8bd4361c4dd4fbc1a2a57b5`. Card 5, held through
+the shared advisory device lock, Health OK and no other process on the card.
+Per-stage device time from one `torch_npu` profiler capture per process with
+`PipeUtilization` counters, median of three captures, one build per process
+(AGENTS.md section 6 rule 2):
+
+| point | prepare | scores | wy | scan | output | 5-kernel sum |
+|---|---:|---:|---:|---:|---:|---:|
+| base bd4 B1/T1024/H32 | 2.6195 | 3.4716 | 2.8457 | 2.0005 | 1.3498 | 12.6544 |
+| rev1 bd4 B1/T1024/H32 | 2.6286 | 3.4704 | 2.8446 | 1.9997 | 1.0946 | 12.4062 |
+| rev3 bd4 B1/T1024/H32 | 2.5116 | 3.4723 | 2.8423 | 2.0040 | 0.7657 | 11.9661 |
+| base bd4 B1/T4096/H32 | 10.5842 | 13.8546 | 11.3456 | 7.9803 | 5.3357 | 50.2733 |
+| rev1 bd4 B1/T4096/H32 | 10.5709 | 13.8603 | 11.3455 | 7.9845 | 4.3944 | 49.3313 |
+| rev3 bd4 B1/T4096/H32 | 10.5718 | 13.8618 | 11.3442 | 7.9762 | 3.1009 | 48.0322 |
+| base bd1 B1/T1024/H32 | 10.4057 | 13.8476 | 11.3333 | 7.9677 | 5.3198 | 49.1983 |
+| rev3 bd1 B1/T1024/H32 | 9.9169 | 13.8471 | 11.3370 | 7.9665 | 3.0692 | 46.4708 |
+
+All times in ms. `output` improves 1.76x (bd4/T1024/H32), 1.72x
+(bd4/T4096/H32), 1.75x (bd4/T4096/H8) and 1.73x (bd1/T1024/H32). The 5-kernel
+device sum improves 1.058x, 1.047x and 1.059x respectively. B1/T1024/H32 is
+`models.json` `test_case_shapes.kimi_linear_layer`; B1/T4096/H8 is the PK-04
+acceptance shape, and it carries exactly the same total work as B1/T1024/H32
+(both are 512 chunk-head items and 32768 prepared tokens), which is why the two
+agree to within 1% on every stage — B1/T4096/H32 is the shape that is
+genuinely four times larger.
+
+Controls: `scores`, `wy` and `scan` are byte-identical source in all four
+builds and agree to within 0.1% across them. `prepare` is also identical source
+and spans 2.5116-2.6849 ms across builds, i.e. about 3.5% of run-to-run noise;
+nothing in this change can affect it.
+
+The rows above were taken on a build whose `output.py` predates this section's
+own docstring paragraph. The exact committed source was then built separately
+and re-measured, and the generated CCE for `pkda_chunk_output` is byte-identical
+between the two (`b076633e33fac35a8f8629744168e2c8ae9eae84f00a174f293a2c1811ded77f`),
+so the difference between their numbers is run-to-run noise, not a change:
+
+| point | prepare | scores | wy | scan | output | 5-kernel sum |
+|---|---:|---:|---:|---:|---:|---:|
+| committed bd4 B1/T1024/H32 | 2.5943 | 3.4694 | 2.8431 | 2.0030 | 0.7643 | 12.0395 |
+| committed bd4 B1/T4096/H32 | 11.1728 | 13.8592 | 11.3468 | 7.9773 | 3.0975 | 48.6379 |
+
+i.e. `output` 1.766x and 1.723x against the same baseline, `aic_mac_ratio`
+0.635 and 0.625, and the same `o` SHA-256 at both shapes as every other
+candidate revision. Its own verification is the same grid: 28 cases at
+`block_dim` 1/2/4 with all 14 stage hashes equal across `block_dim`, the 64
+tail-count cases at `block_dim 4`, 20 same-process repeats of `t4096_h8` giving
+one hash, worst relative L2 5.169e-07 against the CPU chunk reference and
+6.616e-06 against the pinned FLA naive.
+
+Output-stage engine shares at bd4, median of three captures:
+
+| | base | rev1 (UB staging) | rev3 (GM -> L1) |
+|---|---:|---:|---:|
+| `aic_mac_ratio` | 0.000 | 0.444 | 0.634 |
+| `aiv_vec_ratio` | 0.891 | 0.022 | 0.031 |
+| `aiv_mte3_ratio` | 0.044 | 0.473 | 0.202 |
+| `cube_utilization(%)` | 0.007 | 14.233 | 14.235 |
+
+`cube_utilization` is a whole-chip figure: 4 of 28 cube cores is 14.3%, so at
+bd4 it saturates at that and says nothing about how busy those four are.
+`aic_mac_ratio` is the figure that does, and it is what moved 0.000 -> 0.634.
+Rev1's `aiv_mte3_ratio = 0.473` is the `ub_to_l1.nd2nz` multi-burst staging
+(D-084) that the compiler's performance lint names on every such move; rev3
+removes three of its four operands from that path.
+
+### Correctness, unchanged 1e-4 budget, FP32 only
+
+* 28 full-chain native cases at `block_dim` 1, 2 and 4, plus 10 public-API
+  boundary cases per `block_dim`, plus the 64 tail-count cases at `block_dim 4`
+  — all pass against the independent CPU stage references, the CPU chunk
+  reference and the pinned FLA naive.
+* all 14 stage outputs are bitwise identical across `block_dim` 1/2/4 for 28
+  cases, in both the base and the candidate build: core partitioning changes no
+  bit.
+* against the base build, the 13 stage outputs the change does not touch are
+  bitwise identical and only `o` differs.
+* worst relative L2 over every candidate case: 5.17e-07 against the CPU chunk
+  reference, 6.62e-06 against the pinned FLA naive (the span-155 adversarial
+  cases). Per case the cube form is equal to or **better** than the vector form
+  it replaces in all 28 cases — an L0C accumulation tree beats a 128-step
+  sequential vector sum.
+* 30 repeats of `t4096_h8` at `block_dim 4` in one process produce one
+  `o` SHA-256 and no NaN.
+* functional simulator, before `set_hf32` closed that path: 12-point (B,T,H)
+  boundary grid on the stage alone (N=1/2/3, tail counts 1/63/64/65/127/129/130,
+  H=1..4, B=1/2) at `block_dim` 1/2/3/4 — bitwise equal across `block_dim`,
+  relative L2 <= 1.3e-07 against a float64 evaluation, and bitwise equal
+  between rev1 and rev2 at all 48 points. Pipe simulator: no hazards, no
+  deadlock, stage model cycles 72871 -> 59674.
+
+### Left unattempted, and why
+
+`scores` (3.472 ms at bd4/T1024/H32), `wy` (2.842 ms) and `scan` (2.004 ms) are
+still vector-only and are now, in that order, the whole kernel chain's largest
+stages. They were deliberately left:
+
+* `scores` is two `[64,128] x [128,64]` products with the same shape as
+  `kda_fwd_stable/kernels/intra.py`, so the cube form is available — but a
+  matmul cannot evaluate `exp(gc_i - gc_j)` per pair, so it forces the
+  per-channel midpoint decomposition `exp(gc_i - m) * exp(m - gc_j)`. That is
+  mathematically the same product, but it introduces a span limit this stage
+  does not currently have (two factors at `exp(+-span/2)`, finite to about
+  span 174) and one extra rounding in the gate, which on the span-155
+  adversarial cases would be expected to roughly double the 6.2e-06 residual.
+  Both effects stay inside the declared gate of 155 and the 1e-04 budget on
+  paper, but "on paper" is not the standard this unit is held to, and the
+  change deserves its own calibration round rather than being appended here.
+* `wy` is a triangular solve. The A2 blocked-inverse decomposition is the right
+  starting point, but PKDA's system is `(I + L)` with asymmetric `kn`/`bk`
+  keys, and KDA reaches the same place with a separate explicit
+  triangular-inverse stage, i.e. a new pipeline stage and a new workspace
+  buffer, not an in-place rewrite.
+* `scan` is sequential across chunks with only `B*H` independent items, so a
+  cube port has to ping-pong per chunk against a serial state dependency.
+* `prepare` is MTE2/MTE3-bound and is not a cube candidate at all.
+
+One further step is available inside `output` itself and was not taken: the
+remaining `aiv_mte3_ratio = 0.202` is the weighted query's `ub_to_l1.nd2nz`
+staging, which D-084 says a compact-NZ store from the `@vf` plus an odd block
+stride would cut by about 10x.

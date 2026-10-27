@@ -36,6 +36,20 @@ same stage. Two differences follow from FP32 operands:
   D-084), which the compiler's own performance lint names. Three of the four
   operands do not need it at all.
 
+``set_hf32(False)`` is load-bearing. An FP32 cube ``matmul`` obeys the AI
+core's HF32 rounding bit, and nothing in a kernel launch resets it, so a kernel
+that does not set it inherits whatever ran on that core before — including
+another process on the same card. One real-device run of ``t4096_h8`` came back
+at relative L2 3.06e-04 against the CPU reference (budget 1e-04) with all 13
+input stages bitwise identical to the 20+ passing runs of the same case; a
+build with ``set_hf32(True)`` reproduces that run's ``o`` SHA-256 and its
+2.1152198314666748e-05 maximum absolute error exactly. Pinning the bit is the
+only thing standing between this stage and an intermittent silent precision
+downgrade (AGENTS.md section 7). Cost: the pinned Ascriptor reference
+interpreter has no ``core.set_hf32``, so the ``sim`` and ``pipesim`` launchers
+cannot execute this kernel until it gains one — see
+``docs/research/pkda_chunk_fwd_gate_range.md``.
+
 Padded rows need no masking. ``prepare`` writes exact zeros into ``qn`` beyond
 the live token count and ``scores``/``scan`` zero-fill every ``score``/``delta``
 row and column they do not compute, so rows ``>= count`` of both products are
@@ -95,6 +109,8 @@ def pkda_chunk_output(
     per = CeilDiv(B * N * H, GetCubeNum())
     begin = Var(per * GetCubeIdx())
     end = Min(begin + per, B * N * H)
+    with cube_scope():
+        set_hf32(False)
     with auto_sync():
         for item in range(begin, end):
             hh = Var(item % H)
