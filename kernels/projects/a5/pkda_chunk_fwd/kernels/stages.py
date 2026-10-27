@@ -1,4 +1,7 @@
-"""PKDA FP32 causal score, triangular solve, scan and output.
+"""PKDA FP32 causal score, triangular solve and state scan.
+
+The output stage lives in ``output.py``: it is two plain GEMMs and runs on the
+cube engine, like the BF16 sibling unit's output kernel.
 
 Derived from the repository GDN-2 Vector implementation at 375d8f9, applying
 KDA's stable five-stage decomposition. Here kn is the preconditioned WRITE
@@ -257,70 +260,4 @@ def pkda_chunk_scan(
     return states, delta, final_state
 
 
-@vf()
-def output_vf(q: Tensor, g: Tensor, score: Tensor, state: Tensor,
-              delta: Tensor, output: Tensor, count: Var):
-    acc = RegList(DT.float, 2)
-    row = RegList(DT.float, 2)
-    weight = Reg(DT.float)
-    # q is private UB storage; retire the raw query role before its weighted
-    # scalar consumers. FP32 products and subsequent sum order are unchanged.
-    for i in range(count):
-        acc <<= q[i:i+1, 0:D]
-        row <<= g[i:i+1, 0:D]
-        row <<= row.exp()
-        acc <<= acc * row
-        q[i:i+1, 0:D] <<= acc
-    vf_barrier(VfPipe.STORE, VfPipe.LOAD)
-    for i in range(count):
-        acc <<= 0.0
-        for d in range(D):
-            weight <<= q[i:i+1, d:d+1].single()
-            row <<= state[d:d+1, 0:D]
-            row <<= row * weight
-            acc <<= acc + row
-        for j in range(i + 1):
-            weight <<= score[i:i+1, j:j+1].single()
-            row <<= delta[j:j+1, 0:D]
-            row <<= row * weight
-            acc <<= acc + row
-        output[i:i+1, 0:D] <<= acc
-    vf_barrier(VfPipe.STORE, VfPipe.LOAD)
-
-
-@kernel()
-def pkda_chunk_output(
-    qn: GM[f32, ("B", "N", "H", 64, 128)], gc: GM[f32, ("B", "N", "H", 64, 128)],
-    score: GM[f32, ("B", "N", "H", 64, 64)], states: GM[f32, ("B", "N", "H", 128, 128)],
-    delta: GM[f32, ("B", "N", "H", 64, 128)], o: GM[f32, ("B", "T", "H", 128)],
-    B: i32, T: i32, H: i32, N: i32,
-):
-    qu = Tensor(DT.float, [C, D], Position.UB)
-    gu = Tensor(DT.float, [C, D], Position.UB)
-    au = Tensor(DT.float, [C, C], Position.UB)
-    su = Tensor(DT.float, [D, D], Position.UB)
-    du = Tensor(DT.float, [C, D], Position.UB)
-    ou = Tensor(DT.float, [C, D], Position.UB)
-    per = CeilDiv(B * N * H, GetVecNum())
-    begin = Var(per * GetVecIdx())
-    end = Min(begin + per, B * N * H)
-    with auto_sync():
-        for item in range(begin, end):
-            hh = Var(item % H)
-            cc = Var((item // H) % N)
-            bb = Var(item // (N * H))
-            count = Var(Min(C, T - cc * C))
-            qu[:, :] <<= qn[bb, cc, hh, :, :]
-            gu[:, :] <<= gc[bb, cc, hh, :, :]
-            au[:, :] <<= score[bb, cc, hh, :, :]
-            su[:, :] <<= states[bb, cc, hh, :, :]
-            du[:, :] <<= delta[bb, cc, hh, :, :]
-            output_vf(qu, gu, au, su, du, ou, count)
-            for ii in range(count):
-                tt = Var(cc * C + ii)
-                o[bb, tt:tt+1, hh, :] <<= ou[ii:ii+1, :]
-    return o
-
-
-STAGES = (pkda_chunk_scores, pkda_chunk_wy,
-          pkda_chunk_scan, pkda_chunk_output)
+STAGES = (pkda_chunk_scores, pkda_chunk_wy, pkda_chunk_scan)
