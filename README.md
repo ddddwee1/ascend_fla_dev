@@ -297,7 +297,7 @@ _权威来源已确立（2026-09-17，见 docs/research/pkda_semantics.md）：�
 | PK-02 | [#68](https://github.com/ddddwee1/ascend_fla_dev/issues/68) | `a5` | fp32 | ✅ done | ★ 起点 |
 | PK-04 | [#92](https://github.com/ddddwee1/ascend_fla_dev/issues/92) | `a5` | fp32 | ✅ done |  |
 | BF-04 | [#103](https://github.com/ddddwee1/ascend_fla_dev/issues/103) | `a5` | bf16 | ✅ done |  |
-| PK-07 | [#140](https://github.com/ddddwee1/ascend_fla_dev/issues/140) | `a5` | fp32 | ⬜ open |  |
+| PK-07 | [#140](https://github.com/ddddwee1/ascend_fla_dev/issues/140) | `a5` | fp32 | 🔵 assigned |  |
 
 </details>
 
@@ -308,7 +308,7 @@ _权威来源已确立（2026-09-17，见 docs/research/pkda_semantics.md）：�
 | PK-03 | [#69](https://github.com/ddddwee1/ascend_fla_dev/issues/69) | `a5` | bf16、fp32 | ✅ done | ★ 起点 |
 | BF-03 | [#102](https://github.com/ddddwee1/ascend_fla_dev/issues/102) | `a5` | bf16 | ✅ done |  |
 | GDA-05 | [#96](https://github.com/ddddwee1/ascend_fla_dev/issues/96) | `a5` | bf16、fp32 | ✅ done |  |
-| PK-08 | [#141](https://github.com/ddddwee1/ascend_fla_dev/issues/141) | `a5` | fp32、bf16 | ⬜ open |  |
+| PK-08 | [#141](https://github.com/ddddwee1/ascend_fla_dev/issues/141) | `a5` | fp32、bf16 | 🔵 assigned |  |
 
 </details>
 

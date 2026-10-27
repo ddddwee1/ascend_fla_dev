@@ -6222,7 +6222,7 @@
       "wave": "W0",
       "soc": "a5",
       "priority": "P2",
-      "status": "open",
+      "status": "assigned",
       "model": [],
       "kernel": [
         "pkda_chunk_fwd"
@@ -6247,14 +6247,22 @@
       "spec": "docs/pm/tasks/PK-07.md",
       "issue": 140,
       "pr": null,
-      "assignee": null,
-      "assignee_caps": null,
-      "branch": null,
+      "assignee": "limjiunnbin",
+      "assignee_caps": {
+        "agent": "PM 直接调度（用户指示：'起独立session，把未完成的任务派发下去，最多2个session，全部由你管理'）",
+        "session": "pm-dispatched-worktree-subagent-pk07",
+        "socs": "a5（但本次派单的子会话运行在 PM 沙箱里，只有 A2/910B3，没有 A5——这是已知限制，见下）"
+      },
+      "branch": "task/PK-07",
       "timebox_h": 16,
       "reports": [
         {
           "at": "2026-10-16T00:00",
           "summary": "用户直接要求开 PKDA 性能优化任务。PK-04 的真机数字（T1024: 46.8-47.1ms vs torch_npu eager 基线 604.8-613.6ms；T4096: 179.8-179.9ms vs 4679-4697ms，block_dim=4，仅FP32）已经是 13-26 倍于一个弱基线（naive eager），本任务不预设瓶颈，第一步仍是对真实形状（不是契约的 T1024/4096 玩具形状）做自己的 stage 级profile，同 GD2-03 先例的方法论。open，无前置阻塞（PK-04 已 done）。"
+        },
+        {
+          "at": "2026-10-27T01:30",
+          "summary": "用户直接指示 PM 自行起独立 session 派发未完成任务（最多2个，全部由 PM 管理），本任务被选中（open、依赖已满足）。open -> assigned，assignee=limjiunnbin（本仓 pm_github_login，这次是 PM 直接调度而非外部 APPLY，透明记录不伪装成独立申领）。**已知限制**：派发出去的子会话运行在 PM 自己的沙箱里，这台机器只有 A2/910B3，没有 A5 真机——不能在这里完成本任务要求的 A5 真机验收（D-PM-34）。子会话的范围是 profile-first 的源码级分析与实现准备（读源码定目标、必要时在本地 venv 装 ascriptor 跑 CPU/sim 级别的正确性检查），最终真机验证仍需要有 A5 访问的 agent 接续——这不是本次派单的缺陷，是诚实记录的前提条件。"
         }
       ],
       "result": null
@@ -6265,7 +6273,7 @@
       "wave": "W0",
       "soc": "a5",
       "priority": "P2",
-      "status": "open",
+      "status": "assigned",
       "model": [],
       "kernel": [
         "pgdn_chunk_fwd"
@@ -6293,9 +6301,13 @@
       "spec": "docs/pm/tasks/PK-08.md",
       "issue": 141,
       "pr": null,
-      "assignee": null,
-      "assignee_caps": null,
-      "branch": null,
+      "assignee": "limjiunnbin",
+      "assignee_caps": {
+        "agent": "PM 直接调度（用户指示：'起独立session，把未完成的任务派发下去，最多2个session，全部由你管理'）",
+        "session": "pm-dispatched-worktree-subagent-pk08",
+        "socs": "a5（但本次派单的子会话运行在 PM 沙箱里，只有 A2/910B3，没有 A5——这是已知限制，见下）"
+      },
+      "branch": "task/PK-08",
       "timebox_h": 16,
       "reports": [
         {
@@ -6305,6 +6317,10 @@
         {
           "at": "2026-10-16T16:10",
           "summary": "GDA-05 交付 DONE 时（issue #96 comment 6216256035）指出 PK-08 原写集的一个假设是错的：ascend_fla/ops/pgdn_chunk_fwd.py:139 按 q.dtype 把 BF16 分派到完全独立的kernels/projects/a5/pgdn_chunk_fwd_bf16（不是同一套代码同时处理两种dtype）。PM 读源码核实属实。按 D-PM-35\"BF16优先\"，write_set 扩大纳入 pgdn_chunk_fwd_bf16/**。docs/pm/tasks/PK-08.md 已更新。依赖仍是 PK-03（done）+ GDA-05（DONE，PR #143 待PM审查合入，合入前不开始真机测量）。"
+        },
+        {
+          "at": "2026-10-27T01:30",
+          "summary": "用户直接指示 PM 自行起独立 session 派发未完成任务（最多2个，全部由 PM 管理），本任务被选中（open、依赖已满足）。open -> assigned，assignee=limjiunnbin（本仓 pm_github_login，这次是 PM 直接调度而非外部 APPLY，透明记录不伪装成独立申领）。**已知限制**：派发出去的子会话运行在 PM 自己的沙箱里，这台机器只有 A2/910B3，没有 A5 真机——不能在这里完成本任务要求的 A5 真机验收（D-PM-34）。子会话的范围是 profile-first 的源码级分析与实现准备（读源码定目标、必要时在本地 venv 装 ascriptor 跑 CPU/sim 级别的正确性检查），最终真机验证仍需要有 A5 访问的 agent 接续——这不是本次派单的缺陷，是诚实记录的前提条件。"
         }
       ],
       "result": null
