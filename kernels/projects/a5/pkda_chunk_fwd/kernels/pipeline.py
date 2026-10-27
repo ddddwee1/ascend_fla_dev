@@ -12,9 +12,10 @@ GRAPH = (
 
 
 def entries():
+    from .output import pkda_chunk_output
     from .prepare import pkda_chunk_prepare
     from .stages import STAGES
-    return (pkda_chunk_prepare, *STAGES)
+    return (pkda_chunk_prepare, *STAGES, pkda_chunk_output)
 
 
 def run(inputs, launch, *, retain_stages=True):
