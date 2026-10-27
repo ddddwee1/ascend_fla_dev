@@ -6222,7 +6222,7 @@
       "wave": "W0",
       "soc": "a5",
       "priority": "P2",
-      "status": "open",
+      "status": "assigned",
       "model": [],
       "kernel": [
         "pkda_chunk_fwd"
@@ -6247,9 +6247,13 @@
       "spec": "docs/pm/tasks/PK-07.md",
       "issue": 140,
       "pr": null,
-      "assignee": null,
-      "assignee_caps": null,
-      "branch": null,
+      "assignee": "limjiunnbin",
+      "assignee_caps": {
+        "agent": "PM 直接调度（续接：真机已确认 cube 空转，这轮尝试实现 cube port）",
+        "session": "pm-dispatched-worktree-subagent-pk07-round2",
+        "socs": "a5（真机 A5 访问已就位）"
+      },
+      "branch": "task/PK-07",
       "timebox_h": 16,
       "reports": [
         {
@@ -6267,6 +6271,10 @@
         {
           "at": "2026-10-27T05:30",
           "summary": "真机 profile 完成，**假设升级为实测结论**：PKDA chunk 前向（未改动的 main）cube 引擎利用率在两个真实形状（kimi_linear_layer B1/T1024/H32、long_context B1/T4096/H8）、bd1 与 bd4 下全部是 `aic_mac_time=0.0us`、`aic_mac_ratio=0.000`、`cube_utilization=0.000-0.007%`——5 个 kernel（prepare/scores/wy/scan/output）全部靠 vector 引擎（aiv_vec_ratio 0.89-0.97），cube 核启动了但只跑 scalar 同步代码（AIC 侧 46-50% scalar，aic_total_cycles 对 aiv_total_cycles 比例约 1:5800）。正确性先核验（relL2 3.9e-7），再做 profile；bd1→bd4 按 4 倍扩展（48.854→12.253ms），与 PK-04 一致。源码交叉核实：kernels/ 目录零次 matmul 调用，BF16 旁支 output.py 已经在用 mode='mix' 的 cube matmul，证明 cube 路径在这个仓库里是可行的，不是 SoC 限制。`prepare` 是例外——MTE2/MTE3（数据搬运）占主导，不是 cube offload 候选。\n**本轮仍未实现代码改动**：把 scores/wy/scan/output 迁到 cube matmul 是一次新的 kernel 设计（PKDA 的三角求解形状和 KDA 不一样，没有现成可搬的分块求逆方案），属于 AGENTS.md §6.5 '统一修一轮、不零散改' 的范畴，值得单独一轮专注做，不在这轮续接里赶。open（取消本轮 PM 调度），真机数字已经是扎实的目标，下一个申领人可以直接从这份结论起步，不用重新 profile。"
+        },
+        {
+          "at": "2026-10-27T11:20",
+          "summary": "用户指示加快脚步、继续管理子 agent 链条。真机 A5 访问已就位，上一轮搁置的理由（无法用真机校验中间设计选择）已解除，这轮尝试把 scores/wy/scan/output 迁到 cube matmul。open -> assigned。"
         }
       ],
       "result": null
