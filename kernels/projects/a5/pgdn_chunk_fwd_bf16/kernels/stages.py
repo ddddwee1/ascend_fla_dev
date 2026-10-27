@@ -374,12 +374,23 @@ def output_vf(q: Tensor, g: Tensor, score: Tensor, state: Tensor,
             row <<= state[d:d+1, 0:D]
             row <<= row * weight
             acc <<= acc + row
+        # The acausal half of `score` is exactly +-0: `pgdn_bf03_scores` fills the
+        # whole 64x64 tile with 0.0 before writing only the causal entries, and the
+        # independent stage reference multiplies by exp(-inf) there. A finite
+        # `delta` therefore makes every acausal term 0*delta = +-0, and acc only
+        # ever holds +0 or a nonzero value (it starts at +0 and IEEE cancellation
+        # yields +0), so acc + (+-0) == acc exactly. Running the full constant
+        # trip count keeps the increasing-j sum order and the stored values
+        # bitwise unchanged, and removes the data-dependent branch: inside
+        # __VEC_SCOPE__ a guard in this loop body costs far more per iteration
+        # than the body itself (GDA-05: this kernel's own unguarded 128-trip d
+        # loop above runs an identical 7-instruction body ~10x cheaper per
+        # iteration than the guarded j loop did).
         for j in range(C):
-            if j <= i:
-                weight <<= score[i:i+1, j:j+1].single()
-                row <<= delta[j:j+1, 0:D]
-                row <<= row * weight
-                acc <<= acc + row
+            weight <<= score[i:i+1, j:j+1].single()
+            row <<= delta[j:j+1, 0:D]
+            row <<= row * weight
+            acc <<= acc + row
         output[i:i+1, 0:D] <<= acc
     vf_barrier(VfPipe.STORE, VfPipe.LOAD)
 
