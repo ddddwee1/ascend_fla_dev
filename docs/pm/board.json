@@ -6222,7 +6222,7 @@
       "wave": "W0",
       "soc": "a5",
       "priority": "P2",
-      "status": "assigned",
+      "status": "open",
       "model": [],
       "kernel": [
         "pkda_chunk_fwd"
@@ -6247,13 +6247,9 @@
       "spec": "docs/pm/tasks/PK-07.md",
       "issue": 140,
       "pr": null,
-      "assignee": "limjiunnbin",
-      "assignee_caps": {
-        "agent": "PM 直接调度（用户指示：'起独立session，把未完成的任务派发下去，最多2个session，全部由你管理'）",
-        "session": "pm-dispatched-worktree-subagent-pk07",
-        "socs": "a5（但本次派单的子会话运行在 PM 沙箱里，只有 A2/910B3，没有 A5——这是已知限制，见下）"
-      },
-      "branch": "task/PK-07",
+      "assignee": null,
+      "assignee_caps": null,
+      "branch": null,
       "timebox_h": 16,
       "reports": [
         {
@@ -6267,6 +6263,10 @@
         {
           "at": "2026-10-27T01:50",
           "summary": "PM 调度的子 session 完成 profile-first 的源码级分析，STATUS/BLOCKED-on-hardware（不是 DONE，没有真机）。**没有代码改动**（判断任何改动在没有真机 timing 校验下都不可信，按 AGENTS.md §6 铁律一不动手）。核心发现：PKDA chunk 前向的 cube 引擎完全空转——`scores_vf`/`wy_vf`/`scan_vf`/`output_vf` 全部用 vector-engine 嵌套循环实现（stages.py），一次 matmul()/L0C/DBuff 都没用到；同一仓库里语义等价的 `kda_fwd_stable`（intra.py/wy.py）用 cube matmul 做同样的计算，A2 的 `kda_fwd_stable/triangular_inverse.py`还演示了怎么把 O(C²) 前向替换法用分块求逆避免掉。这是最可能的真机 profile 落点，但仍是推断不是结论——用 CPU `pipesim` 的 model_cycles（非真机、是软件事件时序模型）做了旁证：T=64/H=8 时 prepare 阶段占模型总周期 >50%，但这只值得在真机上核实，不是结论。ascriptor 装进本地 venv 后 reference/sim/pipesim 三个非真机阶段全过（16/16 case + sim/pipesim 单 case 通过），compile/cannsim/native 需要真机，没有尝试。"
+        },
+        {
+          "at": "2026-10-27T05:30",
+          "summary": "真机 profile 完成，**假设升级为实测结论**：PKDA chunk 前向（未改动的 main）cube 引擎利用率在两个真实形状（kimi_linear_layer B1/T1024/H32、long_context B1/T4096/H8）、bd1 与 bd4 下全部是 `aic_mac_time=0.0us`、`aic_mac_ratio=0.000`、`cube_utilization=0.000-0.007%`——5 个 kernel（prepare/scores/wy/scan/output）全部靠 vector 引擎（aiv_vec_ratio 0.89-0.97），cube 核启动了但只跑 scalar 同步代码（AIC 侧 46-50% scalar，aic_total_cycles 对 aiv_total_cycles 比例约 1:5800）。正确性先核验（relL2 3.9e-7），再做 profile；bd1→bd4 按 4 倍扩展（48.854→12.253ms），与 PK-04 一致。源码交叉核实：kernels/ 目录零次 matmul 调用，BF16 旁支 output.py 已经在用 mode='mix' 的 cube matmul，证明 cube 路径在这个仓库里是可行的，不是 SoC 限制。`prepare` 是例外——MTE2/MTE3（数据搬运）占主导，不是 cube offload 候选。\n**本轮仍未实现代码改动**：把 scores/wy/scan/output 迁到 cube matmul 是一次新的 kernel 设计（PKDA 的三角求解形状和 KDA 不一样，没有现成可搬的分块求逆方案），属于 AGENTS.md §6.5 '统一修一轮、不零散改' 的范畴，值得单独一轮专注做，不在这轮续接里赶。open（取消本轮 PM 调度），真机数字已经是扎实的目标，下一个申领人可以直接从这份结论起步，不用重新 profile。"
         }
       ],
       "result": null
@@ -6277,7 +6277,7 @@
       "wave": "W0",
       "soc": "a5",
       "priority": "P2",
-      "status": "assigned",
+      "status": "done",
       "model": [],
       "kernel": [
         "pgdn_chunk_fwd"
@@ -6329,9 +6329,25 @@
         {
           "at": "2026-10-27T01:50",
           "summary": "PM 调度的子 session 完成分析并**提交了两处逐位中立的修复**（draft PR #147，分支 task/PK-08，3 个提交 df5d5d9d/70ba6c52/c4c3e67e）。STATUS，不是 DONE——没有真机，D-PM-34 还没满足。\n**根因**（完全从 GDA-05 已合入的真机数字反推出来，没用新真机）：`scores`/`output` 在 t4096_h16_hv32/bd1/FP32 上分别比 `gdn_fwd` 里逐位相同算法的实现慢 2.03x/4.66x——`prepare`/`wy`/`scan`（两个单元同源代码）两边差在 0.2-4.6% 内，说明不是噪声。唯一源码差异是 PK-03 为压 `-Wcce-compat` 告警引入的三角循环写法：`gdn` 是数据依赖的循环界（`j < i+1`），`pgdn` 是固定 64 次循环 + 内部 `if (j<=i)` 守卫。成本模型拟合：`output_vf` 守卫内迭代≈19.5ns vs 不守卫≈2.0ns（7 条指令体无法流水线）；`scores_vf` 每次迭代成本不变（依赖 `vcadd` 归约），2.03x 纯粹是多跑的迭代数。\n**修复1**：`output_vf` 删掉守卫——acausal 项精确是 `0*delta=±0`，RNE 下 `acc+(±0)==acc`，可以安全地一直累加。预测 98.828ms → ~25.2ms。\n**修复2**：`scores_vf` 把三角分块成 8x8——次对角块完全因果、不守卫；只有对角块保留 `jj<=ii` 守卫。守卫迭代数 4096→512。预测 112.359ms → ~63.2ms。\n两条预测都来自拟合 GDA-05 数字的成本模型，文档里明确标注为预测不是实测。两处都同时应用到 FP32 与 BF16 单元（`scores_vf`/`output_vf` 两边字符级相同）。\n**已做的非真机验证**：CCE 发射 diff 确认改动精确范围；功能模拟器 SHA256 比对——B1/T64/H2/HV2 bd1 与 B1/T192/H2/HV4 bd2（奇数 chunk 数+HV>1，按 §6 笛卡尔边界教训选的case）两处改动前后全部 17/17 stage + 3/3 公开输出逐位相同；pipesim 无死锁、hazard/event-balance 清空；`tests/test_pgdn_chunk_fwd.py` 82 passed/30 skipped（新增 8 个）。\n**两条诚实警告**：① CPU pipe cycle 模型反而判修复1是退化（62997→69892），和实测方向相反——模型对'不触发的守卫'不计代价，正是被硬件数据推翻的那条假设；子 session 选择相信真机数据而非模型，并在研究文档里写明。② 修复2没能重新核对 `-Wcce-compat`（需要 compile 阶段）。\n**发现但未实现**（各自需要单独任务）：decay 因子逐通道常量却按 128 宽度逐元素算（128倍冗余，非逐位中立改动）；scores/output 整个在 vector 引擎跑，同仓库 `pkda_chunk_fwd_bf16/output.py` 的 mode='mix' 已经在用 cube 做同样的乘积——和 PK-07 的'cube 引擎空转'是同一类发现，可能是更大的剩余空间；output 的状态行重复加载可以靠 tiling 分摊。"
+        },
+        {
+          "at": "2026-10-27T05:30",
+          "summary": "PM 独立核实真机证据后按 D-PM-33 自行合入：PR #147 → 3541bcd2（squash，2026-10-27T05:27:21Z）。assigned → done。"
         }
       ],
-      "result": null
+      "result": {
+        "commits": [
+          "3541bcd2"
+        ],
+        "merged_commit": "3541bcd2e291c09acd5fef2ebd94a9b90c21dfbc",
+        "merged_at": "2026-10-27T05:27:21Z",
+        "pr": 147,
+        "head_sha_reviewed_and_merged": "c4c3e67ef986ee931e642f2b0edf60eb2062a8f5",
+        "summary": "PGDN chunk 前向 scores/output 两处逐位中立修复，真机验证通过（A5/Ascend950PR V100，CANN 9.1.0-beta.1，compiler+opp timestamp 20260509_173000235，物理卡4，ascriptor 0.1.0）。根因完全从 GDA-05 已合入真机数字反推得到：PK-03 为压 -Wcce-compat 告警引入的三角循环守卫破坏了向量流水线。",
+        "numbers": "t4096_h16_hv32，kernel 总和（设备侧，中位数，3 次 capture）：bd1 FP32 294.086ms→138.142ms（2.129x）；bd2 FP32 147.381ms→69.335ms（2.126x）；bd1 BF16 293.273ms→137.382ms（2.135x）。t1024_h16_hv32 bd1 FP32 73.673ms→34.655ms（2.126x）。分阶段：scores 112.274→30.026ms（3.74x）、output 98.725→24.962ms（3.96x）；atk/prepare/wy/scan 四个未改动 kernel 的二进制（CCE 发射）逐字节相同，计时漂移0.002%-2.4%（噪声下限）。同卡同步三明治（main-A/pk08/main-B 三进程）：t4096 295.641→139.412→295.416ms（2.120x，基线漂移0.076%）；t1024 74.804→35.672→74.577ms（2.094x，漂移0.30%）。\n**正确性/逐位中立性**：main 与 pk08 两份 build 跨 27 个独立设备进程（2 build × bd1/2 × FP32/BF16 × 3 重复 + 6 个三明治进程），公开输出 o/final_state/final_A_state 的 SHA256 每个 case 只有一组值——PM 独立复核：直接读取两份 build 的原始 capture.json，确认 output_sha256 三个哈希逐字符相同；分别读取两份原始 PgdnChunkScores/PgdnChunkOutput 设备侧微秒数，与报告数字一致（main: 112273.002us/98721.418us，pk08: 30049.805us/24962.19us）；36/36 原始日志 exit code 为 0；compile 日志里搜索不到 -Wcce-compat。双 oracle 相对 L2 5.09e-7/6.50e-7，预算 1e-4。\n预测（来自拟合 GDA-05 数字的成本模型）与实测对照：output 预测~25.2ms/实测24.96ms（1%内）；scores 预测~63.2ms/实测30.03ms（比预测好2.1倍——未守卫的次对角块比预测模型假设的还便宜）。",
+        "review": "PM 派出的隔离子 session 做真机验证（host 238，物理卡4，隔离目录/home/l00276318/work/pm-pk0708-verify-20261027T0345Z/，36 个独立设备进程全部exit 0）。PM 自己 SSH 进真机独立复核：exit code 文件、capture.json 的 source_commit 字段（与推送的提交逐字匹配）、output_sha256 跨 build 比对、原始 profile.kernels 微秒数与报告数字交叉核对、compile 日志搜索确认无 -Wcce-compat。确认真实、非自述。无争议。按 D-PM-33 自行合入。",
+        "known_gaps_not_blocking": "owed：BLK=8 vs BLK=16 的对照未测（真机共享磁盘被其他租户多次打到 0 字节可用，子 session 诚实放弃，没有在不安全条件下硬跑）；ascriptor 源码复用自 GDA-05 工作区而非重新从 gitcode 拉取 90cfcdc（gitcode 凭据在真机上不可用），用五份独立任务 checkout 逐字节相同来旁证版本一致，不是新鲜验证的拉取——如实记录，不影响本次修复本身的正确性结论（结论基于实际编译运行的二进制与输出哈希，不依赖这个旁证）。"
+      }
     },
     {
       "id": "DR-01",

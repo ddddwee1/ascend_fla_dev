@@ -34,7 +34,7 @@ serves only as the semantic authority during testing (`naive.py` as a CPU fp32 o
 | Whole-network fusion ops (module / layer) | `fusion` | open to agents | 4 | 1/4 |
 | Mamba-1/2/3 | `mamba` | not scheduled (G4) | — | — |
 | GLA (Gated Linear Attention) | `gla` | not scheduled (G4) | — | — |
-| PKDA / PGDN (preconditioned) | `pkda` | open to agents | 2 | 6/8 |
+| PKDA / PGDN (preconditioned) | `pkda` | open to agents | 2 | 7/8 |
 | Log-Linear Attention | `log_linear` | not scheduled (G4) | — | — |
 | DLA (Dynamic Linear Attention) | `dla` | not scheduled (G4) | — | — |
 | StateX (wide state) | `statex` | not scheduled (G4) | — | — |
@@ -282,14 +282,14 @@ _Not scheduled: gated epic G4 (narrow-slice rule — no target model, no work). 
 
 </details>
 
-<details><summary><b>PKDA / PGDN (preconditioned) —— 2 kernel(s)，6/8 done</b></summary>
+<details><summary><b>PKDA / PGDN (preconditioned) —— 2 kernel(s)，7/8 done</b></summary>
 
 _Source of truth established (2026-09-17, see docs/research/pkda_semantics.md): paper *Preconditioned DeltaNet* (arXiv:2604.21100, ICML 2026), merged upstream into fla (PR fla-org/flash-linear-attention#950, 0.6.0). PKDA is KDA plus an ATK preconditioning step, reusing kda_fwd_stable/kda_bwd_stable — see PK-02. PGDN is the same preconditioning on GDN, but GDN itself lacks GQA grouping (gdn-no-gqa) — PGDN is sequenced after that, see PK-03 (gated). Neither has a released pretrained checkpoint; end-to-end validation cannot reach real logits_
 
 | kernel | track | BF16 | FP32 | progress | next |
 |---|---|---|---|---|---|
 | `pkda_chunk_fwd` | open to agents | ✅ native · A5 hw | ✅ native · A5 hw | 3/4 | [#68](https://github.com/ddddwee1/ascend_fla_dev/issues/68) PK-02 |
-| `pgdn_chunk_fwd` | open to agents | ✅ native · A5 hw → BF-03 | ✅ native · A5 hw | 3/4 | [#69](https://github.com/ddddwee1/ascend_fla_dev/issues/69) PK-03 |
+| `pgdn_chunk_fwd` | open to agents | ✅ native · A5 hw → BF-03 | ✅ native · A5 hw | 4/4 | [#69](https://github.com/ddddwee1/ascend_fla_dev/issues/69) PK-03 |
 
 <details><summary>pkda_chunk_fwd —— 3/4 done，start PK-02</summary>
 
@@ -298,18 +298,18 @@ _Source of truth established (2026-09-17, see docs/research/pkda_semantics.md): 
 | PK-02 | [#68](https://github.com/ddddwee1/ascend_fla_dev/issues/68) | `a5` | fp32 | ✅ done | ★ start |
 | PK-04 | [#92](https://github.com/ddddwee1/ascend_fla_dev/issues/92) | `a5` | fp32 | ✅ done |  |
 | BF-04 | [#103](https://github.com/ddddwee1/ascend_fla_dev/issues/103) | `a5` | bf16 | ✅ done |  |
-| PK-07 | [#140](https://github.com/ddddwee1/ascend_fla_dev/issues/140) | `a5` | fp32 | 🔵 assigned |  |
+| PK-07 | [#140](https://github.com/ddddwee1/ascend_fla_dev/issues/140) | `a5` | fp32 | ⬜ open |  |
 
 </details>
 
-<details><summary>pgdn_chunk_fwd —— 3/4 done，start PK-03</summary>
+<details><summary>pgdn_chunk_fwd —— 4/4 done，start PK-03</summary>
 
 | task | issue | SoC | dtype | status | note |
 |---|---|---|---|---|---|
 | PK-03 | [#69](https://github.com/ddddwee1/ascend_fla_dev/issues/69) | `a5` | bf16、fp32 | ✅ done | ★ start |
 | BF-03 | [#102](https://github.com/ddddwee1/ascend_fla_dev/issues/102) | `a5` | bf16 | ✅ done |  |
 | GDA-05 | [#96](https://github.com/ddddwee1/ascend_fla_dev/issues/96) | `a5` | bf16、fp32 | ✅ done |  |
-| PK-08 | [#141](https://github.com/ddddwee1/ascend_fla_dev/issues/141) | `a5` | fp32、bf16 | 🔵 assigned |  |
+| PK-08 | [#141](https://github.com/ddddwee1/ascend_fla_dev/issues/141) | `a5` | fp32、bf16 | ✅ done |  |
 
 </details>
 
