@@ -341,3 +341,216 @@ medians and all1800 individual samples are linked from
 [native evidence](../../kernels/projects/a5/pgdn_chunk_fwd/evidence/native/README.md).
 No block_dim1 latency, standalone board/aclnn, CUDA/Triton or checkpoint result
 is claimed.
+
+## PK-08: the triangular VF loop form, not the arithmetic, dominates scores/output
+
+This section is added by PK-08 (performance). It changes no ABI, gate, dtype,
+budget or equation: the two rewrites it records are bitwise-neutral by
+construction. **No A5 hardware was reachable from the session that wrote it**, so
+every forward-looking number below is labelled as a prediction from GDA-05's
+measured data, never as a measurement. The acceptance measurements PK-08 still
+owes are listed at the end.
+
+### What GDA-05 actually measured
+
+`docs/research/gda05_profile.md` (PR #143, `4c286d5b`) profiled `gdn_fwd` and
+`pgdn_fwd` on A5/Ascend950PR, CANN/OPP `9.1.0-beta.1`, at the `models.json`
+`long_context` shape `t4096_h16_hv32` (B1/H16/HV32/K=V=128), three profiler
+captures per case, medians below in kernel ms:
+
+| native stage | gdn_fwd bd1 | pgdn_fwd bd1 | ratio | gdn_fwd bd2 | pgdn_fwd bd2 | ratio |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| prepare (FP32) | 2.741 | 2.758 | 1.006 | 1.371 | 1.434 | 1.046 |
+| **scores** | 55.320 | **112.359** | **2.031** | 27.700 | **56.198** | **2.029** |
+| wy | 45.306 | 44.222 | 0.976 | 22.667 | 22.110 | 0.975 |
+| scan | 31.767 | 31.830 | 1.002 | 15.894 | 15.884 | 0.999 |
+| **output** | 21.199 | **98.828** | **4.663** | 10.615 | 49.404 | 4.654 |
+| atk | - | 4.117 | - | - | 2.137 | - |
+
+BF16 reproduces every ratio (scores 55.320/112.476 = 2.034, output
+21.330/98.894 = 4.636). GDA-05 refuses cross-device-group speed-up claims, and
+`gdn_fwd` is group-a while `pgdn_fwd` is group-b, so the ratios above are **not**
+quoted as same-card speed-ups. They are used only against the control in the next
+paragraph.
+
+The control is in the table itself. `prepare`, `wy` and `scan` are the same
+source as the GDN unit's - `diff kernels/projects/a5/gdn_chunk_fwd/kernels/stages.py
+kernels/projects/a5/pgdn_chunk_fwd/kernels/stages.py` shows only H/HV renames, the
+extra `k_write` tile and the read/write key split in those three - and they agree
+to 0.2%-4.6% across the two device groups and both block dimensions. Because
+`wy`/`scan` cost is proportional to the per-tile item count `B*N*HV` and their
+bodies are identical, their agreement also establishes that both families ran the
+same 2048 chunk items (`chunk_gdn` accepts `HV` as a multiple of `H`). `scores` at
+2.03x and `output` at 4.66x are therefore far outside the cross-group spread for
+identical code, and the only remaining source-level difference in those two
+kernels is the shape of the triangular inner loop.
+
+### The one source difference, and why it costs this much
+
+PK-03 replaced the GDN unit's dependent inner bound with a constant trip count
+plus a guard, to clear a `-Wcce-compat` diagnostic ("Decomposition, storage and
+synchronization" above). The emitted CCE differs in nothing else; for `output_vf`
+the two generated `__VEC_SCOPE__` bodies are instruction-for-instruction equal
+apart from:
+
+```c
+/* gdn_chunk_fwd */  const int32_t add_6 = i_1 + 1;
+                     for (uint16_t j = 0; j < add_6; j += 1) { <7 vector ops> }
+/* pgdn_chunk_fwd */ for (uint16_t j = 0; j < 64;    j += 1) {
+                         if (j <= i_1) { <the same 7 vector ops> } }
+```
+
+Three cost models can be checked against the measured pair, per item per vector
+core (bd1 gives `GetVecNum()` = 2 cores, so 2048 items / 2 = 1024 items per core;
+the exact halving from bd1 to bd2 in the table confirms that reading). `output_vf`
+runs 64 preweight rows, 8192 unguarded `d` iterations and the triangular `j` loop.
+
+1. *A skipped guarded iteration is free.* Then both units do identical work and
+   must agree to within the 4.6% control. Measured 4.66x. **Refuted.**
+2. *A skipped iteration costs the same as an active one.* Then PGDN does
+   12288/10272 = 1.196x the work. Measured 4.66x. **Refuted.**
+3. *The guard changes the cost of the loop itself.* Consistent, and the only
+   model that survives. Fitting it: GDN's 20.70 us/item over 10272+ iterations
+   gives ~2.0 ns per unguarded iteration, leaving PGDN's guarded `j` loop at
+   (96.51 - 16.4 - 0.2)/4096 = **~19.5 ns per iteration, ~10x the unguarded
+   cost**. A data-dependent branch inside `__VEC_SCOPE__` evidently prevents the
+   7-instruction body from being pipelined, so each instruction's full latency is
+   exposed.
+
+The outer loop is not the cause: `count` is exactly 64 at T=4096, so
+`i < count` and `i < 64` run the same 64 trips, and a runtime bound cannot be
+cheaper than a constant one. `scores` shows the same guard with a different
+consequence - its per-iteration cost is essentially unchanged (GDN
+55.320/1024/2080 = 26.0 ns, PGDN 112.359/1024/4096 = 26.8 ns) because that body
+is dependency-bound on two `vcadd` reductions feeding single-point stores, so
+there was no pipelining left to lose; its 2.03x is simply 4096/2080 = 1.97x more
+iterations. The two kernels need different repairs for the same reason.
+
+### Repair 1, `output_vf`: drop the guard, keep every stored bit
+
+`score` is zero over the acausal half - `scores_vf` fills the whole 64x64 tile
+with `0.0` before writing only the causal entries, and the independent stage
+reference multiplies by `exp(-inf)` there - so an acausal term is
+`0*delta = +-0`. `acc` starts at `+0` and IEEE round-to-nearest cancellation
+yields `+0`, never `-0`, so `acc + (+-0) == acc` exactly for every reachable
+`acc`. Running all 64 columns keeps the increasing-`j` summation order and leaves
+every stored value bitwise unchanged, while the loop becomes textually identical
+to the unguarded 128-trip `d` loop directly above it in the same kernel.
+
+The premise is finiteness of `delta`: with a non-finite `delta` the acausal term
+would be `0*inf = NaN`. The whole-chain range review above establishes finite
+`delta` over the declared domain, and
+`tests/test_pgdn_chunk_fwd.py::test_acausal_scores_are_exact_zero_so_output_needs_no_guard`
+pins both halves of the premise (exact acausal zeros, finite `delta`, and a
+bit-for-bit replay of guarded versus unguarded accumulation).
+
+### Repair 2, `scores_vf`: block the triangle, keep the trip counts constant
+
+Reverting to the dependent bound is not an option: it is the form that produced
+the `-Wcce-compat` diagnostic, and the form that silently dropped the last
+contribution in `wy_vf` on CANN 9.2/950PR. Instead the triangle is walked as
+`BLK x BLK` blocks (`BLK = 8`, `C == BLK*BLK`). A sub-diagonal block is entirely
+causal - its largest column `ibase-1` is below its smallest row `ibase` - so it
+carries no guard at all and writes `lower` unconditionally; only the diagonal
+block keeps a guard, and there it compares the two VF induction variables
+(`jj <= ii`), the same uint16/uint16 form the flat guard had. Executed inner
+iterations per tile fall from `C*C = 4096` to `1792 + 512 = 2304`; 1792 are now
+unguarded and only 512 remain guarded. The emitted CCE confirms it: every loop
+bound is a literal (one `< 64`, forty-four `< 8`) and the only conditions are the
+sixteen `jj <= ii` / `jj < ii` pairs. Block-relative row and column indices do
+appear as `const int32_t` scalars, but only inside address arithmetic, never as a
+condition operand.
+
+`BLK` trades executed iterations against emitted code: 8 gives 2304 iterations
+from 36 inner bodies, 16 gives 2560 from 10. The cost is real and measurable in
+the emitted CCE - `scores_vf` grows from 29 to 771 static vector instructions
+(4721 to 101147 bytes of generated source) - but at roughly 3-6 KiB of
+instruction bytes it is not obviously an instruction-fetch problem. PK-08 picked
+8 from the iteration count alone and could not measure the pair; both values must
+be timed on A5, and a `BLK = 16` win would mean fetch pressure is the binding
+constraint rather than iteration count.
+
+### Predictions, explicitly not measurements
+
+Applying model 3 to the GDA-05 baseline (bd1, FP32, `t4096_h16_hv32`):
+
+| stage | GDA-05 measured | predicted after repair | basis |
+| --- | ---: | ---: | --- |
+| scores | 112.359 | ~63.2 | 2304/4096 of the measured cost at unchanged per-iteration cost |
+| output | 98.828 | ~25.2 | (8192+4096) iterations at the ~2.0 ns unguarded rate |
+| kernel sum | 294.1 | ~171.3 | other stages unchanged |
+
+The pessimistic reading for `output`, in which the unguarded loop somehow costs
+what GDN's does per iteration, still gives 21.199 * 4096/2080 = 41.8 ms. No
+reading of the measured data leaves `output` at its present 98.828 ms.
+
+### What the local models can and cannot say
+
+On a host with no A5: source emission, the functional simulator and the pipe
+model all run; the vendor build does not. The host used for this section carries
+CANN 9.0.0 whose `opp` kernel tree holds only `ascend910b`/`ascend910_93` and
+whose toolchain contains no `ascend950` target, so the `compile` stage - the one
+that would re-check `-Wcce-compat` - could not be attempted at all.
+
+Functional simulator, `launcher sim`, all 17 stage arrays plus the three public
+outputs compared by SHA-256 against the pre-PK-08 source:
+
+| case | repair | arrays bitwise equal |
+| --- | --- | --- |
+| B1/T64/H2/HV2, bd1 | output only | 17/17 stages, 3/3 public |
+| B1/T64/H2/HV2, bd1 | output + scores | 17/17 stages, 3/3 public |
+| B1/T192/H2/HV4, bd2 | output + scores | 17/17 stages, 3/3 public |
+
+The pipe model is **not** usable for these two candidates and says so loudly:
+its cycle estimate for `output` *rises* from 62997 to 69892 when the guard is
+removed, and is unchanged at 32815 for `scores` when the triangle is blocked.
+Both are consistent with a model that charges nothing for a guarded iteration
+that is not taken - exactly assumption 1, the one GDA-05's hardware numbers
+refute. This is a concrete instance of the standing rule that model time does not
+stand in for hardware time; PK-08 follows the measured data over the model, and
+if an A5 A/B were ever to show `output` slower after the repair, that would mean
+assumption 1 holds after all and the 4.66x has a cause still unidentified.
+Hazards, event balance and deadlock are unchanged (`launcher pipesim`,
+`grid_r1_c1_bd1`: empty hazard and balance lists, no deadlock, all six kernels).
+
+### Measurements PK-08 still owes before any DONE claim
+
+1. Contract `sim` and `pipesim` receipts, then the `compile` stage on a CANN
+   install that carries an `ascend950` target, with the full compiler log read for
+   `-Wcce-compat` - the diagnostic PK-03 cleared and this section's
+   `const int32_t` address scalars must not reintroduce.
+2. Native in-process acceptance over the full 30-input contract grid at bd1 and
+   bd2, FP32 and BF16: unchanged relative L2 budget 1e-4 against references A and
+   B, unchanged BF16 output-quality floor, and cross-block-dimension bitwise
+   equality of all 17 stage arrays. The sim equality above predicts the device
+   arrays are bitwise identical to the pre-PK-08 build; that is the sharpest
+   single check and it needs no reference at all.
+3. Same-card synchronized sandwich timing at `t4096_h16_hv32` and
+   `t1024_h16_hv32`, bd1 and bd2, FP32 and BF16, one build per process, against
+   the GDA-05 stage numbers above rather than against PK-03's T1024/T4096 toy
+   shapes - per-stage, so that the `scores` and `output` predictions are checked
+   separately instead of only in the total.
+4. `BLK = 8` versus `BLK = 16` in `scores_vf`, one build per process.
+5. Each number with SoC, CANN with package timestamp, the `opp` operator package
+   and the raw log lines.
+
+### Candidates PK-08 identified but did not implement
+
+Ranked by the GDA-05 share they address, all of them changing rounding or
+structure and so needing their own task:
+
+1. `scores` is dependency-bound at ~26 ns per (i, j) on two `vcadd` reductions
+   with single-point stores, and would still be the top stage after repair 2.
+   The gate `exp(p_i - p_j)` is channel-constant - `prepare_tile` broadcasts the
+   scalar prefix across all 128 channels - so the per-pair 128-wide `vsub`,
+   `vexp` and `vmul` are 128x redundant and the decay could be applied as a
+   scalar after the reduction, which the bound `|dot| <= 1.5/sqrt(128)` before
+   decay already covers. Not bitwise neutral.
+2. The same `q @ k_write.T` and `score @ delta` products exist as cube `matmul`
+   calls in this repository's sibling PKDA unit
+   (`kernels/projects/a5/pkda_chunk_fwd_bf16/kernels/output.py`, `mode='mix'`,
+   BF16 operands, FP32 L0C accumulation). Both `scores` and `output` are
+   matmul-shaped work currently run entirely on the vector unit.
+3. `output`'s remaining 8192-iteration `d` loop reloads all 128 state rows for
+   every one of the 64 query rows; tiling rows would amortize those loads.
+   `axpy` could also fuse its `vmul`/`vadd` pair.
