@@ -12,6 +12,9 @@ from ascriptor.a5 import *
 D = 128
 C = 64
 SCALE = 1.0 / 11.313708498984761
+# Row/column block edge for the causal score triangle. C == BLK * BLK keeps both
+# the row and the column VF trip counts constant; see `scores_vf`.
+BLK = 8
 
 
 @vf()
@@ -110,24 +113,48 @@ def scores_vf(q: Tensor, k: Tensor, g: Tensor, b: Tensor, lower: Tensor,
     for i in range(C):
         lower[i:i+1, 0:C] <<= z
         score[i:i+1, 0:C] <<= z
-    for i in range(C):
-        qr <<= q[i:i+1, 0:D]
-        gi <<= g[i:i+1, 0:D]
-        br <<= b[i:i+1, 0:D]
-        for j in range(C):
-            if j <= i:
-                kr <<= k[j:j+1, 0:D]
-                gj <<= g[j:j+1, 0:D]
-                gj <<= gi - gj
-                gj <<= gj.exp()
-                kr <<= kr * gj
-                tmp <<= qr * kr
-                dot <<= tmp.cadd()
-                score[i:i+1, j:j+1] <<= dot.single_value()
-                if j < i:
+    # The causal triangle is walked as BLK x BLK blocks instead of as a flat
+    # C-trip j loop with a `j <= i` guard. A sub-diagonal block is entirely
+    # causal (its largest column ibase-1 is below its smallest row ibase), so it
+    # carries no guard at all; only the diagonal block keeps one, and there the
+    # guard compares the two VF induction variables - the same uint16/uint16
+    # form the flat guard had, never a dynamic bound derived from the enclosing
+    # induction variable. Executed inner iterations per tile fall from C*C=4096
+    # to C*BLK*(C//BLK-1)//2 + C*BLK = 1792 + 512 = 2304. Each (i, j) evaluates
+    # the same expression and stores to its own address, so every stored value
+    # is bitwise unchanged and the store order is irrelevant.
+    for ibase in unroll(0, C, BLK):
+        for ii in range(BLK):
+            qr <<= q[ibase+ii:ibase+ii+1, 0:D]
+            gi <<= g[ibase+ii:ibase+ii+1, 0:D]
+            br <<= b[ibase+ii:ibase+ii+1, 0:D]
+            for jbase in unroll(0, ibase, BLK):
+                for jj in range(BLK):
+                    kr <<= k[jbase+jj:jbase+jj+1, 0:D]
+                    gj <<= g[jbase+jj:jbase+jj+1, 0:D]
+                    gj <<= gi - gj
+                    gj <<= gj.exp()
+                    kr <<= kr * gj
+                    tmp <<= qr * kr
+                    dot <<= tmp.cadd()
+                    score[ibase+ii:ibase+ii+1, jbase+jj:jbase+jj+1] <<= dot.single_value()
                     tmp <<= br * kr
                     dot <<= tmp.cadd()
-                    lower[i:i+1, j:j+1] <<= dot.single_value()
+                    lower[ibase+ii:ibase+ii+1, jbase+jj:jbase+jj+1] <<= dot.single_value()
+            for jj in range(BLK):
+                if jj <= ii:
+                    kr <<= k[ibase+jj:ibase+jj+1, 0:D]
+                    gj <<= g[ibase+jj:ibase+jj+1, 0:D]
+                    gj <<= gi - gj
+                    gj <<= gj.exp()
+                    kr <<= kr * gj
+                    tmp <<= qr * kr
+                    dot <<= tmp.cadd()
+                    score[ibase+ii:ibase+ii+1, ibase+jj:ibase+jj+1] <<= dot.single_value()
+                    if jj < ii:
+                        tmp <<= br * kr
+                        dot <<= tmp.cadd()
+                        lower[ibase+ii:ibase+ii+1, ibase+jj:ibase+jj+1] <<= dot.single_value()
     vf_barrier(VfPipe.STORE, VfPipe.LOAD)
 
 
