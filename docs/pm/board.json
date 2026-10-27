@@ -6246,7 +6246,7 @@
       },
       "spec": "docs/pm/tasks/PK-07.md",
       "issue": 140,
-      "pr": null,
+      "pr": 148,
       "assignee": "limjiunnbin",
       "assignee_caps": {
         "agent": "PM 直接调度（续接：真机已确认 cube 空转，这轮尝试实现 cube port）",
@@ -6279,6 +6279,10 @@
         {
           "at": "2026-10-27T13:30",
           "summary": "用户直接给出新的标准验收线，记入 AGENTS.md §6 与 docs/pm/tasks/PK-07.md（适用于本任务及之后所有性能优化任务）：① 开始优化前先把工具链升级到最新 PyPTO-Pro 框架 + 官方插件 pypto-pro-op-orchestrator（cann/pypto-gym 仓库，不是 cann/cannbot 社区版——两者容易混，按仓库路径区分）；② 量化停止线：每个 kernel 要达到计算 bound 或搬运 bound，对应资源的真机 PipeUtilization ≥85%，不是'比基线快很多'就算完。\n**当前已在跑的第二轮（cube port）没有带着这条新线出发**——派发时这条线还没定。子 session 交回报告时会按这条新线复核（如果没打到 85%，不直接当作本轮验收通过，按差多少决定续第三轮还是如实记录物理上限）；工具链升级（pypto_pro + 官方插件）从下一轮开始落实，不回头打断当前子 session。"
+        },
+        {
+          "at": "2026-10-27T14:00",
+          "summary": "PK-07 第二轮子 session 交回：PKDA FP32 `output` 阶段迁到 cube 引擎，draft PR #148（分支 task/PK-07，3 个提交），**不是 DONE**，有两条待决定事项，不自行合入。\n**真机结果**：output 阶段 1.73-1.77x（设备侧，同卡同步，多 shape/bd）；5-kernel 总和仅 1.05-1.06x（output 本来就是最小的阶段）。正确性：CPU 功能模拟器 48 个边界点（奇偶 token 数、多头）跨 bd 逐位相同；真机 28 个全链 case × bd{1,2,4} + 10 个边界 case + 64 个 tail case，跨 bd 逐位相同，13 个未改阶段输出与 base build 逐位相同（证明改动范围精确），最差相对 L2 5.17e-07（vs CPU 参考）/6.62e-06（vs FLA naive），预算 1e-4 内。\n**比速度提升更重要的发现（已记入 docs/matrix/gaps.json 的新 P0 缺口 a5-fp32-cube-matmul-inherits-hf32，仓库级）**：A5 上 FP32 cube matmul 没有显式设置 HF32 舍入位，共享卡上会继承前一个租户的设置，静默把精度降到 HF32——真机复现一次真实失败（relL2 3.06e-04，超预算3倍），用 set_hf32(True)/False) 做决定性复现（分别 6/6 与 30/30 次重现对应的输出 hash）。暴露面是 kda_fwd_stable、kda_bwd_stable、kda_scan_diag 全部，不只 PKDA——现有真机 FP32 精度记录是否被污染过取决于当时共享卡状态，无法从报告本身看出来；是否追溯历史 done 记录留给用户决定，PM 不自行扩大范围。\n**两条待决定、未自行合入的原因**：① `set_hf32` 在 ascriptor 的参考解释器里没实现，加了这个调用会让这个单元的 sim/pipesim 两条非真机验证路径跑不了（native 和 reference 不受影响）——这是 contract/validation.json 层面的取舍，子 session 正确地没有自己决定。② **按今天刚定的新验收线（85% pipe 利用率），output 阶段 bd4 真机aic_mac_ratio=0.635，没到 85%**——已知还有 aiv_mte3_ratio=0.197 的改进空间（权重 query 的 ub_to_l1.nd2nz 多拷了一次）没有在本轮一起改（一次只改一处）。scores/wy/scan 本轮都没动，各自需要新的设计（分别受语义/三角求解/串行依赖限制），有详细理由记在 PR 描述与研究文档里。"
         }
       ],
       "result": null
