@@ -25,6 +25,16 @@ same stage. Two differences follow from FP32 operands:
   ``kda_fwd_stable/kernels/intra.py`` uses for its FP32 cube products.
 * no cast is needed on either side, so ``weighted_query`` writes FP32 directly
   and the L0C drain is copied out by a plain vector move.
+* and because no cast is needed, ``score``, ``states`` and ``delta`` are used
+  **verbatim**: they go straight from GM into L1 with one ``gm_to_l1_nd2nz``
+  each on the cube side, never touching UB. The BF16 sibling has to route them
+  through UB because it casts them. Only the weighted query is vector-computed
+  and therefore still staged UB -> L1. The first FP32 revision staged all four
+  operands through UB and measured ``aiv_mte3_ratio = 0.473`` on the real
+  device with ``aic_mac_ratio = 0.444``: the stage was bound by the
+  ``ub_to_l1.nd2nz`` multi-burst move (one MTE3 burst per NZ fractal column,
+  D-084), which the compiler's own performance lint names. Three of the four
+  operands do not need it at all.
 
 Padded rows need no masking. ``prepare`` writes exact zeros into ``qn`` beyond
 the live token count and ``scores``/``scan`` zero-fill every ``score``/``delta``
@@ -73,9 +83,6 @@ def pkda_chunk_output(
     qu = Tensor(DT.float, [HALF, D], Position.UB)
     gu = Tensor(DT.float, [HALF, D], Position.UB)
     qw = Tensor(DT.float, [HALF, D], Position.UB)
-    au = Tensor(DT.float, [HALF, C], Position.UB)
-    su = Tensor(DT.float, [C, D], Position.UB)
-    du = Tensor(DT.float, [HALF, D], Position.UB)
     middle = Tensor(DT.float, [HALF, D], Position.UB)
     out = Tensor(DT.float, [HALF, D], Position.UB)
     ql = Tensor(DT.float, [C, D], Position.L1)
@@ -84,10 +91,7 @@ def pkda_chunk_output(
     dl = Tensor(DT.float, [C, D], Position.L1)
     product = Tensor(DT.float, [C, D], Position.L0C)
     q_ready = VcMutex(0, guards=ql, src_end_pipe=Pipe.MTE3, dst_end_pipe=Pipe.FIX)
-    a_ready = VcMutex(1, guards=al, src_end_pipe=Pipe.MTE3, dst_end_pipe=Pipe.FIX)
-    s_ready = VcMutex(2, guards=sl, src_end_pipe=Pipe.MTE3, dst_end_pipe=Pipe.FIX)
-    d_ready = VcMutex(3, guards=dl, src_end_pipe=Pipe.MTE3, dst_end_pipe=Pipe.FIX)
-    result_ready = CvMutex(4, guards=middle, src_end_pipe=Pipe.FIX, dst_end_pipe=Pipe.V)
+    result_ready = CvMutex(1, guards=middle, src_end_pipe=Pipe.FIX, dst_end_pipe=Pipe.V)
     per = CeilDiv(B * N * H, GetCubeNum())
     begin = Var(per * GetCubeIdx())
     end = Min(begin + per, B * N * H)
@@ -97,39 +101,23 @@ def pkda_chunk_output(
             cc = Var((item // H) % N)
             bb = Var(item // (N * H))
             rr = Var(GetSubBlockIdx() * HALF)
-            sr = Var(GetSubBlockIdx() * C)
             q_ready.lock()
             qu[:, :] <<= qn[bb, cc, hh, rr:rr+HALF, :]
             gu[:, :] <<= gc[bb, cc, hh, rr:rr+HALF, :]
             weighted_query(qu, gu, qw)
             ql[rr:rr+HALF, :] <<= qw[:, :]
             q_ready.ready()
-            a_ready.lock()
-            au[:, :] <<= score[bb, cc, hh, rr:rr+HALF, :]
-            al[rr:rr+HALF, :] <<= au[:, :]
-            a_ready.ready()
-            s_ready.lock()
-            su[:, :] <<= states[bb, cc, hh, sr:sr+C, :]
-            sl[sr:sr+C, :] <<= su[:, :]
-            s_ready.ready()
-            d_ready.lock()
-            du[:, :] <<= delta[bb, cc, hh, rr:rr+HALF, :]
-            dl[rr:rr+HALF, :] <<= du[:, :]
-            d_ready.ready()
 
+            gm_to_l1_nd2nz(sl[0:D, 0:D], states[bb, cc, hh, 0:D, 0:D], D, D, D, D)
+            gm_to_l1_nd2nz(al[0:C, 0:C], score[bb, cc, hh, 0:C, 0:C], C, C, C, C)
+            gm_to_l1_nd2nz(dl[0:C, 0:D], delta[bb, cc, hh, 0:C, 0:D], C, D, D, C)
             q_ready.wait()
-            s_ready.wait()
             matmul(product, ql, sl.T, m=C, n=D, k=D, splitk=SPLIT_K)
-            a_ready.wait()
-            d_ready.wait()
             matmul(product, al, dl.T, m=C, n=D, k=C, is_init=False)
             result_ready.lock()
             middle[:, :] <<= product[:, :]
             result_ready.ready()
             q_ready.free()
-            a_ready.free()
-            s_ready.free()
-            d_ready.free()
 
             result_ready.wait()
             copy_rows(middle, out)
