@@ -120,7 +120,7 @@ _首个目标算子族，Kimi-Linear 用它_
 | 任务 | issue | SoC | dtype | 状态 | 说明 |
 |---|---|---|---|---|---|
 | BF-07 | [#106](https://github.com/ddddwee1/ascend_fla_dev/issues/106) | `a5` | bf16 | ✅ done | ★ 起点 |
-| BF-09-P1 | — | `a5` | bf16、fp32 | 🔵 assigned | ★ 起点 |
+| BF-09-P1 | [#155](https://github.com/ddddwee1/ascend_fla_dev/issues/155) | `a5` | bf16、fp32 | 🔵 assigned | ★ 起点 |
 | BF-08 | [#117](https://github.com/ddddwee1/ascend_fla_dev/issues/117) | `a5` | bf16 | ✅ done |  |
 | BF-09 | [#125](https://github.com/ddddwee1/ascend_fla_dev/issues/125) | `a5` | bf16、fp32 | ✅ done |  |
 

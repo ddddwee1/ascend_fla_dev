@@ -121,7 +121,7 @@ _First target family; used by Kimi-Linear_
 | task | issue | SoC | dtype | status | note |
 |---|---|---|---|---|---|
 | BF-07 | [#106](https://github.com/ddddwee1/ascend_fla_dev/issues/106) | `a5` | bf16 | ✅ done | ★ start |
-| BF-09-P1 | — | `a5` | bf16、fp32 | 🔵 assigned | ★ start |
+| BF-09-P1 | [#155](https://github.com/ddddwee1/ascend_fla_dev/issues/155) | `a5` | bf16、fp32 | 🔵 assigned | ★ start |
 | BF-08 | [#117](https://github.com/ddddwee1/ascend_fla_dev/issues/117) | `a5` | bf16 | ✅ done |  |
 | BF-09 | [#125](https://github.com/ddddwee1/ascend_fla_dev/issues/125) | `a5` | bf16、fp32 | ✅ done |  |
 
