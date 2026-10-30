@@ -166,6 +166,50 @@ tile，取数口先顶上来。（item 空间的粒度本身是这个 kernel 的
   相对 L2 也完全一致（`dq` 3.722987e-02、`dk` 7.390429e-02、`dg` 1.354975e-01，
   全部在预算内）。
 
+#### 独立确认：未插桩的同卡同步三明治
+
+profiler 会扰动执行，所以上面的设备时间与下面的墙上时间是**两套独立采样体系，
+互不相减**。三明治是 base / cand1 / base 在**一把设备锁内**、同一张卡上跑三轮，
+每轮 warmup 10 + 50 个计时样本，每次调用前后同步，不剔除离群值：
+
+| 轮 | base | cand1 | base（后） |
+|---|--:|--:|--:|
+| 1 | 2.5094 ms | **2.2247 ms** | 2.5188 ms |
+| 2 | 2.5216 ms | **2.2504 ms** | 2.5098 ms |
+| 3 | 2.5153 ms | **2.2376 ms** | 2.5020 ms |
+
+六个 base 中位数落在 **2.5020~2.5216 ms**，三个 cand 落在 **2.2247~2.2504 ms**
+—— **两组不重叠**（base 的最小值 2.5020 仍大于 cand 的最大值 2.2504），所以
+提速是 **1.11~1.13×**，取中位数对中位数是 **2.5126 / 2.2376 = 1.123×**。
+
+这与设备侧 kernel 时间给出的 1.126~1.134× **几乎重合**，顺带说明一件事：
+反向在这个形状上的墙上时间**基本就是设备时间**，host 侧固定成本很小
+（与 decode 那条相反，见 `kda_perf_decode.md`）。
+
+#### 整套已提交回归：改动后全绿
+
+`pytest tests/ -q` 在改动后的工作树上跑完整套（A5 真机、独占设备锁、CANN 9.1.0）：
+**1510 passed / 28 failed / 93 skipped**，43 分 23 秒。**28 个失败逐个归因，没有一个
+出自本轮改动**：
+
+| 失败 | 个数 | 原因 |
+|---|--:|---|
+| `test_a2_bringup.py` | 8 | `AssertionError: no bring-up receipts under …/benchmarks/a2/evidence/bringup` —— 测量用的工作树是精简传输，刻意排除了 `**/evidence/**`（16760 个受管文件里有 15993 个在它下面） |
+| `test_kda_fwd_a2.py` | 11 | `FileNotFoundError: …/workspace/kernels/tools/unit_runner.py` —— ascriptor `workspace/` 只拷了 `projects/a5/{kda_fwd,kda_bwd}`，没有 `kernels/tools/` |
+| `test_a2_gdn_chunk.py` | 3 | A2 单元，这台机器是 A5，`a2` 未资格化 |
+| `test_pgdn_chunk_bwd.py` | 3 | `KeyError: 'FLA_PGDN_NAIVE'` —— 环境只配了 `FLA_KDA_NAIVE` |
+| `test_pkda_chunk_fwd_bf16.py` | 3 | `KeyError: 'FLA_PKDA_NAIVE'` —— 同上 |
+| `test_kda_layer_npu.py::test_deep_gate_needs_stable_impl` | 1 | 已登记的 `opp-path-read-once` 单进程约束：这个 case 要 `impl="upstream"`，而 conftest 的 fixture 只按默认 `impl="stable"` 预编译，于是整套测试跑在一个进程里时，首次编译 `kda_sub1_gate_kernel`（上游名）撞上 `AclError: 已经执行过 aclnn 算子，不能再注册新的 vendor 树`。**它走的是 `upstream` 实现，根本不加载本轮改过的 `intra.py`** |
+
+**凡是真正跑到本轮改过的 kernel 的测试全部通过**：`test_kda_bwd_npu.py`
+（契约五个 case，`block_dim` 1 / 2 / 3，含 `grouped_idle_cores` —— 那个 case 是
+`bd=3` 而工作量只有 1~2 个 item，**正是本轮改的分区逻辑的退化边界**）、
+`test_kda_bwd_deep_npu.py`、`test_kda_caches_npu.py`、`test_kda_fwd_npu.py`、
+`test_kda_decode.py`（含本轮新增的那条）、`test_kda_decode_bf16.py`、
+`test_kda_gating.py`、`test_kda_aqk_dispatch.py`、`test_kda_layout_kernel.py`、
+`test_kda_prep_{kernel,backward}.py`、`test_kda_scan_diag.py`、
+`test_kda_layer_{npu（除上面那一条）,semantics}.py`、`test_kda_domain_checks.py`。
+
 **没有达标，差多少说清楚：**
 
 | kernel | 改前最高管线 | 改后最高管线 | 离 85% 差 |

@@ -39,6 +39,21 @@ token-major `[B, T, H/HV, 128]` 并在 kernel 内按 `hi // (HV//H)` 取 q/k 的
 > 在 `kda_fused_recurrent`（本任务写集内）里做同一处改动是可行的，但那个 kernel
 > 公共入口到不了，等于优化一段取不到的代码、也无法用公共路径做真机验证。
 
+## HF32 暴露面：两个 decode 单元都没有（回答 HF-01 没覆盖的那一格）
+
+HF-01 的回溯诊断没有覆盖 decode，由本任务确认。结论是**零暴露**，两条证据：
+
+1. **静态（AST，不 import）**：`kda_fused_recurrent/kernels/step.py` 与
+   `kda_fused_recurrent_bf16/kernels/step.py` 里 `matmul` / `mmad` / `matmul_mx` /
+   `mmad_mx` / `conv2d` / `l1_to_l0` 的调用数**都是 0**，`Position.L0A/L0B/L0C` 的出现
+   次数**也都是 0**。bf16 单元的两个入口还显式声明了 `@kernel(mode="vec")` ——
+   cube 核根本不参与发射。HF32 舍入位只管 FP32 cube 乘法，没有 cube 乘法就没有暴露。
+2. **真机**：三次采集（T=1/bd4、T=1/bd28、T=16/bd4）的 `cube_utilization` 全部是
+   **0.000%**，`aic_*` 全部是 0.000 —— 与静态结论一致。
+
+所以 decode 这条链**不需要** `set_hf32`，也不存在"历史精度数字可能被污染"的问题；
+它报的 `o` / `final_state` 相对 L2（1e-7~1e-8 量级，见下表）与共享卡的历史状态无关。
+
 ## 基线（公共入口 `fused_recurrent_kda`，FP32，`kimi` 形状 B1 / HV32 / H32）
 
 | case | `block_dim` | 设备 µs | `aiv_vec` | `aiv_mte2` | `aiv_mte3` | `aiv_scalar` | 三条口之和 | 判定 |
