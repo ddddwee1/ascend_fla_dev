@@ -9,9 +9,13 @@
 
 | kernel | 绑定资源 | base | 本轮改后 | 达标 | 本轮动作 |
 |---|---|--:|--:|---|---|
-| `inverse_mm_bounded_kernel` | 搬运 `aic_mte2` | **0.941** | 0.948（未改动） | **是** | 不动（已到位） |
-| `finalize_pre_stable_kernel` | `aiv_vec` | 0.535 | 0.523 | 否，差 32.7 点 | **改了**：墙上时间 **1.90×** |
-| `finalize_post_stable_kernel` | `aiv_vec` → `aiv_mte2` | 0.571 | 0.536 | 否，差 31.4 点 | **改了**：墙上时间 **1.55×** |
+| `inverse_mm_bounded_kernel` | 搬运 `aic_mte2` | **0.934 ~ 0.972** | 0.937 ~ 0.971（未改动） | **是** | 不动（已到位） |
+| `finalize_pre_stable_kernel` | `aiv_vec` | 0.527 ~ 0.543 | 0.507 ~ 0.523 | 否，差 **32.7 ~ 34.3** 点 | **改了**：墙上时间 **1.76 ~ 1.90×** |
+| `finalize_post_stable_kernel` | `aiv_vec` → `aiv_mte2` | 0.567 ~ 0.582 | 0.533 ~ 0.551 | 否，差 **29.9 ~ 31.7** 点 | **改了**：墙上时间 **1.55 ~ 1.58×** |
+
+区间取自 bd4 / bd1 × `kimi_linear_layer` / `long_context` 共四组（cand 的 bd4 kimi 跑了两次）。
+`inverse_mm` 未被本轮改动，列它两次是为了说明"同一 kernel 在 base 与 cand 两份 build 里
+量到的值一致"，即改动没有波及它（CCE 层面也逐字节相同，见下）。
 
 **两个 finalize 变快了但没达标，这两件事都要说。** 原因是本轮解掉的是"一半向量核
 在空转"（并行度），而 85% 这条线量的是**单核占空比**；后者由"取数与计算不重叠"

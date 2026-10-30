@@ -7,15 +7,26 @@
 
 本单元四个 kernel，**两个已达标、两个没达标**：
 
-| kernel | 绑定资源 | 实测 | 达标 | 本轮动作 |
-|---|---|--:|---|---|
-| `kda_sub1_gate_stable_kernel` | 搬运 `aiv_mte3` | **0.957**（long_context 0.984） | **是** | 不动（已到位） |
-| `kda_sub2_score_stable_kernel` | 计算 `aic_mac` | **0.981**（long_context 0.993） | **是** | 只钉 HF32 位（见下，不改算术） |
-| `kda_sub3_wy_stable_kernel` | `aic_fixpipe` | 0.671 | 否，差 17.9 点 | 未改 —— 定位到位、改法给出、算过一遍发现"显而易见的那条"不是净收益 |
-| `kda_sub45_aqk_repaired_kernel` | `aiv_mte3` | 0.623 | 否，差 22.7 点 | 未改 —— 同上 |
+**报区间不报单点。** 同一个 kernel 的耗时在多次采集间很稳（例如 `wy` 136.65~146.50 µs），
+但管线占空比有 ±0.05 量级的采集噪声，所以下面给**六次 `kimi_linear_layer` / bd4 采集
+加上 bd1 与 `long_context` 各一次**的实测区间，单点数值在后面的明细表里。
 
-"不动"不是省事：`gate` 与 `scores` 的最高管线在两个真实形状、两个 `block_dim` 上都
-≥0.93，**没有可挤的空隙**，按 AGENTS.md §6「不要制造没有依据的改动」就该如实报数。
+| kernel | 绑定资源 | 实测区间（kimi bd4，6 次） | bd1 / long_context | 达标 | 本轮动作 |
+|---|---|--:|--:|---|---|
+| `kda_sub1_gate_stable_kernel` | 搬运 `aiv_mte3` | **0.954 ~ 0.966** | 0.989 / 0.984 | **是** | 不动（已到位） |
+| `kda_sub2_score_stable_kernel` | 计算 `aic_mac` | **0.980 ~ 0.983** | 0.994 / 0.993 | **是** | 只钉 HF32 位（见下，不改算术） |
+| `kda_sub3_wy_stable_kernel` | `aic_fixpipe` | 0.623 ~ 0.716 | `aiv_mte2` 0.584 / 0.605 | 否，差 **13 ~ 23** 点 | 未改 —— 定位到位、改法给出，而且算过一遍发现"显而易见的那条"不是净收益 |
+| `kda_sub45_aqk_repaired_kernel` | 搬运 `aiv_mte3` | 0.619 ~ 0.639 | 0.633 / 0.660 | 否，差 **19 ~ 23** 点 | 未改 —— 同上 |
+
+两点口径说明：
+
+- `scores` 那一行**只在 HF32 位被钉成 off 时成立**。同一个 kernel 在 HF32=on 的进程里
+  量到的是 `aic_mac` 0.227~0.229、最高管线变成 `aiv_mte3` 0.877，结论会反过来。
+  见下面「HF32」一节 —— 这是本轮必须先钉住那一位的直接原因。
+- "不动"不是省事：`gate` 与 `scores` 的最高管线在两个真实形状、两个 `block_dim`、
+  六次采集上都 ≥0.95，**没有可挤的空隙**，按 AGENTS.md §6「profile 之前不要相信任何
+  性能推断」的反面 —— profile 之后也不要制造没有依据的改动 —— 就该如实报数。
+  （另见本文末尾对 `G3` 那句"高占比本身不证明吞吐最优"的保留。）
 
 ## 环境身份
 
@@ -225,7 +236,8 @@ SHA-256 判等来验证改动没有改数学）。
 - `TrilInverse64V2StrictBf16Kernel`（384.95 µs，`aiv_vec` 0.444）：ascriptor 仓的
   `kda_fwd/kernels/triangular_inverse.py`，按 AGENTS.md §3 只读。lint 在它上面报 8 处
   nd2nz（`kernel-nd2nz-suboptimal`）。
-- `kda_layout` 的两个 kernel（合计 **1202.77 µs = 48.1%**，`aiv_mte2` 0.752 / 0.785）：
+- `kda_layout` 的两个 kernel（`kimi_linear_layer` 合计 **1174.58~1202.77 µs = 48.1%**，
+  `long_context` **4022.18 µs = 43.9%**；`aiv_mte2` 0.749~0.849）：
   纯布局转换，是 `kernels/projects/a5/kda_layout` 单元，不在本任务写集。
   **它们是前向最大的单项头寸**：接近一半的设备时间花在 token-major ↔ BHCLD 的搬运上，
   而且已经接近搬运 bound（75~85%），所以在"这一层"里没多少可挤的 ——
@@ -235,7 +247,7 @@ SHA-256 判等来验证改动没有改数学）。
 ### 门控跨度检查的设备成本（顺带量到的）
 
 `chunk_kda_fwd` 默认开 `check_gate_range`，它在 device 上走 torch_npu 的
-`cumsum`/`amin`/`amax`/`max`/`sub`。实测 `kimi_linear_layer` 70.34 µs（占 2.8%）、
+`cumsum`/`amin`/`amax`/`max`/`sub`。实测 `kimi_linear_layer` 69.66~70.34 µs（占 2.9%）、
 `long_context` **281.44 µs（占 3.1%）**。这段不在任何 kernel 里，是 `ops/kda/chunk.py`
 的 host 算术（`D-PM-42` 登记的例外之一，且该文件是 A2-15 的写集，本任务不碰）。
 登记在这里是因为它和 kernel 时间混在同一个 profile 里，不说明就会被误读成 kernel 成本。
