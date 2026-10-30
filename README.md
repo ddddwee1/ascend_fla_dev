@@ -69,7 +69,7 @@ _首个目标算子族，Kimi-Linear 用它_
 | A2-03 | [#34](https://github.com/ddddwee1/ascend_fla_dev/issues/34) | `a2` | bf16、fp32 | ✅ done | ★ 起点 |
 | A5-04 | [#50](https://github.com/ddddwee1/ascend_fla_dev/issues/50) | `a5` | bf16、fp32 | 🔒 gated (wave:W-A3) | ★ 起点 |
 | A5K-01 | [#76](https://github.com/ddddwee1/ascend_fla_dev/issues/76) | `a5` | bf16、fp32 | ✅ done | ★ 起点 |
-| KDA-P1 | — | `a5` | fp32 | 🔵 assigned | ★ 起点 |
+| KDA-P1 | [#149](https://github.com/ddddwee1/ascend_fla_dev/issues/149) | `a5` | fp32 | 🔵 assigned | ★ 起点 |
 | A5K-02 | [#81](https://github.com/ddddwee1/ascend_fla_dev/issues/81) | `a5` | bf16、fp32 | ✅ done |  |
 | A2-12 | [#39](https://github.com/ddddwee1/ascend_fla_dev/issues/39) | `a2` | bf16、fp32 | ✅ done |  |
 | A2-K1 | [#44](https://github.com/ddddwee1/ascend_fla_dev/issues/44) | `a2` | bf16、fp32 | ✅ done |  |
@@ -88,7 +88,7 @@ _首个目标算子族，Kimi-Linear 用它_
 | A2-K1 | [#44](https://github.com/ddddwee1/ascend_fla_dev/issues/44) | `a2` | bf16、fp32 | ✅ done | ★ 起点 |
 | A5-04 | [#50](https://github.com/ddddwee1/ascend_fla_dev/issues/50) | `a5` | bf16、fp32 | 🔒 gated (wave:W-A3) | ★ 起点 |
 | A5-05 | [#51](https://github.com/ddddwee1/ascend_fla_dev/issues/51) | `a5` | bf16、fp32 | 🔒 gated (wave:W-A3) | ★ 起点 |
-| KDA-P1 | — | `a5` | fp32 | 🔵 assigned | ★ 起点 |
+| KDA-P1 | [#149](https://github.com/ddddwee1/ascend_fla_dev/issues/149) | `a5` | fp32 | 🔵 assigned | ★ 起点 |
 | A2-13 | [#40](https://github.com/ddddwee1/ascend_fla_dev/issues/40) | `a2` | bf16、fp32 | ✅ done |  |
 | A5K-03 | [#120](https://github.com/ddddwee1/ascend_fla_dev/issues/120) | `a5` | bf16 | ✅ done |  |
 | A2-15 | [#42](https://github.com/ddddwee1/ascend_fla_dev/issues/42) | `a2` | bf16、fp32 | 🔵 assigned |  |
@@ -107,7 +107,7 @@ _首个目标算子族，Kimi-Linear 用它_
 | A5-01 | [#47](https://github.com/ddddwee1/ascend_fla_dev/issues/47) | `a5` | fp32 | 🔒 gated (wave:W-A3) | ★ 起点 |
 | A5-02 | [#48](https://github.com/ddddwee1/ascend_fla_dev/issues/48) | `a5` | fp32 | 🔒 gated (wave:W-A3) | ★ 起点 |
 | A5-03 | [#49](https://github.com/ddddwee1/ascend_fla_dev/issues/49) | `a5` | fp32 | 🔒 gated (wave:W-A3) | ★ 起点 |
-| KDA-P1 | — | `a5` | fp32 | 🔵 assigned | ★ 起点 |
+| KDA-P1 | [#149](https://github.com/ddddwee1/ascend_fla_dev/issues/149) | `a5` | fp32 | 🔵 assigned | ★ 起点 |
 | A2-14 | [#41](https://github.com/ddddwee1/ascend_fla_dev/issues/41) | `a2` | bf16、fp32 | ✅ done |  |
 | A2-15 | [#42](https://github.com/ddddwee1/ascend_fla_dev/issues/42) | `a2` | bf16、fp32 | 🔵 assigned |  |
 | A2-16 | [#43](https://github.com/ddddwee1/ascend_fla_dev/issues/43) | `a2` | bf16、fp32 | 🔒 gated (用户已放行（D-PM-43），待前置任务与规格) |  |
@@ -135,7 +135,7 @@ _Qwen3-Next 用它，六项 ABI 缺口待补（第四期，与本条无关）。
 |---|---|---|---|---|---|
 | `gdn_fwd` | 可申领 | ✅ 原生 · A5 真机 | — | 6/8 | [#35](https://github.com/ddddwee1/ascend_fla_dev/issues/35) A2-07 |
 | `gdn_bwd` | 可申领 | ✅ 原生 · A5 真机 | ✅ 原生 · A5 真机 | 5/7 | [#35](https://github.com/ddddwee1/ascend_fla_dev/issues/35) A2-07 |
-| `gdn_fused_recurrent` | 可申领 | — | — | 1/3 | — GDN-P1 |
+| `gdn_fused_recurrent` | 可申领 | — | — | 1/3 | [#150](https://github.com/ddddwee1/ascend_fla_dev/issues/150) GDN-P1 |
 | `gdn_chunk_fwd_a5` | 可申领 | ✅ 原生 · A5 真机 | ✅ 原生 · A5 真机 | — | _窄范围例外（D-PM-20/22）：非 GQA 前向 + GQA/GVA 分组均已合入（GDA-01/02）；BF16 原生 + 分组由 kernel 内 head 索引完成、FP32 公共入口也改走新单元（输出逐字节不变）见 BF-01，已合入_ |
 
 <details><summary>gdn_fwd —— 6/8 完成，起点 A2-07、GDN-P1、GDA-01</summary>
@@ -144,7 +144,7 @@ _Qwen3-Next 用它，六项 ABI 缺口待补（第四期，与本条无关）。
 |---|---|---|---|---|---|
 | A2-07 | [#35](https://github.com/ddddwee1/ascend_fla_dev/issues/35) | `a2` | bf16、fp32 | ✅ done | ★ 起点 |
 | GDA-01 | [#73](https://github.com/ddddwee1/ascend_fla_dev/issues/73) | `a5` | bf16、fp32 | ✅ done | ★ 起点 |
-| GDN-P1 | — | `a5` | fp32 | 🔵 assigned | ★ 起点 |
+| GDN-P1 | [#150](https://github.com/ddddwee1/ascend_fla_dev/issues/150) | `a5` | fp32 | 🔵 assigned | ★ 起点 |
 | A2-K1 | [#44](https://github.com/ddddwee1/ascend_fla_dev/issues/44) | `a2` | bf16、fp32 | ✅ done |  |
 | GDA-02 | [#82](https://github.com/ddddwee1/ascend_fla_dev/issues/82) | `a5` | bf16、fp32 | ✅ done |  |
 | BF-01 | [#100](https://github.com/ddddwee1/ascend_fla_dev/issues/100) | `a5` | bf16 | ✅ done |  |
@@ -159,7 +159,7 @@ _Qwen3-Next 用它，六项 ABI 缺口待补（第四期，与本条无关）。
 |---|---|---|---|---|---|
 | A2-07 | [#35](https://github.com/ddddwee1/ascend_fla_dev/issues/35) | `a2` | bf16、fp32 | ✅ done | ★ 起点 |
 | GDA-03 | [#91](https://github.com/ddddwee1/ascend_fla_dev/issues/91) | `a5` | bf16、fp32 | ✅ done | ★ 起点 |
-| GDN-P1 | — | `a5` | fp32 | 🔵 assigned | ★ 起点 |
+| GDN-P1 | [#150](https://github.com/ddddwee1/ascend_fla_dev/issues/150) | `a5` | fp32 | 🔵 assigned | ★ 起点 |
 | BF-02 | [#101](https://github.com/ddddwee1/ascend_fla_dev/issues/101) | `a5` | bf16 | ✅ done |  |
 | A2-K1 | [#44](https://github.com/ddddwee1/ascend_fla_dev/issues/44) | `a2` | bf16、fp32 | ✅ done |  |
 | GDA-05 | [#96](https://github.com/ddddwee1/ascend_fla_dev/issues/96) | `a5` | bf16、fp32 | ✅ done |  |
@@ -173,7 +173,7 @@ _Qwen3-Next 用它，六项 ABI 缺口待补（第四期，与本条无关）。
 |---|---|---|---|---|---|
 | A2-20 | [#45](https://github.com/ddddwee1/ascend_fla_dev/issues/45) | `a2` | bf16、fp32 | 🔒 gated (kernel-batch-approval) | ★ 起点 |
 | GDA-04 | [#94](https://github.com/ddddwee1/ascend_fla_dev/issues/94) | `a5` | bf16、fp32 | ✅ done | ★ 起点 |
-| GDN-P1 | — | `a5` | fp32 | 🔵 assigned | ★ 起点 |
+| GDN-P1 | [#150](https://github.com/ddddwee1/ascend_fla_dev/issues/150) | `a5` | fp32 | 🔵 assigned | ★ 起点 |
 
 </details>
 
