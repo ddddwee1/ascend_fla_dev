@@ -490,6 +490,8 @@ PM 在权威 workspace 上独立跑了 `benchmarks/diag_c1_multihead.py`，**上
 **2026-10-30 补充（BF-09-P1，真机实测，不是推断）。** kda_prep（本仓自建的 raw-flags 训练前处理单元，BF-08/BF-09）的 block_dim 上限也被这条声明限制间接卡住——不是因为它自己需要 28 核，是因为 `kernels/projects/a5/kda_prep/runtime.py` 自己维护一份 `_BLOCK_DIMS`，照抄了 `platform.py` 给 `kda_fwd`/`kda_bwd`（不同的、真正需要这条上游限制的 kernel）用的那个元组——两处声明耦合但没有共同的权威来源。真机 bd1→bd4→bd28（同卡、同形状、逐位相同输出、双 oracle精度不变）：反向 713.722→190.834→27.076ms（**7.047x**），前向 2.7023→0.4514ms（**5.986x**），线性穿过声明上限 4，没有饱和迹象。单独抬高 kda_prep 自己的上限需要改 `ascend_fla/ops/kda/autograd.py`（A2-15 写集）与 `ascend_fla/platform.py`，是 ABI/架构决定，不是 kernel 实现层的性能调优——留给用户决定，BF-09-P1 没有自己动手（§6.5）。
 
 **同一次测量顺带发现一个比 DR-P1 更极端的『85% 线失效』实例**：`kda_prep` 的 gate 反向 kernel 在 bd=1/4/28 下 `aiv_vec_ratio` **恒为 0.996**（因为比值只算这次启动的核里的忙闲，不算这次启动了多少核占全芯片的比例——bd=4 时 56 个向量核只启动 8 个，这 8 个确实忙 99.6%），而真实设备耗时在三者之间相差 **26.5 倍**。按字面读验收线，bd=1（最慢）、bd=4、bd=28（最快）会得到同一个“已达标”结论——这条指标在这个场景下完全看不出芯片利用率的差异，不只是“占用率非吞吐充分证据”，是“占用率对这整条轴完全不敏感”。
+
+**两条留给下一个处理 kda_prep block_dim 决定的人的提醒（BF-09-P1 收尾时补充）**：① 这不是调参——kda_prep 与主 KDA 链共用同一个 block_dim 参数，抬高意味着要么给 kda_prep 一个自己的参数（caller-visible ABI 改动），要么等上游把 kda_fwd/kda_bwd 一起抬高；7.047x 是真的，但不是免费的。② BF-09-P1 的 bd>4 证据只覆盖了三个真实形状，没有重新跑 contract.json 的 (C,HV) 边界矩阵——按 AGENTS.md §6 自己的教训（两个维度各自全绿不等于组合全绿），真的要把 28 写进声明域之前，这是剩下要补的那一步，不是声明同步的问题（防漂移的 guard test 已经在，两边不同步会直接报错）。
 - **建议** 已有答案：是声明限制。下一步是在 ascriptor 侧把 kda_fwd/kda_bwd 的 domain.block_dim 上限抬高并补 cases 覆盖（contract 的 core_ownership 说 gate 按 B*HV*C 切、scores/WY/inverse 按 cube 组切、融合尾部按 B*HV 头对切 —— kimi 形状下 B*HV=32、B*HV*C=512，工作量足够喂满 28 核）。kernel 源码归 ascriptor 仓所有（AGENTS.md §3：只读），改动要走那一侧。本仓的 SUPPORTED_BLOCK_DIM 与 contract 的声明由 tests/test_kda_gating.py 锁在一起，抬高后会同时提醒。
 
 #### `qk-l2norm-not-in-kernel` — fla 的 KDA 在 kernel 内做 q/k 的 L2 归一化、门控变换与 beta sigmoid，ascriptor 的不做
