@@ -1958,6 +1958,86 @@
       ],
       "correctness_extended": "VALIDATION.md 记录的最大已验证形状是 T=2048/H=8。DR-P1 用本单元自带的 gate/judge/golden 新测 B1/T1024/H=32(=HMAX) 与 H=16，36 项比对全 PASS——把 H 轴扩到声明上限。T=16384 的正确性仍未测（CPU oracle 在 16 倍工作量下超出本任务预算，留作已知缺口）。",
       "toolchain": "真正的 PyPTO-Pro 已装好且就是这个单元实际运行的框架（与原 PR 同代，故意不升级以保证苹果对苹果比较，如实记为对任务 spec 的偏离）。pypto-pro-op-orchestrator 插件**第一次在本仓真正派上用场**：直接跑 pypto_pro_op_lint（未执行 init.sh 改仓库），PL11（golden 纯净性）9/9 过；PL15/16 恰好只在 gated_delta_rule_fwd 上失败（与独立读源码发现的'零域校验'结论吻合，命名偏差为主，但带出一条 VALIDATION.md 的真实文档错误：声称每个 kernel 都有 NPU golden，这个只有一个）；PL01/02 因目录布局不同报 9/9，记为'此布局无判定'而不是真失败。"
+    },
+    "bf09_p1_pipe_utilization": {
+      "recorded_at": "2026-10-30",
+      "task": "BF-09-P1",
+      "note": "AGENTS.md §6 验收线要求的 pipe 利用率记录：kda_prep（BF-08/BF-09，本仓自建的 raw-flags 训练前处理单元，q/k l2norm、门控变换、beta sigmoid）在 A5 真机上实测。BF-09 的历史优化对比基准是墙钟耗时比值，不是 PipeUtilization，此前 ops.json 没有这个单元的记录。完整表格见 docs/research/kda_prep_backward_p1.md。",
+      "environment": "A5 / Ascend950PR_957b（28 cube / 56 vec），CANN 9.1.0，python 3.12.14 / torch 2.12.0+cu130 / torch_npu 2.12.0，ascriptor library pin 90cfcdc720bb…（核实与仓库 pin 逐字节相同，156 个 .py）。kernel 源码为 BF-09 冻结的 backward.py（哈希 ba38f200…cba7dbb56c）。",
+      "stages_backward_kimi_t4096_bd4": {
+        "shape": "B1/T4096/HV32（BF-09 自己的配置），device 总和 182976.53us",
+        "kernels": [
+          {
+            "entry": "KdaPrepBackwardGateBf16F32F32Kernel",
+            "us": 164801.8,
+            "pipe": "aiv_vec",
+            "ratio": 0.996,
+            "verdict": "达标，计算 bound"
+          },
+          {
+            "entry": "KdaPrepBackwardNormBf16Kernel",
+            "us": 17747.04,
+            "pipe": "aiv_vec",
+            "ratio": 0.94,
+            "verdict": "达标，计算 bound"
+          },
+          {
+            "entry": "KdaPrepBackwardBetaBf16Kernel",
+            "us": 301.27,
+            "pipe": "aiv_vec",
+            "ratio": 0.952,
+            "verdict": "达标，计算 bound"
+          },
+          {
+            "entry": "KdaPrepBackwardGateReduceF32F32Kernel",
+            "us": 116.27,
+            "pipe": "aiv_vec/aiv_mte2",
+            "ratio": 0.53,
+            "verdict": "未达标，占总设备时间 0.069%，判定不值得优化"
+          },
+          {
+            "entry": "KdaPrepChunkBetaBf16Kernel（前向 sigmoid，反向消费其输出）",
+            "us": 10.14,
+            "pipe": "aiv_mte2",
+            "ratio": 0.682,
+            "verdict": "未达标，占比同上量级"
+          }
+        ],
+        "forward_verdict": "前向三个 kernel（ChunkNormBf16Bf16/ChunkGateBf16F32F32/ChunkBetaBf16）全部未达标（0.575/0.524/0.731），但前向只占 2.70ms 对反向 190.83ms，权重很小。",
+        "accuracy": "跨 7 个 block_dim（1/2/3/4/8/16/28）梯度逐位相同（SHA-256 一致），双 oracle（独立 FP64 解析 + torch autograd）均在冻结预算内，最差预算占用 0.3321。backward_budgets.json 字节级不变（af053b4d3987e9ba…）。"
+      },
+      "methodological_finding_sharper_than_dr_p1": {
+        "summary": "**同一个 kernel、同一形状、输出逐位相同，aiv_vec_ratio 在 bd=1/4/28 下恒为 0.996，真实设备耗时相差 26.5 倍。**",
+        "table": [
+          {
+            "block_dim": 1,
+            "vec_cores_used": 2,
+            "device_us": 645813.07,
+            "aiv_vec_ratio": 0.996,
+            "meets_85": true
+          },
+          {
+            "block_dim": 4,
+            "vec_cores_used": 8,
+            "device_us": 164801.8,
+            "aiv_vec_ratio": 0.996,
+            "meets_85": true
+          },
+          {
+            "block_dim": 28,
+            "vec_cores_used": 56,
+            "device_us": 24379.79,
+            "aiv_vec_ratio": 0.996,
+            "meets_85": true
+          }
+        ],
+        "mechanism": "aiv_vec_ratio 的分母只算这次启动的核的忙闲时间，不算这次启动了多少核占全芯片的比例——bd=4 时 56 个向量核只启动 8 个，这 8 个确实忙 99.6%，但其余 48 个闲置，比值完全看不出来。",
+        "comparison_to_dr_p1": "DR-P1 同一天测到的反例是 1.13~1.69x 速度差（更慢的配置过线）；这次是 26.5x 速度差、且全部三个配置都'过线'——指标对这整条轴完全不敏感，不只是不充分。",
+        "disposition": "PM 未自行采纳任何验收线修改。四个任务（KDA-P1、GDN-P1、DR-P1、BF-09-P1）同一天独立撞到相关问题，已汇总转达用户决定。"
+      },
+      "hf32": "kda_prep 全部 7 个 kernel 都是 @kernel(mode='vec')/@vf()，源码 0 次 matmul/mmad/splitk；13 次真机采集里 aic_mac_ratio 与 cube_utilization 逐次（不只是均值）为 0.000。真机正控（跨进程：另一进程强制 allow_hf32=True 跑 4096² matmul 后退出，正控自己的哈希确认真的翻转了）下，kda_prep 的全部 8 个公开输出（3 前向+5 反向）三条链逐位相同——不暴露于 a5-fp32-cube-matmul-inherits-hf32，不需要任何 set_hf32 守卫。",
+      "block_dim_ceiling_root_cause": "kda_prep 自己的 block_dim 上限不是实现限制，是声明耦合：kernels/projects/a5/kda_prep/runtime.py 维护一份 _BLOCK_DIMS，照抄 platform.py 给 kda_fwd/kda_bwd（不同 kernel）用的那个元组。真机验证 bd1→4→28 线性扩展（反向 7.047x、前向 5.986x，逐位相同、双 oracle 不变），没有饱和迹象。单独抬高需要改 ascend_fla/ops/kda/autograd.py（A2-15 写集）与 platform.py，是 ABI/架构决定，BF-09-P1 没有自己动手，留给用户决定（见 gaps.json 的 block-dim-ceiling）。",
+      "environment_note": "本任务在 host 238 上以 host-native（非 Docker）方式运行，与 machine_specs.md 记录的 Docker 边界要求不一致——子 session 主动披露、称三个同日姊妹任务（HF-01/KDA-P1/GDN-P1）在这台机器上也是这样做的。按 D-PM-28（机器与卡归 assignee 自己管理，PM 不仲裁），PM 不对此做裁决，只如实记录；共享机器礼仪（健康/占用检查、锁、不碰他人进程）本身遵守良好，有真机记录。"
     }
   }
 }
