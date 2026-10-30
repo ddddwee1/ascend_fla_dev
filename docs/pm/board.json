@@ -6432,6 +6432,164 @@
         "review": "PM 自己扫描：范围/安全干净（50 文件全增、全在新目录、无新依赖、无 .github 改动、无二进制、无网络/凭据/eval/exec 代码）。隔离 worktree 子代理独立复核，verdict ACCEPT-WITH-NOTES：\n- CPU 可跑部分（tests/validate_against_fla.py）真跑通过，强声明（chunk vs naive_chunk、recurrent state vs naive_recurrent）精确复现 0.000e+00；弱声明量级一致但与文档引用区间略有出入（可能是 float32 累加顺序环境差异）。\n- 7/9 个 *_golden_cpu.py 自测脚本的交叉校验 import 指向另一仓库的目录布局，是开发时遗留死代码，崩溃但不影响实际验收路径（test_*.py 只 import 干净的参考函数）；与 README 的'自包含、拷到哪都能跑'说法矛盾，应如实记录。\n- 本机无 A5/pypto_pro，无法独立复现 PR 自己的硬件正确性与性能数字——这些数字完全是申领人自述；第二 oracle 脚本（不需要 pypto_pro）在真实 A2 硬件上跑通，确认 oracle 机制真实，但不是对这个 PR 自己 A5 kernel 的复现。\n- 门控纪律与 README 文档不完全一致（AGENTS.md §7 相关）：V 的'64 的倍数'约束未被任何代码校验，且与 PR 自己验证通过的 V=96 case 矛盾；B=1 只在 9 个 kernel 中 1 个（gdr_bwd_dqkw）靠静态 shape 生效，其余 7 个训练 kernel 对 B 无限制，B>1 会先跑掉链上前 4 个 kernel 才在第 5 个失败（不是 README 说的'任何 kernel 启动前就拒绝'）；第 9 个独立推理 kernel 完全没有域校验。VALIDATION.md 自己的措辞比 README 更准确。这些是文档过度承诺，不是代码静默算错——因为代码未接入任何调用链，不构成当前风险，但记录在案供后续跟进。\n- 许可证头不一致：23 个文件带 'Copyright (c) PyPTO Contributors ... CANN Open Software License Agreement Version 2.0 ... See LICENSE in the root directory' 的头，本仓没有根级 LICENSE 文件、没有 license 字段、其它文件都没有这类头——指向一份本仓不存在的许可证文本和不同的版权主体。PM 已上报用户；用户知情后仍批准合入。\n- `docs/PERFORMANCE.md` 的自我限定（naive 基线弱、比例随形状缩小、仅测前向、host dispatch 占比高）逐字核实真实存在，披露诚实。\n双 oracle 机制（CPU fla naive + NPU 下同一 naive 实现）确认是真代码，不是摆设。",
         "known_gaps_not_blocking": "V 的域约束未被代码校验（仅 K、H 有）；B>1 的拒绝发生在链路中段而非入口；独立推理 kernel 零域校验；许可证头指向本仓不存在的文件。均因代码未接入任何调用链而不构成当前风险，接入 ascend_fla 公开 API 前需要重新审视。"
       }
+    },
+    {
+      "id": "HF-01",
+      "title": "回溯核查：A5 FP32 cube matmul 的 HF32 状态继承是否污染过已有真机精度记录",
+      "wave": "W0",
+      "soc": "a5",
+      "priority": "P0",
+      "status": "assigned",
+      "model": [],
+      "kernel": [],
+      "dtype": [
+        "fp32"
+      ],
+      "deps": [],
+      "write_set": [
+        "tmp/HF-01/**"
+      ],
+      "needs": {
+        "npu": true,
+        "ascriptor": true,
+        "fla": true
+      },
+      "spec": "docs/pm/tasks/HF-01.md",
+      "issue": null,
+      "pr": null,
+      "assignee": "limjiunnbin",
+      "assignee_caps": {
+        "agent": "PM 直接调度（用户指示：继续起子 session 做性能优化，不要停下来）",
+        "session": "pm-dispatched-worktree-subagent-hf-01",
+        "socs": "a5"
+      },
+      "branch": "task/HF-01",
+      "timebox_h": 24,
+      "origin": {
+        "kind": "user",
+        "note": "用户直接指示：继续起子 session 做性能优化任务，覆盖已完成功能验收但未做性能优化的算子族。"
+      },
+      "reports": [
+        {
+          "at": "2026-10-30T12:00",
+          "summary": "PM 直接调度派发（用户指示，不等外部 APPLY）。"
+        }
+      ],
+      "result": null
+    },
+    {
+      "id": "KDA-P1",
+      "title": "KDA 核心三单元性能优化：先 profile 到底，按 85% 管线利用率验收",
+      "wave": "W0",
+      "soc": "a5",
+      "priority": "P1",
+      "status": "assigned",
+      "model": [],
+      "kernel": [
+        "kda_fwd_stable",
+        "kda_bwd_stable",
+        "kda_fused_recurrent"
+      ],
+      "dtype": [
+        "fp32"
+      ],
+      "deps": [],
+      "write_set": [
+        "kernels/projects/a5/kda_fwd_stable/**",
+        "kernels/projects/a5/kda_bwd_stable/**",
+        "kernels/projects/a5/kda_fused_recurrent/**",
+        "tests/test_kda_fwd_npu.py",
+        "tests/test_kda_bwd_npu.py",
+        "tests/test_kda_decode.py",
+        "docs/research/kda_perf_fwd.md",
+        "docs/research/kda_perf_bwd.md",
+        "docs/research/kda_perf_decode.md"
+      ],
+      "needs": {
+        "npu": true,
+        "ascriptor": true,
+        "fla": true
+      },
+      "spec": "docs/pm/tasks/KDA-P1.md",
+      "issue": null,
+      "pr": null,
+      "assignee": "limjiunnbin",
+      "assignee_caps": {
+        "agent": "PM 直接调度（用户指示：继续起子 session 做性能优化，不要停下来）",
+        "session": "pm-dispatched-worktree-subagent-kda-p1",
+        "socs": "a5"
+      },
+      "branch": "task/KDA-P1",
+      "timebox_h": 24,
+      "origin": {
+        "kind": "user",
+        "note": "用户直接指示：继续起子 session 做性能优化任务，覆盖已完成功能验收但未做性能优化的算子族。"
+      },
+      "reports": [
+        {
+          "at": "2026-10-30T12:00",
+          "summary": "PM 直接调度派发（用户指示，不等外部 APPLY）。"
+        }
+      ],
+      "result": null
+    },
+    {
+      "id": "GDN-P1",
+      "title": "GDN 核心三单元性能优化：先 profile 到底，按 85% 管线利用率验收",
+      "wave": "W0",
+      "soc": "a5",
+      "priority": "P1",
+      "status": "assigned",
+      "model": [],
+      "kernel": [
+        "gdn_fwd",
+        "gdn_bwd",
+        "gdn_fused_recurrent"
+      ],
+      "dtype": [
+        "fp32"
+      ],
+      "deps": [],
+      "write_set": [
+        "kernels/projects/a5/gdn_fwd/**",
+        "kernels/projects/a5/gdn_bwd/**",
+        "kernels/projects/a5/gdn_fused_recurrent/**",
+        "ascend_fla/ops/gdn_chunk_fwd.py",
+        "ascend_fla/ops/gdn_chunk_bwd.py",
+        "ascend_fla/ops/gdn_fused_recurrent.py",
+        "tests/test_gdn_chunk_fwd.py",
+        "tests/test_gdn_chunk_bwd.py",
+        "docs/research/gdn_perf_fwd.md",
+        "docs/research/gdn_perf_bwd.md",
+        "docs/research/gdn_perf_decode.md"
+      ],
+      "needs": {
+        "npu": true,
+        "ascriptor": true,
+        "fla": true
+      },
+      "spec": "docs/pm/tasks/GDN-P1.md",
+      "issue": null,
+      "pr": null,
+      "assignee": "limjiunnbin",
+      "assignee_caps": {
+        "agent": "PM 直接调度（用户指示：继续起子 session 做性能优化，不要停下来）",
+        "session": "pm-dispatched-worktree-subagent-gdn-p1",
+        "socs": "a5"
+      },
+      "branch": "task/GDN-P1",
+      "timebox_h": 24,
+      "origin": {
+        "kind": "user",
+        "note": "用户直接指示：继续起子 session 做性能优化任务，覆盖已完成功能验收但未做性能优化的算子族。"
+      },
+      "reports": [
+        {
+          "at": "2026-10-30T12:00",
+          "summary": "PM 直接调度派发（用户指示，不等外部 APPLY）。"
+        }
+      ],
+      "result": null
     }
   ],
   "label_github_login": "ascend-fla-pm-bot",
