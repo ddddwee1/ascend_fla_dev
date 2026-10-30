@@ -125,6 +125,26 @@ must not change what bd1/bd2 do.
   `final_state = 11d813fb11bc…` at T=4096). This is §6's reference-free hard
   criterion: core splitting must not change the arithmetic, and it does not.
 
+### Uninstrumented same-card sandwich
+
+Everything above is profiler-instrumented device time. This is the user-visible
+number with the profiler off: three processes back to back on one card, each
+3 rounds x (10 warmup + 50 timed samples), `perf_counter_ns` around the public
+call plus the completion wait. `qwen3_next_layer`, FP32.
+
+| order | build | block_dim | round medians (ms) | median |
+|---|---|---:|---|---:|
+| A | base | 2 | 19.6935 / 19.6923 / 19.6966 | 19.6935 |
+| B | change A | 16 | 2.6115 / 2.6127 / 2.6192 | **2.6127** |
+| C | base | 2 | 19.7071 / 19.6981 / 19.6938 | 19.6981 |
+
+**7.54x**, with the repeated baseline drifting +0.023 % between A and C, so the
+measurement is not an artefact of card state. All three processes produced the
+same public output SHA-256 (`o = cd985f2170bf…`). The host-inclusive ratio (7.54x)
+is slightly below the device-kernel ratio (7.906x) because the five kernel
+launches are a fixed ~0.13 ms that does not shrink with block_dim and is now 5 %
+of a 2.6 ms call.
+
 ### Where the scaling stops, and why it was predictable
 
 At bd28 the per-stage breakdown shows `gdn_bf01_scan` flat against bd16 —
@@ -344,9 +364,18 @@ guard, and its parallelism ceiling is `B*HV` rather than `B*N*HV`.
 
 ## 4. Verdict against the 85 % line
 
-- The forward is **vector-arithmetic bound**: four of five stages sit at
-  0.865–0.977 `aiv_vec_ratio` across bd1…bd28, i.e. above the 85 % line, and the
-  fifth (`prepare`, 1.7–3.2 % of the total) is MTE-bound at 0.52–0.66 `mte2`.
+- The forward is **vector-arithmetic bound and, on the shipped code, at the
+  line**: four of five stages sit at 0.865–0.977 `aiv_vec_ratio` across
+  bd1…bd28 — that is 98.3 % of the device kernel time above 85 % — and the fifth
+  (`prepare`, 1.7–3.2 % of the total) is MTE-dominated but **does not** itself
+  clear 85 % on any single pipe (best is `mte2` 0.649 at bd16, 20.1 points short).
+  So strictly: 98.3 % of the forward passes, 1.7 % does not, and the 1.7 % is not
+  worth a change.
+- **After the two measured kernel changes the picture shifts**: at T=1024/bd16 the
+  ratios become scores 0.934, wy 0.867, scan 0.942, output 0.866 — still all
+  ≥ 0.85 — but `scan` becomes the largest stage at 32.4 %, so a further round
+  would be aimed there and would be a different kind of problem (a real
+  sequential recurrence with a `B*HV` parallelism ceiling).
 - **The cube engine is 0.000 % used.** There is no FP32 cube matmul in the GDN
   forward, so the HF32 inheritance P0 does not apply, and conversely the single
   largest remaining lever is algorithmic: `scores`, `wy`, `scan` and `output` are

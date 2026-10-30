@@ -1809,7 +1809,8 @@
         "speedup_vs_old_ceiling_bd2": "前向 T1024 bd16 7.906x / bd28 10.767x；前向 T4096 bd16 7.69x；反向 T1024 bd16 7.39x；反向 T4096 bd16 7.47x。",
         "control": "同卡、基线 build 与改动 build 在 bd1/bd2 上对照：前向 T1024 bd1 39136.644→39144.036us（+0.019%）、bd2 19597.633→19607.914us（+0.052%），均在跑间噪声内——放宽可接受值集合没有改变 bd1/bd2 的行为。",
         "saturation": "前向的 scan 与反向的 checkpoints/reverse 都按 B*HV 切（B1/HV32 = 32 个 item），在 GetVecNum()==32 即 bd16 饱和：scan 512.964→512.558us、checkpoints 1018.826→1019.230us、reverse 4752.320→4864.412us（bd28 反而慢 2.4%，多出的 24 个核 begin==end 只付启动代价）。**这条是先从源码预测、再被 bd28 实测确认的**。其余 launch 按 B*N*HV 或 B*T*H 切，继续扩展。**B*HV=32 时：前向取 bd28、反向取 bd16。**",
-        "bitwise": "公开输出 SHA-256 在两个 build × 六个 block_dim × 两个形状下只有一组值（前向 T4096 o=2c540d8f6d15… / final_state=11d813fb11bc…；反向 T1024 dq=c96ffc390e33… 等五个）。核切分不改算式——§6 的无参考硬判据成立。各 block_dim 的 relative L2 逐位相同。"
+        "bitwise": "公开输出 SHA-256 在两个 build × 六个 block_dim × 两个形状下只有一组值（前向 T4096 o=2c540d8f6d15… / final_state=11d813fb11bc…；反向 T1024 dq=c96ffc390e33… 等五个）。核切分不改算式——§6 的无参考硬判据成立。各 block_dim 的 relative L2 逐位相同。",
+        "uninstrumented_sandwich": "关掉 profiler 的同卡同步三明治（三个进程背靠背、每个 3 轮 ×（10 warmup + 50 计时样本）、perf_counter_ns 包住公开调用 + 完成等待），形状 qwen3_next_layer / FP32：\n前向 base bd2 19.6935ms → 改动 bd16 2.6127ms → base bd2 19.6981ms = **7.54x**，基线漂移 +0.023%；\n反向 base bd2 45.8427ms → 改动 bd16 6.2521ms → base bd2 45.6738ms = **7.33x**，基线漂移 −0.368%；\ndecode（无代码改动，只换 block_dim）base bd1 0.4521ms → bd28 0.0792ms → bd1 0.4497ms = **5.71x**，漂移 −0.53%。\n三组里每个进程的公开输出 SHA-256 都相同。host-inclusive 比值低于设备侧比值（前向 7.54 vs 7.906、decode 5.71 vs 13.73），差额是不随 block_dim 缩小的 host 调用开销——decode 在 bd28 上约三分之二的调用时间是 host 时间。这正是 §6 铁律一说的那个坑，两个数都报，不单报任何一个。"
       },
       "gdn_fwd_remaining_headroom": {
         "summary": "前向还有约 1.58x 的逐位中立空间，已在真机实测，但**不在 GDN-P1 写集内**（见 write_set_conflict）。",

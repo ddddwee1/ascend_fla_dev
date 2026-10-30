@@ -111,18 +111,29 @@ How each launch partitions, and therefore where it saturates:
 
 Measured, T=1024, FP32, device kernel total (median of 3 captures):
 
-| block_dim | total us | `checkpoints` | `reverse` | `group_reduce` | vs bd1 |
-|---:|---:|---:|---:|---:|---:|
-| 1  | 91813.633 | 15944.312 | 69505.197 | 6374.338 | 1.00x |
-| 2  | 45777.200 |  7890.177 | 34724.257 | 3174.270 | 2.01x |
-| 16 |  6192.010 |  1018.826 |  4752.320 |  422.030 | **14.83x** (7.39x vs bd2) |
-| 28 |  6131.463 |  1019.230 |  4864.412 |  247.024 | 14.97x (7.46x vs bd2) |
+| block_dim | total us (change A build) | `checkpoints` | `reverse` | `group_reduce` | vs bd1 | vs bd2 |
+|---:|---:|---:|---:|---:|---:|---:|
+| 1  | 91896.419 | — | — | — | 1.00x | 0.50x |
+| 2  | 45876.280 | — | — | — | 2.00x | 1.00x |
+| 4  | 23138.396 | — | — | — | 3.97x | 1.98x |
+| 8  | 11844.123 | — | — | — | 7.76x | 3.87x |
+| 16 |  6192.010 | 1018.826 | 4752.320 | 422.030 | **14.84x** | **7.41x** |
+| 28 |  6131.463 | 1019.230 | 4864.412 | 247.024 | 14.99x | 7.48x |
 
 T=4096, FP32: bd2 183111.737 us → bd16 24527.631 us, **7.47x**.
 
-bd1 and bd2 come from the baseline build and bd16/bd28 from the change-A build;
-the two are the same code at bd1/bd2, which the forward control in
-`gdn_perf_fwd.md` §2 confirms to 0.05 %.
+**Control — the ops-layer change is inert on the old grid.** Same card, baseline
+build vs change-A build:
+
+| block_dim | base build | change A | drift |
+|---:|---:|---:|---:|
+| 1 | 91813.627 us | 91896.419 us | +0.090 % |
+| 2 | 45777.156 us | 45876.280 us | +0.217 % |
+
+Both inside run-to-run noise. The per-stage split for bd1 on the baseline build
+is `checkpoints` 15944.312 / `reverse` 69505.197 / `group_reduce` 6374.338 us,
+with vec/mte2 ratios 0.636/0.346, 0.708/0.253 and 0.104/0.884 respectively — the
+same balance as bd16, so the verdict in §2 is not an artefact of one block_dim.
 
 The bd16 → bd28 rows confirm the prediction made from the source *before* the
 bd28 run: `checkpoints` is flat (1018.826 → 1019.230 us) and `reverse` is
@@ -132,6 +143,22 @@ launch cost. Only `group_reduce` keeps scaling (422.030 → 247.024 us). Net tot
 6192.010 → 6131.463 us, a 1.0 % gain that is not worth the extra build.
 
 **For the backward at `B*HV = 32`, bd16 is the operating point**, not bd28.
+
+### Uninstrumented same-card sandwich
+
+Profiler off, three processes back to back on one card, 3 rounds x (10 warmup +
+50 timed samples) each, `perf_counter_ns` around the public call plus the
+completion wait. `qwen3_next_layer`, FP32.
+
+| order | build | block_dim | round medians (ms) | median |
+|---|---|---:|---|---:|
+| A | base | 2 | 45.8563 / 45.8260 / 45.8427 | 45.8427 |
+| B | change A | 16 | 6.2435 / 6.2521 / 6.2677 | **6.2521** |
+| C | base | 2 | 45.7158 / 45.6680 / 45.6738 | 45.6738 |
+
+**7.33x** host-inclusive, with the repeated baseline drifting −0.368 % between A
+and C. All three processes produced the same five gradient SHA-256 values
+(`dq = c96ffc390e33…`).
 
 ### Correctness and bitwise neutrality
 

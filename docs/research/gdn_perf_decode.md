@@ -116,6 +116,34 @@ point, 5.835 us) the best single pipe is `aiv_mte2_ratio = 0.356`, i.e. **49.4
 percentage points below the line**, and the sum over pipes is 0.891. At S=16/bd16
 the vector pipe is 0.819, **3.1 points below the line**; only bd1/bd2 clear it.
 
+## 3b. Uninstrumented same-card sandwich, and why the 14x shrinks to 5.7x
+
+Everything in §2 is profiler-instrumented *device* time. With the profiler off,
+three processes back to back on one card, 3 rounds x (10 warmup + 50 timed
+samples), `perf_counter_ns` around the public call plus the completion wait,
+S=16, FP32:
+
+| order | block_dim | round medians (ms) | median |
+|---|---:|---|---:|
+| A | 1  | 0.4554 / 0.4521 / 0.4495 | 0.4521 |
+| B | 28 | 0.0815 / 0.0792 / 0.0790 | **0.0792** |
+| C | 1  | 0.4516 / 0.4497 / 0.4480 | 0.4497 |
+
+**5.71x host-inclusive**, baseline drift −0.53 %, identical output SHA-256 in all
+three processes.
+
+Device-only the same pair is 13.73x (395.611 → 28.805 us). The difference is
+host call overhead: GDA-05 measured the public call's return at ~0.051 ms for
+this family, and that does not shrink with block_dim. At bd28 the device work is
+0.029 ms, so **roughly two thirds of a bd28 decode call is host time**.
+
+This is the trap AGENTS.md §6 iron rule 1 describes — a device-side improvement
+disappearing into host overhead — and it cuts both ways here. It does not
+invalidate the device measurement, but it does mean the realistic benefit of
+raising the decode default is ~5.7x end to end at S=16, not 14x, and that
+reducing the per-call host cost is a comparably large lever at these sizes. Both
+numbers are reported; neither alone is the answer.
+
 ## 4. Independent reproduction of GDA-05
 
 Same family, same shapes, different session and card, two weeks apart. GDA-05's
