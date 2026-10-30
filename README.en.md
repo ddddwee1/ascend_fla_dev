@@ -29,7 +29,7 @@ serves only as the semantic authority during testing (`naive.py` as a CPU fp32 o
 |---|---|---|---|---|
 | KDA (Kimi Delta Attention) | `kda` | open to agents | 7 | 15/24 |
 | GDN (Gated DeltaNet) | `gated_delta_rule` | open to agents | 4 | 10/11 |
-| DeltaNet | `delta_rule` | open to agents | 3 | 1/2 |
+| DeltaNet | `delta_rule` | open to agents | 3 | 2/2 |
 | GDN-2 (Gated DeltaNet 2) | `gdn2` | owner track | 6 | 4/5 |
 | Whole-network fusion ops (module / layer) | `fusion` | open to agents | 4 | 1/4 |
 | Mamba-1/2/3 | `mamba` | not scheduled (G4) | — | — |
@@ -180,7 +180,7 @@ _Used by Qwen3-Next; six ABI gaps to close (phase 4, unrelated to this). **GDN/P
 
 </details>
 
-<details><summary><b>DeltaNet —— 3 kernel(s)，1/2 done</b></summary>
+<details><summary><b>DeltaNet —— 3 kernel(s)，2/2 done</b></summary>
 
 _Upstream ascriptor units (delta_rule_fwd/bwd) still unscheduled; DR-01 is a separate implementation path (PyPTO-Pro, external contribution) coexisting with them_
 
@@ -188,14 +188,14 @@ _Upstream ascriptor units (delta_rule_fwd/bwd) still unscheduled; DR-01 is a sep
 |---|---|---|---|---|---|
 | `delta_rule_fwd` | no task yet | ✅ native · A5 hw | — | 7/9 passed | _Upstream unit exists; no task scheduled yet_ |
 | `delta_rule_bwd` | no task yet | ✅ native · A5 hw | — | 7/9 passed | _Upstream unit exists; no task scheduled yet_ |
-| `gdr_chunk_fwd_bwd_pypto_pro` | open to agents | ✅ native · A5 hw | ✅ native · A5 hw | 1/2 | — DR-01 |
+| `gdr_chunk_fwd_bwd_pypto_pro` | open to agents | ✅ native · A5 hw | ✅ native · A5 hw | 2/2 | — DR-01 |
 
-<details><summary>gdr_chunk_fwd_bwd_pypto_pro —— 1/2 done，start DR-01、DR-P1</summary>
+<details><summary>gdr_chunk_fwd_bwd_pypto_pro —— 2/2 done，start DR-01、DR-P1</summary>
 
 | task | issue | SoC | dtype | status | note |
 |---|---|---|---|---|---|
 | DR-01 | — | `a5` | fp32、bf16 | ✅ done | ★ start |
-| DR-P1 | [#153](https://github.com/ddddwee1/ascend_fla_dev/issues/153) | `a5` | fp32、bf16 | 🔵 assigned | ★ start |
+| DR-P1 | [#153](https://github.com/ddddwee1/ascend_fla_dev/issues/153) | `a5` | fp32、bf16 | ✅ done | ★ start |
 
 </details>
 

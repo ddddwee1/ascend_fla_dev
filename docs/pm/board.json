@@ -6644,7 +6644,7 @@
       "wave": "W0",
       "soc": "a5",
       "priority": "P2",
-      "status": "assigned",
+      "status": "done",
       "model": [],
       "kernel": [
         "gdr_chunk_fwd_bwd_pypto_pro"
@@ -6685,9 +6685,30 @@
         {
           "at": "2026-10-30T13:15",
           "summary": "PM 直接调度派发（用户指示，不等外部 APPLY）。DR-01 复核时已发现其真机数字是自述、从未独立复现，且有三处门控纪律与文档不符——本任务先坐实数字，再按 85% 线做性能优化；门控缺口记账不在本任务里改代码。"
+        },
+        {
+          "at": "2026-10-30T15:45",
+          "summary": "PM 独立复核真机证据（host 238，原始 op_summary CSV 的 Task Duration/aic_mac_ratio 与报告逐位匹配，SHA-256 身份链在原始日志里逐项核实）后按 D-PM-33 自行合入。PR #154 → 52217ae7（squash，2026-10-30T15:45:07Z）。assigned → done。诊断性任务，未改任何 kernel 源码。"
         }
       ],
-      "result": null
+      "result": {
+        "commits": [
+          "52217ae7"
+        ],
+        "merged_commit": "52217ae76b1689659d78ddc3bf3728c26d6648be",
+        "merged_at": "2026-10-30T15:45:07Z",
+        "pr": 154,
+        "head_sha_reviewed_and_merged": "0686ba407396eb4df47518665c1ab6c1d8781955",
+        "summary": "DR-01（PR #145）的真机数字首次被独立复现：设备侧耗时逐项在 0.3% 以内吻合，强正确性声明（0.000e+00）精确复现；但对 fla 的加速比不可复现（实测 7.81x/5.60x，不是自述 13.2x/6.0x——原因在参照侧，这次环境下 fla 的 naive_chunk 本身快了 36%，不是本单元变慢）。85% 线：生产形状 0/8 训练 kernel 达标，大形状 1/8（finalize，搬运 bound）；两个 scan kernel 的瓶颈用wave-quantization 公式精确预测（预测 76.2%/57.1%，实测 75.99%/57.14%）；主导上限是 FP32 dtype 本身（FP32/BF16 MMAD 吞吐比 14.8x，实测），不是调度问题。HF32：PyPTO-Pro 执行模型完全没有 HF32 控制位，真机正控双向排除（进程内、跨进程）确认不暴露。三处门控纪律缺口记入gaps.json，未改代码。",
+        "review": "PM 读 diff（4 文件，858 行，全部在声明写集内——gaps.json 两个新研究文档，以及 gen_matrix.py 自动重生成的 README.md，与历史上每次 gaps.json 改动的惯例一致，不算越界）。独立 SSH 复核（host 238，card 3）：op_summary CSV 的 scanab_default/scanab_vt64s2 两组 Task Duration(us)/aic_mac_ratio 与报告的 vt/streams A/B 表逐位匹配（1086.968/0.792、1231.407/0.911）；grep 原始 logs/scanab_*.log 确认五个配置的输出 SHA-256（cc851b9d…）完全相同；grep logs/hf32_probe.log 与 logs/queue.log 确认 HF32 正控的哈希转移序列（776bf9be…→e91b7240…、776bf9be…/c6d51980…/776bf9be…）与报告描述逐项吻合。确认真实、非自述。无争议。按 D-PM-33 自行合入。",
+        "known_gaps_not_blocking": [
+          "**方法论发现，已转达用户，未自行采纳**：gdr_fwd_train_scan 的 vt/streams A/B 显示85% 占用率线可以被一个逐位相同但更慢 1.13x~1.69x 的配置满足——与 KDA-P1/GDN-P1 同日独立发现的占用率非吞吐充分证据问题一致，但这次是最尖锐的实例（字面执行会放行一次倒退）。建议的配套约束（过线配置不能比已测到的最快配置更慢）留给用户决定是否采纳。",
+          "BF16 算术路径是唯一能大幅推高占用率的办法（14.8x MMAD 吞吐），但会破坏刚确认的 fla 逐位一致性——语义决定，未做。",
+          "T=16384 的正确性未测（CPU oracle 工作量超出任务预算）。",
+          "文档内 7 处细节错误（区间遗漏最小值、185应为180、five应为four、README 的 fla_npu_baseline.py 调用示例会崩溃）——建议单独开一个文档修复任务，不与性能测量混在一起。",
+          "贡献者自己的上游仓（gitcode.com/MikejR2904/pypto-gy m）HEAD 已经领先于本仓合入的版本（v2 设计，3.5x faster than v1）——是否跟踪上游，留给用户决定。"
+        ]
+      }
     }
   ],
   "label_github_login": "ascend-fla-pm-bot",
