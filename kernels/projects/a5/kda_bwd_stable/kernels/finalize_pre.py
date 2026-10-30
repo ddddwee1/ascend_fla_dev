@@ -128,43 +128,51 @@ def finalize_pre_stable_kernel(q: GM[bf16, ('B', 'T', 'H', 128)], k: GM[bf16, ('
     mbase_ub = Tensor(DT.bfloat16, [L, L], Position.UB)
     mbeta_ub = Tensor(DT.bfloat16, [L, L], Position.UB)
 
+    # KDA-P1: this kernel has no matmul -- every instruction in it runs on a
+    # vector subblock. Partitioning the item space over GetCubeNum() and then
+    # parking subblock 1 leaves HALF the vector engine idle (GetVecNum() ==
+    # 2 * GetCubeNum()). Partition over GetVecNum() instead: one worker still
+    # owns a whole (b, hv, c) item, so the duplicate-GM-write hazard the old
+    # subblock-0 guard existed to prevent cannot come back -- the six outputs
+    # are disjoint contiguous BHCLD blocks (>=8 KiB each), nowhere near sharing
+    # a 32-byte GM write granule between workers. Arithmetic, buffers, read
+    # pitches, store order within an item and the emitted VF are unchanged, so
+    # the outputs are bitwise identical; only the worker count doubles.
     work_count = Var(B * HV * C)
-    work_per_core = CeilDiv(work_count, GetCubeNum())
-    work_begin = Var(work_per_core * GetCubeIdx())
-    work_end = Min(work_begin + work_per_core, work_count)
+    work_per_vec = CeilDiv(work_count, GetVecNum())
+    work_begin = Var(work_per_vec * GetVecIdx())
+    work_end = Min(work_begin + work_per_vec, work_count)
 
     with auto_sync():
-        # One vector subblock owns the whole chunk; the peer must not duplicate GM writes.
-        if GetSubBlockIdx() == 0:
-            for work in range(work_begin, work_end):
-                c_idx = Var(work % C)
-                bhv = Var(work / C)
-                hv_idx = Var(bhv % HV)
-                b_idx = Var(bhv / HV)
+        for work in range(work_begin, work_end):
+            c_idx = Var(work % C)
+            bhv = Var(work / C)
+            hv_idx = Var(bhv % HV)
+            b_idx = Var(bhv / HV)
 
-                # Strided on-device reads from token-major BTHVD primaries/caches; the
-                # H->HV gather (h_idx = hv_idx / G) happens here. q/k carry H heads
-                # (pitch H*D); g/beta/dAqk/dAkk carry HV (pitch HV*D / HV / HV*L).
-                row0 = Var(c_idx * L)
-                h_idx = Var(hv_idx / G)
-                gm_to_ub_pad(q_ub[0:L, 0:D], q[b_idx, row0:row0 + L, h_idx, 0:D], L, D, (H - 1) * D, 0)
-                gm_to_ub_pad(k_ub[0:L, 0:D], k[b_idx, row0:row0 + L, h_idx, 0:D], L, D, (H - 1) * D, 0)
-                gm_to_ub_pad(g_ub[0:L, 0:D], g_cumsum[b_idx, row0:row0 + L, hv_idx, 0:D], L, D, (HV - 1) * D, 0)
-                gm_to_ub_pad(beta_ub[0:L, 0:1], beta[b_idx, row0:row0 + L, hv_idx], L, 1, HV - 1, 0)
-                gm_to_ub_pad(dAqk_ub[0:L, 0:L], dAqk[b_idx, row0:row0 + L, hv_idx, 0:L], L, L, (HV - 1) * L, 0)
-                gm_to_ub_pad(dAkk_ub[0:L, 0:L], dAkk[b_idx, row0:row0 + L, hv_idx, 0:L], L, L, (HV - 1) * L, 0)
+            # Strided on-device reads from token-major BTHVD primaries/caches; the
+            # H->HV gather (h_idx = hv_idx / G) happens here. q/k carry H heads
+            # (pitch H*D); g/beta/dAqk/dAkk carry HV (pitch HV*D / HV / HV*L).
+            row0 = Var(c_idx * L)
+            h_idx = Var(hv_idx / G)
+            gm_to_ub_pad(q_ub[0:L, 0:D], q[b_idx, row0:row0 + L, h_idx, 0:D], L, D, (H - 1) * D, 0)
+            gm_to_ub_pad(k_ub[0:L, 0:D], k[b_idx, row0:row0 + L, h_idx, 0:D], L, D, (H - 1) * D, 0)
+            gm_to_ub_pad(g_ub[0:L, 0:D], g_cumsum[b_idx, row0:row0 + L, hv_idx, 0:D], L, D, (HV - 1) * D, 0)
+            gm_to_ub_pad(beta_ub[0:L, 0:1], beta[b_idx, row0:row0 + L, hv_idx], L, 1, HV - 1, 0)
+            gm_to_ub_pad(dAqk_ub[0:L, 0:L], dAqk[b_idx, row0:row0 + L, hv_idx, 0:L], L, L, (HV - 1) * L, 0)
+            gm_to_ub_pad(dAkk_ub[0:L, 0:L], dAkk[b_idx, row0:row0 + L, hv_idx, 0:L], L, L, (HV - 1) * L, 0)
 
-                finalize_pre_vf(
-                    q_ub, k_ub, g_ub, beta_ub, dAqk_ub, dAkk_ub,
-                    q_scaled_ub, k_scaled_ub, kg_ub,
-                    mqk_ub, mbase_ub, mbeta_ub, Var(L),
-                )
+            finalize_pre_vf(
+                q_ub, k_ub, g_ub, beta_ub, dAqk_ub, dAkk_ub,
+                q_scaled_ub, k_scaled_ub, kg_ub,
+                mqk_ub, mbase_ub, mbeta_ub, Var(L),
+            )
 
-                q_scaled[b_idx, hv_idx, c_idx, 0:L, 0:D] <<= q_scaled_ub[0:L, 0:D]
-                k_scaled[b_idx, hv_idx, c_idx, 0:L, 0:D] <<= k_scaled_ub[0:L, 0:D]
-                kg[b_idx, hv_idx, c_idx, 0:L, 0:D] <<= kg_ub[0:L, 0:D]
-                m_qk[b_idx, hv_idx, c_idx, 0:L, 0:L] <<= mqk_ub[0:L, 0:L]
-                m_base[b_idx, hv_idx, c_idx, 0:L, 0:L] <<= mbase_ub[0:L, 0:L]
-                m_beta[b_idx, hv_idx, c_idx, 0:L, 0:L] <<= mbeta_ub[0:L, 0:L]
+            q_scaled[b_idx, hv_idx, c_idx, 0:L, 0:D] <<= q_scaled_ub[0:L, 0:D]
+            k_scaled[b_idx, hv_idx, c_idx, 0:L, 0:D] <<= k_scaled_ub[0:L, 0:D]
+            kg[b_idx, hv_idx, c_idx, 0:L, 0:D] <<= kg_ub[0:L, 0:D]
+            m_qk[b_idx, hv_idx, c_idx, 0:L, 0:L] <<= mqk_ub[0:L, 0:L]
+            m_base[b_idx, hv_idx, c_idx, 0:L, 0:L] <<= mbase_ub[0:L, 0:L]
+            m_beta[b_idx, hv_idx, c_idx, 0:L, 0:L] <<= mbeta_ub[0:L, 0:L]
 
     return q_scaled, k_scaled, kg, m_qk, m_base, m_beta
