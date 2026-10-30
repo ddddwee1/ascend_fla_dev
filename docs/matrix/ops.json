@@ -1821,6 +1821,143 @@
       },
       "gdn_decode_default_block_dim": "ascend_fla/ops/gdn_fused_recurrent.py 的 prepare() 与 fused_recurrent_gdn() 默认 block_dim=1，而契约自 GDA-04 起已验收 1/2/4/8/16/28、本次实测各 block_dim 输出逐位相同。不传 block_dim 的调用方因此在 56 个向量核里只用 2 个，比同一份 build 的 bd16 多付 14.0x（S=16：395.611 vs 28.255us）或 9.1x（S=1：53.043 vs 5.835us），精度完全无差别。**本任务没有改这个默认值**，两条具体理由：① 没有一个值对所有形状都对（B*HV=32 时 bd16 优于 bd28，B*HV>32 时反过来），而 block_dim 是 build 参数、一个进程一个算子名只能有一份 build（§6 铁律二）；② tests/conftest.py:56 刻意把 prepare(block_dim=1) 钉住并注明了同样的理由，改公开默认值需要先审计 pytest 会话里哪次 prepare 先执行，否则可能触发 §5 的「已经执行过 aclnn 算子」失败，而这一点不跑完整真机测试无法验证。决策交给 PM。",
       "hf01_cross_check": "HF-01 的静态审计报了 GDN 侧 14 个 FP32 cube matmul 位点（gdn_fwd/kernels/inverse.py 10 处、gdn_bwd/kernels/finalize.py 3 处、gdn_fwd/kernels/preprocess.py 1 处）。**那些是上游 ascriptor 的 a5.gdn_fwd / a5.gdn_bwd 单元，不是本仓 GDN 路径**——两边共用 kernels/projects/a5/ 前缀，容易混。四条独立核对：① 本仓没有 kernels/projects/a5/gdn_fwd 与 gdn_bwd 目录，整个 kernels/ 下也没有 inverse.py / finalize.py / preprocess.py；② 公开路径上四个 GDN 单元的 kernels/ 目录里 grep matmul / set_hf32 / Position.L0C / mode='mix' 零命中（gdn_chunk_bwd/ref/stages.py 里的 torch.matmul 是 CPU 参考，其 docstring 自述 'using CPU matmul'，不是设备 cube 位点）；③ ascend_fla/ops/gdn_* 与 ascend_fla/runtime/ 都不引用 a5.gdn_fwd / a5.gdn_bwd / ASCRIPTOR_WORKSPACE，gdn_chunk_fwd/README.md:40 明写上游单元「只是 ABI 对照来源」，gdn_chunk_bwd/README.md:17 明写不用 cube rounding；④ **最决定性的是真机**：九个设备 kernel（前向五个 stage、反向三个 launch、decode）在每个 block_dim、两个形状下 aic_mac_ratio 全 0.000、cube_utilization≤0.004%——真有 cube matmul 在跑，这个计数器不会是 0。**结论：GDN-P1 写集里不需要加任何 set_hf32 守卫**，PK-07 模板（12a6f66c）无处可挂；没有改动任何上游文件。三份报告里每个进程仍然显式把 allow_hf32 置 False 并记录。"
+    },
+    "dr_p1_pipe_utilization": {
+      "recorded_at": "2026-10-30",
+      "task": "DR-P1",
+      "note": "AGENTS.md §6 验收线要求的 pipe 利用率记录：gdr_chunk_fwd_bwd_pypto_pro（DeltaNet/gated_delta_rule，DR-01 外部贡献，本仓唯一原生 PyPTO-Pro 单元，不是 ascriptor/CCE）的九个 kernel 在 A5 真机上实测。此前这个单元在 ops.json 里完全没有条目（DR-01 的真机数字是申领人自述，从未被独立复现）。完整表格见 docs/research/dr_perf_{fwd,bwd}.md。",
+      "environment": "A5 / Ascend950PR_957b（28 cube / 56 vec），CANN 9.1.0-beta.1 含 ascend950 opp，python 3.12.13 / torch 2.12.0+cpu / torch_npu 2.12.0，pypto 0.2.1（真正的 pypto_pro：pl.jit/pl.vector_function/pl.Vf 均存在）、fla 0.5.2——与原 PR #145 的 PERFORMANCE.md 同代同 CANN，可直接对照。",
+      "device_numbers_reproduced": "生产形状设备总耗时 908.85us vs 自述 911.98us（-0.34%，申领人自己重测过是 909.14us，与之相差0.03%）；长形状 T=16384/H=16 14232.13us vs 自述 14.24ms；前向单独 4875.01us vs 4873.3us（0.035%）。强正确性声明精确复现为 0.000e+00（chunk vs naive_chunk、recurrent state vs naive_recurrent，4 个形状全部）。",
+      "device_numbers_not_reproduced": "fla 对比加速比不可复现：生产形状实测 7.81x（不是自述的 13.2x），长形状 5.60x（不是 6.0x）——原因在参照侧：这次环境下 fla 的 naive_chunk 跑得比自述环境快 36%，不是本单元变慢。合理区间改记为 5.6x-7.8x，不是 6.0x-13.2x。「6/8 kernel 在大形状上过 93% 占用」不可复现（实测 4/8）；「生产形状 2/8 过线」不可复现（实测 0/8）。pipeline 16 steps/call 的 828.5us 应为区间不是单点（四次独立实测 835.7~882.7us/step，全部高于828.5）。",
+      "stages_production_shape": {
+        "shape": "Qwen3-Next GQA 展开后 B1/T4096/H32(=HMAX)/K=V=128，九个 kernel 中 0/8 训练 kernel 过 85% 线",
+        "kernels": [
+          {
+            "entry": "gdr_fwd_train_wy",
+            "us": 1052.0,
+            "share_pct": 16,
+            "pipe": "aic_mac",
+            "ratio": 0.469,
+            "verdict": "差 38 点"
+          },
+          {
+            "entry": "gdr_fwd_train_scan",
+            "us": 1138.51,
+            "share_pct": 18,
+            "pipe": "aic_mac",
+            "ratio": 0.761,
+            "verdict": "差 9 点；根因=wave quantization，公式 (items/cores)/ceil(items/cores) 预测 76.2% 实测 75.99%"
+          },
+          {
+            "entry": "gdr_bwd_dv_local",
+            "us": 271.63,
+            "share_pct": 4,
+            "pipe": "aic_mac",
+            "ratio": 0.696,
+            "verdict": "差 15 点"
+          },
+          {
+            "entry": "gdr_bwd_reverse_scan",
+            "us": 1277.13,
+            "share_pct": 20,
+            "pipe": "aic_mac",
+            "ratio": 0.577,
+            "verdict": "差 27 点"
+          },
+          {
+            "entry": "gdr_bwd_dqkw",
+            "us": 1207.15,
+            "share_pct": 19,
+            "pipe": "aic_mac",
+            "ratio": 0.692,
+            "verdict": "差 16 点"
+          },
+          {
+            "entry": "gdr_bwd_wy_matmuls",
+            "us": 789.63,
+            "share_pct": 12,
+            "pipe": "aic_mac",
+            "ratio": 0.829,
+            "verdict": "差 2.1 点，最接近"
+          },
+          {
+            "entry": "gdr_bwd_wy_reduce",
+            "us": 507.41,
+            "share_pct": 8,
+            "pipe": "aiv_mte2",
+            "ratio": 0.816,
+            "verdict": "差 3.4 点"
+          },
+          {
+            "entry": "gdr_bwd_finalize",
+            "us": 224.14,
+            "share_pct": 3,
+            "pipe": "aiv_mte2",
+            "ratio": 0.896,
+            "verdict": "达标，搬运 bound"
+          },
+          {
+            "entry": "gated_delta_rule_fwd（独立推理 kernel，无域校验）",
+            "us": 2532.41,
+            "pipe": "aic_mac",
+            "ratio": 0.461,
+            "verdict": "差 39 点"
+          }
+        ],
+        "large_shape_verdict": "T=16384/H=16：1/8 过线（finalize 的 aiv_mte2 0.928）。aic_mte3_ratio 在两个形状、全部九个 kernel 上恒为 0.000。",
+        "dominant_ceiling": "FP32 dtype 本身，不是调度问题：本单元自己的 probe 测得 FP32/BF16 MMAD 吞吐比 14.8x。BF16 算术路径是唯一能大幅推高占用率的办法，但会破坏刚刚确认逐位一致的 fla 对比——这是语义决定，本任务未做。"
+      },
+      "methodological_finding_needs_decision": {
+        "summary": "**85% 占用率线可以被一个更慢的配置满足。** gdr_fwd_train_scan 作者自带的 _vt/_streams 调参开关做 A/B（单进程单采集、同一真实形状）：",
+        "table": [
+          {
+            "config": "default (28,1,64)",
+            "us": 1086.97,
+            "vs_default": "1.00x",
+            "aic_mac": 0.792,
+            "verdict": "差线"
+          },
+          {
+            "config": "vt=64,streams=2",
+            "us": 1231.41,
+            "vs_default": "1.13x 更慢",
+            "aic_mac": 0.911,
+            "verdict": "过线"
+          },
+          {
+            "config": "vt=48,streams=1",
+            "us": 1568.58,
+            "vs_default": "1.44x 更慢",
+            "aic_mac": 0.736,
+            "verdict": "差线"
+          },
+          {
+            "config": "vt=32,streams=1",
+            "us": 1801.64,
+            "vs_default": "1.66x 更慢",
+            "aic_mac": 0.795,
+            "verdict": "差线"
+          },
+          {
+            "config": "vt=32,streams=2",
+            "us": 1834.89,
+            "vs_default": "1.69x 更慢",
+            "aic_mac": 0.917,
+            "verdict": "过线"
+          }
+        ],
+        "all_five_sha256_identical": "cc851b9d…（PM 已在原始 logs/scanab_*.log 里核实五份日志哈希相同，且各自的 aic_mac/duration 与原始 msprof op_summary CSV 逐位匹配）",
+        "conclusion": "作者的默认配置在暴露的调参面上已经是最优——没有主机侧旋钮能让它更快，所以它的差线不是没调好。但 aic_mac_ratio 与真实速度非单调：两个'过线'配置反而更慢（1.13x、1.69x）。这与 KDA-P1/GDN-P1 独立发现的同类问题（占用率不是吞吐最优的充分证据）一致，但这次是最尖锐的实例——照字面执行验收线会放行一个更慢的配置。",
+        "proposed_companion_clause": "建议给 85% 线加一条配套约束：'满足占用率线的配置，耗时不能比已测到的最快配置更慢'——但这是对用户 2026-10-27 给出的验收线本身的修改，PM 未自行采纳，等用户决定。"
+      },
+      "hf32": "PyPTO-Pro 执行模型完全没有 HF32 控制位（pl.matmul 无精度参数，pypto/pypto_pro 源码与全部 .so 都搜不到 hf32/HF32 字符串）。真机正控实测两个方向：进程内强制 allow_hf32=True 并跑 4 次 4096² FP32 matmul 确认哈希移动（556b3b81…→e91b7240…）但本单元链路哈希不变；跨进程（真实共享卡威胁模型）让另一个进程强制 HF32=True 跑完退出后，本单元新进程哈希仍与基线逐位相同（776bf9be…出现两次，中间夹着污染进程自己的 c6d51980…，PM 已在原始 logs/queue.log 核实）。**结论：本单元不暴露于 a5-fp32-cube-matmul-inherits-hf32**（经两种机制实测排除，不是假设）。",
+      "gaps_recorded_not_fixed": [
+        "gdr-v-domain-never-validated：README 声称 V 必须是 64 的倍数，但从未被任何 kernel 的 assert/raise 校验过，且与自己验证通过的 V=96 case 矛盾",
+        "gdr-b1-enforced-mid-chain：B=1 只在链上第 5 个 kernel（gdr_bwd_dqkw_impl.py:335-336 的 _B1_DYN4 类型标注）生效，前 4 个 kernel 对 B 无限制",
+        "gdr-inference-fwd-no-domain-validation：独立推理 kernel gated_delta_rule_fwd 全 57 行零 assert/raise，v/g/beta 缺省为 None，缺输入会报不友好的 AttributeError 而不是清楚的域错误"
+      ],
+      "correctness_extended": "VALIDATION.md 记录的最大已验证形状是 T=2048/H=8。DR-P1 用本单元自带的 gate/judge/golden 新测 B1/T1024/H=32(=HMAX) 与 H=16，36 项比对全 PASS——把 H 轴扩到声明上限。T=16384 的正确性仍未测（CPU oracle 在 16 倍工作量下超出本任务预算，留作已知缺口）。",
+      "toolchain": "真正的 PyPTO-Pro 已装好且就是这个单元实际运行的框架（与原 PR 同代，故意不升级以保证苹果对苹果比较，如实记为对任务 spec 的偏离）。pypto-pro-op-orchestrator 插件**第一次在本仓真正派上用场**：直接跑 pypto_pro_op_lint（未执行 init.sh 改仓库），PL11（golden 纯净性）9/9 过；PL15/16 恰好只在 gated_delta_rule_fwd 上失败（与独立读源码发现的'零域校验'结论吻合，命名偏差为主，但带出一条 VALIDATION.md 的真实文档错误：声称每个 kernel 都有 NPU golden，这个只有一个）；PL01/02 因目录布局不同报 9/9，记为'此布局无判定'而不是真失败。"
     }
   }
 }
