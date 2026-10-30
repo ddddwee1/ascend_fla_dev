@@ -1600,6 +1600,227 @@
       "profile": "Level-1 PipeUtilization：device total2665.141→2576.490us/token，rows273→219；mixed kernel 54样本mean/median42.339/42.168us，AIC MTE2平均/中位91.880%/92.150%，cube utilization平均87.914%。native GEMV+mixed W12合计2323.348us/token，占90.175%。",
       "pending": "决定是否用约1.030GB派生权重换2.6%吞吐，或先设计prompt/decode共用布局再改默认；下一次大步优化需要weight-only低精度及独立任务质量预算。",
       "evidence": "kernels/projects/a5/gdn2_norm2_w12_swiglu/contract.json；benchmarks/verify_gdn2_mixed_mlp.py；tmp/gdn2-rmsnorm-swiglu/{gamma-fold-real95b-v1.json,gemv-static-sim-v1.json,gemv-hardware-*.json,mixed-mlp-hardware-v*.json,conservative-whole-cce-first-v2.json,conservative-graph-*.json,profile-conservative-v1,performance-analysis.md}/（git-ignored）"
+    },
+    "gdn_p1_pipe_utilization": {
+      "recorded_at": "2026-10-30",
+      "task": "GDN-P1",
+      "note": "AGENTS.md §6「性能优化任务的验收线」要求的 pipe 利用率记录：GDN 三个核心单元（gdn_chunk_fwd 的生产路径 = gdn_chunk_fwd_bf16 的五个 stage、gdn_chunk_bwd 的三个 launch、gdn_fused_recurrent）在 A5 真机上用 aic_metrics=PipeUtilization 实测。GDA-05 显式关闭了 AI Core 性能计数器，所以这一项此前是「未验证」。完整表格与证据见 docs/research/gdn_perf_{fwd,bwd,decode}.md。",
+      "environment": "A5 / Ascend950PR（28 cube / 56 vec），CANN/opp 9.1.0 含 ascend950，driver/npu-smi 25.7.rc1，python 3.12.14 / torch 2.12.0+cu130 / torch_npu 2.12.0，ascriptor 0.1.0 library pin 90cfcdc720bbcd66e8bd4361c4dd4fbc1a2a57b5，FLA oracle pin e52dbc0e（源码 SHA256 d1cf1799…，与 GDA-05 同一份）",
+      "conditions": "FP32；形状取 models.json 的 qwen3_next_layer(B1/T1024/H16/HV32) 与 long_context(T4096)，decode 取 S=16/S=1；每行一个独立进程、独立 vendor 树与编译缓存，持设备锁，同一张物理卡；torch.npu.matmul.allow_hf32 在每个进程里显式置 False 并随结果记录；ProfilerLevel.Level1 + aic_metrics=PipeUtilization，显式 wait=0/warmup=1/active=1/repeat=1；设备 kernel 时间取 3 次 capture 的中位数。CANN 偶发丢失 ACL→NPU 关联的 capture 按失败重采，只保留 CSV 完整且 native entry 齐全的。",
+      "cube_usage": "三个单元 **全部** aic_mac_ratio=0.000、cube_utilization≤0.004%（bd28 的 prepare 最高 1.525%，仍是噪声级）。源码侧一致：五个前向 stage、三个反向 launch 与 decode 都是 @vf() / @kernel(mode='vec')，kernels/ 里零次 matmul 调用。**结论：仓库级 P0 a5-fp32-cube-matmul-inherits-hf32 在 GDN 族没有可达点**（HF-01 覆盖的是 KDA 三个单元）。",
+      "gdn_fwd_pipe_utilization": {
+        "shape": "B1/T4096/H16/HV32 (long_context), FP32, block_dim 1",
+        "kernel_total_us": 156379.76,
+        "stages": [
+          {
+            "entry": "gdn_bf01_scores",
+            "us": 55337.894,
+            "share_pct": 35.39,
+            "aiv_vec_ratio": 0.977,
+            "aiv_mte2_ratio": 0.024,
+            "aiv_mte3_ratio": 0.006,
+            "verdict": "vector-bound, >=85%"
+          },
+          {
+            "entry": "gdn_bf01_wy",
+            "us": 45300.04,
+            "share_pct": 28.97,
+            "aiv_vec_ratio": 0.974,
+            "aiv_mte2_ratio": 0.026,
+            "aiv_mte3_ratio": 0.011,
+            "verdict": "vector-bound, >=85%"
+          },
+          {
+            "entry": "gdn_bf01_scan",
+            "us": 31800.207,
+            "share_pct": 20.34,
+            "aiv_vec_ratio": 0.959,
+            "aiv_mte2_ratio": 0.04,
+            "aiv_mte3_ratio": 0.021,
+            "verdict": "vector-bound, >=85%"
+          },
+          {
+            "entry": "gdn_bf01_output_f32",
+            "us": 21222.263,
+            "share_pct": 13.57,
+            "aiv_vec_ratio": 0.899,
+            "aiv_mte2_ratio": 0.076,
+            "aiv_mte3_ratio": 0.042,
+            "verdict": "vector-bound, >=85%"
+          },
+          {
+            "entry": "gdn_bf01_prepare_f32",
+            "us": 2719.709,
+            "share_pct": 1.74,
+            "aiv_vec_ratio": 0.188,
+            "aiv_mte2_ratio": 0.52,
+            "aiv_mte3_ratio": 0.549,
+            "verdict": "MTE-bound，单条管线未到 85%；占比 1.74%"
+          }
+        ],
+        "accuracy": "worst relative L2 vs 单元自带 CPU FP32 block-solve 参考：o 4.503e-07、final_state 4.270e-07，预算 1e-4；T1024 为 4.444e-07。每个 block_dim 完全相同。",
+        "verdict": "85% 线：四个 stage（合计 98.26% 的 kernel 时间）达标，prepare（1.74%）是搬运主导但单管线未到 85%。**但本任务同时实测到两个反例，说明 aiv_vec_ratio>=0.85 不足以证明已到位** —— 见 gdn_fwd_remaining_headroom。"
+      },
+      "gdn_bwd_pipe_utilization": {
+        "shape": "B1/T1024/H16/HV32 (qwen3_next_layer), FP32, block_dim 16",
+        "kernel_total_us": 6192.01,
+        "stages": [
+          {
+            "entry": "gdn_bwd_reverse",
+            "us": 4752.32,
+            "share_pct": 76.75,
+            "aiv_vec_ratio": 0.652,
+            "aiv_mte2_ratio": 0.3,
+            "aiv_mte3_ratio": 0.16,
+            "verdict": "未达标：最接近的向量管线差 19.8 个百分点"
+          },
+          {
+            "entry": "gdn_bwd_checkpoints",
+            "us": 1018.826,
+            "share_pct": 16.45,
+            "aiv_vec_ratio": 0.624,
+            "aiv_mte2_ratio": 0.354,
+            "aiv_mte3_ratio": 0.012,
+            "verdict": "未达标：向量管线差 22.6 个百分点"
+          },
+          {
+            "entry": "gdn_bwd_group_reduce",
+            "us": 422.03,
+            "share_pct": 6.82,
+            "aiv_vec_ratio": 0.1,
+            "aiv_mte2_ratio": 0.889,
+            "aiv_mte3_ratio": 0.246,
+            "verdict": "达标：mte2 0.889，搬运 bound"
+          }
+        ],
+        "accuracy": "per-gradient relative L2 vs 单元自带独立解析 CPU adjoint：dq 1.23e-07、dk 1.18e-07、dv 2.24e-07、dg 2.45e-07、dbeta 2.657e-07，预算 1e-4。每个 block_dim 完全相同。",
+        "verdict": "**GDN 三个单元里唯一明确未达标的。** 按时间加权，6.82% 达标、93.18% 未达标。机制已定位（不是症状规律）：gdn_bwd_reverse 每 token 往 GM replay tape 写 64 KiB 再读回，T=1024 下一次调用约 4 GiB GM 流量；gdn_bwd_checkpoints 另有一条独立原因，逐 token 读 512 字节输入（每 chunk 256 次小 MTE2）。候选修法与各自代价见 docs/research/gdn_perf_bwd.md §4，本任务一处都没动（§6.5 一次只改一处）。"
+      },
+      "gdn_decode_pipe_utilization": {
+        "shape": "B1/H16/HV32 (qwen3_next_layer 头配置), FP32, S=16 与 S=1",
+        "s16": [
+          {
+            "block_dim": 1,
+            "us": 395.611,
+            "aiv_vec_ratio": 0.907,
+            "aiv_mte2_ratio": 0.056,
+            "aiv_mte3_ratio": 0.034
+          },
+          {
+            "block_dim": 2,
+            "us": 198.481,
+            "aiv_vec_ratio": 0.906,
+            "aiv_mte2_ratio": 0.057,
+            "aiv_mte3_ratio": 0.034
+          },
+          {
+            "block_dim": 4,
+            "us": 107.403,
+            "aiv_vec_ratio": 0.839,
+            "aiv_mte2_ratio": 0.096,
+            "aiv_mte3_ratio": 0.058
+          },
+          {
+            "block_dim": 8,
+            "us": 54.542,
+            "aiv_vec_ratio": 0.836,
+            "aiv_mte2_ratio": 0.097,
+            "aiv_mte3_ratio": 0.055
+          },
+          {
+            "block_dim": 16,
+            "us": 28.255,
+            "aiv_vec_ratio": 0.819,
+            "aiv_mte2_ratio": 0.108,
+            "aiv_mte3_ratio": 0.052
+          },
+          {
+            "block_dim": 28,
+            "us": 28.805,
+            "aiv_vec_ratio": 0.798,
+            "aiv_mte2_ratio": 0.11,
+            "aiv_mte3_ratio": 0.049
+          }
+        ],
+        "s1": [
+          {
+            "block_dim": 1,
+            "us": 53.043,
+            "aiv_vec_ratio": 0.448,
+            "aiv_mte2_ratio": 0.296,
+            "aiv_mte3_ratio": 0.234
+          },
+          {
+            "block_dim": 2,
+            "us": 27.188
+          },
+          {
+            "block_dim": 4,
+            "us": 17.598
+          },
+          {
+            "block_dim": 8,
+            "us": 10.032
+          },
+          {
+            "block_dim": 16,
+            "us": 5.835,
+            "aiv_vec_ratio": 0.29,
+            "aiv_mte2_ratio": 0.356,
+            "aiv_mte3_ratio": 0.245
+          },
+          {
+            "block_dim": 28,
+            "us": 6.114,
+            "aiv_vec_ratio": 0.254,
+            "aiv_mte2_ratio": 0.332,
+            "aiv_mte3_ratio": 0.208
+          }
+        ],
+        "accuracy": "双 oracle：单元自带 CPU FP32 递推 relL2 o 1.362e-07 / final_state 9.155e-08（S=16）；pinned FLA naive 1.537e-07 / 9.705e-08。S=1 为 7.859e-08 / 9.027e-08。预算 1e-4，每个 block_dim 相同。",
+        "verdict": "S=16 在 bd1/bd2 达标（0.907/0.906）；bd4..28 落到 0.839..0.798，略低于线，原因是每核计算量变小而每 item 的 64 KiB state 读 + 64 KiB 写不变，配比向搬运移动。**S=1 在任何 block_dim、任何单管线都达不到 85%**（最佳为 bd16 的 mte2 0.356，差 49.4 个百分点）——这是算术强度决定的：一个 decode token 对 O(D^2) 的 state 做 O(D^2) 的计算，约 1 次运算/字节。不是 kernel 缺陷，kernel 级改动无法改变。"
+      },
+      "gdn_block_dim_grid": {
+        "change": "ascend_fla/ops/gdn_chunk_fwd.py 与 gdn_chunk_bwd.py 的 block_dim 从 (1,2) 放宽到 (1,2,4,8,16,28)，与 gdn_fused_recurrent 一致。无 kernel 源码改动。",
+        "why": "原上限是已验收范围，不是限制：GetVecNum()==2*block_dim，bd2 只用到 56 个向量核中的 4 个（7%）。每个 launch 都按 GetVecIdx()/GetVecNum() 切互不相交的 GM 片，没有跨核归约。28 是上限——block_dim 超过物理核数会在硬件 barrier 上死锁。",
+        "fwd_t1024_us_by_block_dim": {
+          "1": 39144.036,
+          "2": 19607.914,
+          "4": 9840.322,
+          "8": 4958.516,
+          "16": 2480.18,
+          "28": 1820.993
+        },
+        "fwd_t4096_us_by_block_dim": {
+          "1": 156379.76,
+          "2": 78254.409,
+          "16": 10174.896
+        },
+        "bwd_t1024_us_by_block_dim": {
+          "1": 91813.633,
+          "2": 45777.2,
+          "16": 6192.01,
+          "28": 6131.463
+        },
+        "bwd_t4096_us_by_block_dim": {
+          "2": 183111.737,
+          "16": 24527.631
+        },
+        "speedup_vs_old_ceiling_bd2": "前向 T1024 bd16 7.906x / bd28 10.767x；前向 T4096 bd16 7.69x；反向 T1024 bd16 7.39x；反向 T4096 bd16 7.47x。",
+        "control": "同卡、基线 build 与改动 build 在 bd1/bd2 上对照：前向 T1024 bd1 39136.644→39144.036us（+0.019%）、bd2 19597.633→19607.914us（+0.052%），均在跑间噪声内——放宽可接受值集合没有改变 bd1/bd2 的行为。",
+        "saturation": "前向的 scan 与反向的 checkpoints/reverse 都按 B*HV 切（B1/HV32 = 32 个 item），在 GetVecNum()==32 即 bd16 饱和：scan 512.964→512.558us、checkpoints 1018.826→1019.230us、reverse 4752.320→4864.412us（bd28 反而慢 2.4%，多出的 24 个核 begin==end 只付启动代价）。**这条是先从源码预测、再被 bd28 实测确认的**。其余 launch 按 B*N*HV 或 B*T*H 切，继续扩展。**B*HV=32 时：前向取 bd28、反向取 bd16。**",
+        "bitwise": "公开输出 SHA-256 在两个 build × 六个 block_dim × 两个形状下只有一组值（前向 T4096 o=2c540d8f6d15… / final_state=11d813fb11bc…；反向 T1024 dq=c96ffc390e33… 等五个）。核切分不改算式——§6 的无参考硬判据成立。各 block_dim 的 relative L2 逐位相同。",
+        "uninstrumented_sandwich": "关掉 profiler 的同卡同步三明治（三个进程背靠背、每个 3 轮 ×（10 warmup + 50 计时样本）、perf_counter_ns 包住公开调用 + 完成等待），形状 qwen3_next_layer / FP32：\n前向 base bd2 19.6935ms → 改动 bd16 2.6127ms → base bd2 19.6981ms = **7.54x**，基线漂移 +0.023%；\n反向 base bd2 45.8427ms → 改动 bd16 6.2521ms → base bd2 45.6738ms = **7.33x**，基线漂移 −0.368%；\ndecode（无代码改动，只换 block_dim）base bd1 0.4521ms → bd28 0.0792ms → bd1 0.4497ms = **5.71x**，漂移 −0.53%。\n三组里每个进程的公开输出 SHA-256 都相同。host-inclusive 比值低于设备侧比值（前向 7.54 vs 7.906、decode 5.71 vs 13.73），差额是不随 block_dim 缩小的 host 调用开销——decode 在 bd28 上约三分之二的调用时间是 host 时间。这正是 §6 铁律一说的那个坑，两个数都报，不单报任何一个。"
+      },
+      "gdn_fwd_remaining_headroom": {
+        "summary": "前向还有约 1.58x 的逐位中立空间，已在真机实测，但**不在 GDN-P1 写集内**（见 write_set_conflict）。",
+        "measured": "T1024 bd1 kernel 总和 39136.644us → scores 静态分块后 32822.435us（1.192x，scores 13849.094→7533.391us = 1.838x）；wy 静态分块后 31096.228us（1.259x，wy 11333.607→3290.507us = 3.444x）。T4096 bd1 同样：156379.760 → 131094.411（scores 55337.894→30056.191 = 1.841x）/ 124180.263（wy 45300.040→13119.799 = 3.453x）。bd16 上同比例：2480.180 → 2085.5（scores）/ 1975.8（wy）。三处都公开输出 SHA-256 与基线逐位相同、relative L2 不变、CCE 发射 diff 只命中被改的那一个 kernel 的三个生成文件。",
+        "root_cause": "GDN 的 scores_vf 用动态循环界（for i in range(count) / for j in range(i+1)），而 count 在契约域内恒为 64（公开入口拒绝 T 非 64 倍数）；wy_vf 用固定 64 次 + 全程 j<i 守卫。PK-08 已合入的 PGDN 修法（BLK×BLK 分块 + 编译期 unroll + 常量内层次数）把同一算式的 scores 做到 30.026ms（t4096/bd1/FP32），GDN 的是 55.338ms，归约次数完全相同（各 4096 次 cadd）、PGDN 还多跑迭代（2304 vs 2080）。移植后 GDN 的 scores 实测 30.056ms，与 PGDN 差 0.10%。",
+        "write_set_conflict": "**ascend_fla/ops/gdn_chunk_fwd.py:112 的生产路径走 _native_pipeline() = kernels/projects/a5/gdn_chunk_fwd_bf16/kernels，FP32 与 BF16 共用**；stages.py:513-514 里 scores/wy/scan 对两种 dtype 是同一个 kernel 对象，output_vf 也共享。gdn_chunk_fwd/kernels 在源码里标注为 legacy 诊断路径，不在公开链上。所以 FP32 前向没有自己的 kernel 源码，任何前向 kernel 改动必然落在 BF16 目录、必然同时影响 BF16。GDN-P1 写集写的是 kernels/projects/a5/gdn_fwd/**（该目录不存在）并要求不碰 BF16 写集，因此这两处改动只做了真机测量、**没有提交**。PK-08 的写集当年正是因为同一类发现被显式扩大（D-PM-35 BF16 优先）。补丁原文见 docs/research/gdn_perf_fwd.md §5。",
+        "methodological": "**aiv_vec_ratio>=0.85 不是「已到位」的充分证据。** 它量的是管线占用，依赖停顿的向量管线同样记作 busy。同一个单元内两个实测反例：scores 0.977→0.955 的同时快 1.84x，wy 0.974→0.907 的同时快 3.44x。验收线应读作「没有哪条管线被饿着」，而不是「没有工作可省」；有同算式的跨实现对照时，那个对照是更强的判据。"
+      },
+      "gdn_decode_default_block_dim": "ascend_fla/ops/gdn_fused_recurrent.py 的 prepare() 与 fused_recurrent_gdn() 默认 block_dim=1，而契约自 GDA-04 起已验收 1/2/4/8/16/28、本次实测各 block_dim 输出逐位相同。不传 block_dim 的调用方因此在 56 个向量核里只用 2 个，比同一份 build 的 bd16 多付 14.0x（S=16：395.611 vs 28.255us）或 9.1x（S=1：53.043 vs 5.835us），精度完全无差别。**本任务没有改这个默认值**，两条具体理由：① 没有一个值对所有形状都对（B*HV=32 时 bd16 优于 bd28，B*HV>32 时反过来），而 block_dim 是 build 参数、一个进程一个算子名只能有一份 build（§6 铁律二）；② tests/conftest.py:56 刻意把 prepare(block_dim=1) 钉住并注明了同样的理由，改公开默认值需要先审计 pytest 会话里哪次 prepare 先执行，否则可能触发 §5 的「已经执行过 aclnn 算子」失败，而这一点不跑完整真机测试无法验证。决策交给 PM。",
+      "hf01_cross_check": "HF-01 的静态审计报了 GDN 侧 14 个 FP32 cube matmul 位点（gdn_fwd/kernels/inverse.py 10 处、gdn_bwd/kernels/finalize.py 3 处、gdn_fwd/kernels/preprocess.py 1 处）。**那些是上游 ascriptor 的 a5.gdn_fwd / a5.gdn_bwd 单元，不是本仓 GDN 路径**——两边共用 kernels/projects/a5/ 前缀，容易混。四条独立核对：① 本仓没有 kernels/projects/a5/gdn_fwd 与 gdn_bwd 目录，整个 kernels/ 下也没有 inverse.py / finalize.py / preprocess.py；② 公开路径上四个 GDN 单元的 kernels/ 目录里 grep matmul / set_hf32 / Position.L0C / mode='mix' 零命中（gdn_chunk_bwd/ref/stages.py 里的 torch.matmul 是 CPU 参考，其 docstring 自述 'using CPU matmul'，不是设备 cube 位点）；③ ascend_fla/ops/gdn_* 与 ascend_fla/runtime/ 都不引用 a5.gdn_fwd / a5.gdn_bwd / ASCRIPTOR_WORKSPACE，gdn_chunk_fwd/README.md:40 明写上游单元「只是 ABI 对照来源」，gdn_chunk_bwd/README.md:17 明写不用 cube rounding；④ **最决定性的是真机**：九个设备 kernel（前向五个 stage、反向三个 launch、decode）在每个 block_dim、两个形状下 aic_mac_ratio 全 0.000、cube_utilization≤0.004%——真有 cube matmul 在跑，这个计数器不会是 0。**结论：GDN-P1 写集里不需要加任何 set_hf32 守卫**，PK-07 模板（12a6f66c）无处可挂；没有改动任何上游文件。三份报告里每个进程仍然显式把 allow_hf32 置 False 并记录。"
     }
   }
 }

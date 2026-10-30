@@ -36,14 +36,23 @@ def _bf16_pipeline():
     return import_module(name + '.pipeline')
 
 
-@functools.lru_cache(maxsize=2)
+# Qualified native inprocess grid. All three launches partition independent GM
+# slices by GetVecIdx()/GetVecNum() (== 2*block_dim) with no cross-core reduction,
+# so widening the grid changes only how many vector cores share the same per-item
+# arithmetic; returned gradients are bitwise equal across the grid. 28 is the
+# ceiling: Ascend950PR has 28 cube / 56 vector cores and a block_dim above the
+# physical count deadlocks on the hardware barrier.
+BLOCK_DIMS = (1, 2, 4, 8, 16, 28)
+
+
+@functools.lru_cache(maxsize=len(BLOCK_DIMS))
 def _compiled(block_dim):
     from ..runtime.compile import compile_kernel
     return tuple(compile_kernel(e, device='a5', block_dim=block_dim, backend='cce')
                  for e in _pipeline().entries())
 
 
-@functools.lru_cache(maxsize=2)
+@functools.lru_cache(maxsize=len(BLOCK_DIMS))
 def _bf16_compiled(block_dim):
     from ..runtime.compile import compile_kernel
     return tuple(compile_kernel(e, device='a5', block_dim=block_dim, backend='cce')
@@ -51,8 +60,8 @@ def _bf16_compiled(block_dim):
 
 
 def _options(device, block_dim):
-    if device != 'a5' or type(block_dim) is not int or block_dim not in (1, 2):
-        raise ValueError('GDN backward requires a5 and integer block_dim in (1,2)')
+    if device != 'a5' or type(block_dim) is not int or block_dim not in BLOCK_DIMS:
+        raise ValueError(f'GDN backward requires a5 and integer block_dim in {BLOCK_DIMS}')
 
 
 def prepare(*, device='a5', block_dim=2):

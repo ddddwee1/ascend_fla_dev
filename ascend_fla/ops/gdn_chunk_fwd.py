@@ -37,7 +37,15 @@ def _native_pipeline():
     return import_module(name + '.pipeline')
 
 
-@functools.lru_cache(maxsize=2)
+# Qualified native inprocess grid. Every stage partitions independent GM slices
+# by GetVecIdx()/GetVecNum() (== 2*block_dim), so widening this grid changes only
+# how many vector cores share the same per-item arithmetic; public outputs are
+# bitwise equal across the grid. Ascend950PR has 28 cube / 56 vector cores, so 28
+# is the ceiling - above the physical count the hardware barrier deadlocks.
+BLOCK_DIMS = (1, 2, 4, 8, 16, 28)
+
+
+@functools.lru_cache(maxsize=len(BLOCK_DIMS))
 def _compiled(block_dim):
     from ..runtime.compile import compile_kernel
     return tuple(compile_kernel(entry, device='a5', block_dim=block_dim, backend='cce')
@@ -45,8 +53,8 @@ def _compiled(block_dim):
 
 
 def _options(device, block_dim):
-    if device != 'a5' or type(block_dim) is not int or block_dim not in (1, 2):
-        raise ValueError(f'requires a5 and block_dim in (1,2); got {device}/{block_dim}')
+    if device != 'a5' or type(block_dim) is not int or block_dim not in BLOCK_DIMS:
+        raise ValueError(f'requires a5 and block_dim in {BLOCK_DIMS}; got {device}/{block_dim}')
 
 
 def prepare(*, device='a5', block_dim=2):
