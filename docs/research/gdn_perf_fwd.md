@@ -71,6 +71,41 @@ therefore answered negatively: the repository-level P0
 This is the same "cube engine idle" structure PK-07 measured in PKDA, arrived at
 independently here from the device counters.
 
+### Cross-check against HF-01's static HF32 audit
+
+HF-01 statically audited every FP32 cube `matmul` operand pair in the tree and
+reported GDN sites: 10 in `gdn_fwd/kernels/inverse.py`, 3 in
+`gdn_bwd/kernels/finalize.py`, 1 in `gdn_fwd/kernels/preprocess.py`. **Those are
+upstream ascriptor's `a5.gdn_fwd` / `a5.gdn_bwd` units, not this repository's GDN
+path**, and they are not reachable from `ascend_fla.ops.gdn_*`. Both repositories
+use the same `kernels/projects/a5/...` prefix, which is what makes the two easy
+to conflate. Four independent checks:
+
+1. `kernels/projects/a5/gdn_fwd` and `gdn_bwd` **do not exist here**, and
+   `find kernels -name inverse.py -o -name finalize.py -o -name preprocess.py`
+   returns nothing. This repo's units are `gdn_chunk_fwd`, `gdn_chunk_fwd_bf16`,
+   `gdn_chunk_bwd`, `gdn_chunk_bwd_bf16`, `gdn_fused_recurrent`.
+2. Grepping `matmul`, `set_hf32`, `Position.L0C` and `mode='mix'` across the
+   `kernels/` directories of all four GDN units on the public path returns **zero
+   hits**. (`gdn_chunk_bwd/ref/stages.py` does contain `torch.matmul`, but that is
+   the CPU reference — its own docstring says "using CPU matmul for the primal
+   contraction" — not a device cube site.)
+3. Nothing in `ascend_fla/ops/gdn_chunk_fwd.py`, `gdn_chunk_bwd.py`,
+   `gdn_fused_recurrent.py` or `ascend_fla/runtime/` references `a5.gdn_fwd`,
+   `a5.gdn_bwd` or `ASCRIPTOR_WORKSPACE`. `gdn_chunk_fwd/README.md:40` states the
+   upstream unit "is only an ABI comparison source", and
+   `gdn_chunk_bwd/README.md:17` states that no "cube rounding" is used.
+4. **The decisive one is on hardware, not from a grep**: `aic_mac_ratio = 0.000`
+   and `cube_utilization ≤ 0.004 %` across all nine device kernels (five forward
+   stages, three backward launches, decode), at every block_dim and both shapes.
+   A cube matmul that executed would move that counter.
+
+So **no `set_hf32` guard is needed anywhere in the GDN-P1 write set** — the
+PK-07 template (`12a6f66c`) has nothing to attach to, because there is no FP32
+cube matmul on the GDN path to guard. No upstream file was touched. Every run in
+these three reports still pins `allow_hf32=False` and records it, so the numbers
+do not depend on what a co-tenant left in the rounding-mode bit either way.
+
 **`prepare` is the one data-movement-bound stage** (`mte2` 0.520 + `mte3` 0.549,
 which overlap) and it is 1.74 % of the total. It is not a target.
 
