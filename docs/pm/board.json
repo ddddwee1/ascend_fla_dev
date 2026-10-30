@@ -6439,7 +6439,7 @@
       "wave": "W0",
       "soc": "a5",
       "priority": "P0",
-      "status": "assigned",
+      "status": "done",
       "model": [],
       "kernel": [],
       "dtype": [
@@ -6473,9 +6473,28 @@
         {
           "at": "2026-10-30T12:00",
           "summary": "PM 直接调度派发（用户指示，不等外部 APPLY）。"
+        },
+        {
+          "at": "2026-10-30T14:30",
+          "summary": "诊断完成，未改任何 kernel 源码（worktree git status clean）。见 result。"
         }
       ],
-      "result": null
+      "result": {
+        "kind": "diagnostic",
+        "commits": [
+          "e5c4b425c0c65ee3a6ce8ff7f03bae433e9aec6f"
+        ],
+        "pr": null,
+        "merged_commit": null,
+        "merged_at": null,
+        "narrative": "三个单元结论不同，且 gaps.json 的 a5-fp32-cube-matmul-inherits-hf32 条目在三点上是错的（已由 PM 核实并修正，见本仓同批提交）：① kda_fwd_stable/kernels/wy.py 操作数是 BF16，不暴露（原条目误列）；② kda_bwd_stable、kda_scan_diag 静态审计零处 FP32 cube matmul，不是『全部暴露』；③ 真正占主导的暴露点未被原条目提及：上游（ascriptor 固定修订，本仓不改）kda_fwd/kernels/triangular_inverse.py 11 处 FP32 cube matmul，是 kda_fwd_stable 链路里数量最大的暴露面。kda_fwd_stable 自己的 intra.py 另有 2 处（L246/L247）。\n\n真机 A/B（host 238 卡1，CANN 9.1.0，lib 90cfcdc/kernels b3b3f9c）：kda_fwd_stable：暴露属实，但 ops.json 记录的两个真实形状精度数字（C=2 relL2 3.185e-03、C=4 3.248e-03）用『数字匹配』方式核实为 hf32=OFF 状态测得（若 ON 则应记为 3.195e-03/3.266e-03，4位有效数字可辨）——这两个记录点未被污染。C=8/C=16、GQA、长上下文、layer 级数字，以及 bd1-vs-bd4 逐位行，未重测，仍是未知。kda_bwd_stable：自身 5 个 cube kernel 的 6 个梯度在 hf32 强制 ON/OFF 下逐位相同（SHA256 相同）——自身 kernel 结构性零风险；但其输入来自 kda_fwd_stable 的检查点，链路层面不是零风险（一个额外 build 显示前向强制 ON、后向保持真实配置时六个梯度均有 0.005%~0.08% 的扰动，远小于预算余量，最紧的 dq 预算余量 4.4%）。kda_scan_diag：静态零处 FP32 cube matmul；同进程内 hf32 强制 ON/OFF 与不改动的production scan_fused 三者输出哈希完全一致——结构性零风险，A5K-03 的可复现性结论不受影响。\n\n占用回溯：A5K-03/A5K-01 的 evidence 文件记了『共享卡+本仓咨询锁』但不记『这块核前一个租户设的是什么』（HF32 状态本身不可观测、没人在记）；A5K-02 的 public_validation.json完全没有占用字段，只能从 board 报告文本里找到间接佐证。两个单元真正的『源头』验收会话（2026-09-11，产生 ops.json 现在的数字）无法回溯——commit message 没留卡号/占用信息，如实记为『无法回溯』，不是猜测填空。\n\n静态审计方法论note：exposure 判定必须解析操作数 dtype，不能 grep `matmul(`——原 gap 条目的三处错误正是 dtype-blind 审计会犯的错误。\n\n是否修复（kernels/projects/a5/kda_fwd_stable/kernels/intra.py 补 set_hf32(False)，以及 triangular_inverse.py 的上游暴露要不要走 §3 派生单元路线）——诊断任务范围内明确不实现，留给用户决定；写集若要扩大到 kernels/projects/a5/kda_fwd_stable/** 需按D-PM-33 先问用户。",
+        "known_gaps_not_blocking": [
+          "C=8/C=16/GQA/长上下文/layer 级历史数字未重测，污染状态仍未知（仅 C=2/C=4 核实为未污染）",
+          "triangular_inverse.py 是上游只读代码，不是本仓一行能修的（需派生单元或 ascriptor 侧流程）",
+          "A5K-01/A5K-02/A5K-03 的『源头』验收会话占用状态无法回溯（commit 未留记录）",
+          "本次诊断额外发现 GDN/DeltaNet 侧（gdn_fwd/inverse.py 10 处、delta_rule_fwd/inverse.py 10 处、gdn_bwd/finalize.py 3 处、gdn_fwd/preprocess.py 1 处）同样暴露，仅静态审计未测，供 GDN-P1 参考"
+        ]
+      }
     },
     {
       "id": "KDA-P1",
