@@ -248,7 +248,7 @@ P0 3 项 · P1 24 项 · P2 16 项 · 已解决 13 项 · 共 56 项
 
 | 缺口 | 级别 | 要在 kernel 侧改什么 |
 |---|---|---|
-| `a5-fp32-cube-matmul-inherits-hf32` | P0 | 本仓自建派生单元需要补 `set_hf32(False)`：`kernels/projects/a5/kda_fwd_stable/kernels/{intra.py,wy.py}`、`kernels/projects/a5/kda_bwd_stable/**`、`kernels/projects/a5/kda_scan_diag/**`（具体文件以 PK-07 round2 commit `12a6f66c`『pin the cube's HF32 bit off, and say why』为参照模板）。`pkda_chunk_fwd` 的 output 阶段已经修（PK-07 round2，待合入）。 |
+| `a5-fp32-cube-matmul-inherits-hf32` | P0 | 本仓自建派生单元需要补 `set_hf32(False)` 的，目前只有 `kernels/projects/a5/kda_fwd_stable/kernels/intra.py`（L246/L247，HF-01 实测核实，`wy.py` 不需要——BF16操作数）。`pkda_chunk_fwd` 的 output 阶段已经修（PK-07 round2 commit `12a6f66c`，待合入）。`kda_fwd_stable` 真正占主导的暴露点在上游只读 `kda_fwd/kernels/triangular_inverse.py`（11 处），不能靠补一行解决，需要派生单元或 ascriptor 侧流程——留给用户决定是否现在做（见 proposed_action ②④）。`kda_bwd_stable`、`kda_scan_diag` 不需要任何改动（HF-01 实测核实零 FP32 cube matmul）。GDN/DeltaNet 侧的 38 处 FP32 cube位点（见 impact）尚未测，GDN-P1 任务范围内可以参考这份静态清单。 |
 | `c1-multihead-o-corrupt` | P0 | **根因已定位**（A2-04 / PR #60，joshjms 诊断，PM 独立复算）：`kda_fwd/kernels/recurrent.py` 的 `Aqk` L1 交接是**两信用配固定槽** —— `aqk_l1_valid = DEvent(Pipe.MTE1, Pipe.MTE2, preset=True)`（:130）给两个信用，而槽是 `aqk_slot = Var(c_idx % 2)`（:243 写、:373 读），按 chunk 取。一个头最后一个 chunk 的槽是 `(C-1)%2`，下一个头第一个 chunk 的槽是 `0` —— **当且仅当 C 为奇数时两者相撞**，写方领先一周期踩进还没被读走的槽（:245 的 MTE2 写 与 :398 的 MTE1 读无序）。每核最后一个头后面没有写，所以恰好是对的。**不是漏了某次 DEvent/Mutex 调用**，是信用数与实际轮转的槽数不匹配 —— 与 ascriptor `library/docs/defects/M10-076-mutex-credits-and-handoff-slots.md` 同型（那一条在 autosync 里已修成『depth <= j 才算有序』，但本 kernel 是手写同步，不过 autosync）。**修法**：让槽按每核周期序号轮转 `((pair_idx - pair_begin) * C + c_idx) % 2`，两信用配两槽；或把两个 DEvent 降成 SEvent（少一周期 run-ahead）。 **补充（来自 A2-04 的 delta）**：`l1_Aqk` 是两槽 `DBuff`（:146）。备选修法是把 `aqk_l1_valid`/`aqk_l1_ready` 改 `SEvent`（去掉一拍 run-ahead，**性能未测**）。落地按 AGENTS.md §3 走本仓派生单元、进 kernel 批次。A5 上的硬判据：失效表 12 格全对、偶数 C 与未修版逐位相同、bd=1 与 bd=4 逐位相同。 **2026-09-19**：本仓派生单元已落地并接入公开调度（见 proposed_action）；上游 ascriptor 的 `kda_fwd/kernels/recurrent.py` 源码仍未改，`requires_kernel_change` 因此保持 true（指上游）。 |
 | `a2-kda-bwd-gcumsum-bf16-precision` | P1 | 只改本仓 A2 派生单元（`kernels/projects/a2/kda_bwd_stable/**`），不碰 A5 源码、不碰上游 ascriptor：新建派生单元（不是原地改现有冻结单元），四个消费者 `unit.py:112/121/135/149/172` 的 `gc2` 输入类型从 BF16 改 FP32（GM/UB 声明 + 载入/转换），`scan_fused`/`inverse_epilogue`/`finalize_pre`/`finalize_post` 四个 kernel 跟着改，其余五个 kernel 与其余 8 项缓存不动。需要新 UB/ABI/同步 preflight、全部 vendor 预编译、完整真机验收。属 kernel 批次候选，要用户批准（同 `a2-splitk-fp32-cube`/`kda-bwd-scan-dh0-nondeterministic` 的先例）。 |
 | `a2-splitk-fp32-cube` | P1 | 只改 A2 派生单元（A2-03 前向 + decode 与 A2-09 反向的 `kernels/projects/a2/**`），A5 源码不动：`kda_fwd/kernels/triangular_inverse.py:273/279/284-285`、`gdn_fwd/kernels/inverse.py:306/312/317-318`、`gdn_bwd/kernels/finalize.py:205/217/226/235/244` 的 FP32 `is_init=False` matmul 之前补 `barrier(Pipe.M)`；`kda_fwd_stable/kernels/recurrent.py:401`、`gdn_bwd/kernels/wu.py:206` 的 BF16 累加链同样补（不分 dtype，A2-01 的 W4）。以 a2 lint 0 trap 作闸，验证按 `benchmarks/a2/README.md` §8 的 W2。属 kernel 批次 A2-K1，要用户批准。 |
@@ -345,11 +345,28 @@ PM 在权威 workspace 上独立跑了 `benchmarks/diag_c1_multihead.py`，**上
 ② 错误均匀分布在全部 32768 行输出上，逐元素相对误差中位数 2.9e-04 ≈ 2^-11.75 → 是降精度算术，不是竞态。
 ③ **决定性复现**：显式 `set_hf32(True)` 的 build，复现那次失败运行的 `o` SHA256 （`ba6c99c5...`）与其 max_abs 误差 `2.1152198314666748e-05`，6/6 次全中；显式 `set_hf32(False)` 的 build，给出正确 SHA256（`0a7745cf...`），30/30 次全对。
 **根因**：FP32 cube `matmul` 的精度服从 AI core 的 HF32 舍入位，kernel 发射不会重置这个位，不显式设置就会继承**这块核上一次跑的随便什么进程**留下的状态——在共享卡（本仓库所有真机验证都在共享卡上做）上，这意味着别的租户的进程可能悄悄把你的 FP32 精度降到 HF32，没有报错、没有 NaN、数值量级完全正常，只有相对 L2 变大。
-- **影响** **这是仓库级暴露，不是 PKDA 一个单元的事。** 扫过 `kernels/projects/` 的 FP32 cube matmul 调用点，没有一处显式设置 HF32 位：`kda_fwd_stable/kernels/{intra,wy}.py`、`kda_bwd_stable`、`kda_scan_diag` 全部暴露，而这些单元现在都在 docs/matrix/ops.json 里挂着真机实测的 FP32 精度数字（例如 kda_fwd_stable 的 board/native 验收）。这些数字本身不一定是错的——是否真的踩到取决于同一块核之前跑了什么——但**这意味着任何一次历史真机验收，如果恰好赶上共享卡被别的租户设成 HF32，测出来的精度数字会比真实值差，而报告上完全看不出来**。反过来，已经通过预算的历史记录也不能倒推'HF32 位肯定是对的'，因为预算本身留了裕度，HF32 的降级幅度（约 2^-11.75 相对误差量级）未必每次都会把原本通过的 case 顶出预算——这正是'静默'的意思：会不会触发全凭当时共享卡的状态，复现与否都不能证明这个缺口不存在。
-- **建议** ① **立即**：PK-07 的 PKDA output cube port 已经在自己的改动范围里加了 `set_hf32(False)`（`cube_scope()` 内一次性设置），真机确认设置前后 `o` SHA 相同（原来就是 off，这次只是不再依赖'原来是 off'这个未声明的前提）、各 shape 耗时差在 0.1% 内——修复本身零代价。
-② **要做（本仓侧，不改 ascriptor 仓，按 AGENTS.md §3）**：给 `kda_fwd_stable/kernels/{intra,wy}.py`、`kda_bwd_stable`、`kda_scan_diag` 里每一处 FP32 cube matmul 补 `set_hf32(False)`，和 PKDA 这次的改法一样——这些都是本仓自建的派生单元，不受 §3『不改 ascriptor 仓』的限制。
-③ **要做（静态守卫）**：加一条和 `tests/test_a2_accumulate_barriers.py`（A2 split-K barrier 守卫）同类的静态检查——凡是 A5 kernel 里对 FP32 操作数的 `matmul` 调用，同一 `cube_scope()` 内必须先出现 `set_hf32(False)`，否则测试失败。这样下一个新写的 FP32 cube matmul 不会重新踩这个坑。
-④ **留给用户决定**：历史上已经'通过'的 A5 FP32 真机精度记录（kda_fwd_stable 等）要不要重新跑一遍来确认当时测到的数字没有被 HF32 污染——这些任务当年都已经 done，按仓库纪律『已 done 的纯主机任务不追溯』，但这次不是主机任务，是真机数字，而且污染机制是这次才发现的，是否追溯、追溯到哪些任务，PM 不自行决定。
+
+**2026-10-30 更正（HF-01，诊断任务，真机复测，不是推断）。** 原文下面的 impact/proposed_action/kernel_change_note 三处写错了暴露面，已重写——保留这段是因为『那个判断也要写下来，否则下一个人还得重查一遍』（AGENTS.md §6 的纪律）：原条目靠grep `matmul(` 判暴露面，没解析操作数 dtype，于是：① 把 BF16 的 `wy.py` 错判成暴露；② 把零 FP32-cube-matmul 的 `kda_bwd_stable`/`kda_scan_diag` 错判成『全部暴露』；③ 漏掉了真正占主导的暴露点——上游（ascriptor 固定修订 b3b3f9c，本仓不改）`kda_fwd/kernels/triangular_inverse.py` 11 处 FP32 cube matmul。
+- **影响** **2026-10-30 更正后的暴露面（HF-01 实测，按操作数 dtype 逐处核实，不是 grep）：**
+
+| 单元 | cube 位点 | FP32 暴露 |
+|---|---|---|
+| `kda_fwd_stable` 链 | 19 | **13** —— `intra.py` 2 处（L246/L247）+ 上游`kda_fwd/kernels/triangular_inverse.py` 11 处（本仓不改的只读代码） |
+| `kda_bwd_stable` 链（9 kernel） | 14 | **0** |
+| `kda_scan_diag`（6 kernel） | 6 | **0** |
+
+`wy.py` 的操作数（`l1_abeta`/`l1_kexp`/`l1_v`）是 BF16，不暴露。
+
+**真机 A/B 结果（host 238 卡1，CANN 9.1.0，lib 90cfcdc/kernels b3b3f9c，HF-01）：**
+`kda_fwd_stable` 暴露属实、历史数字有被污染的可能，但 `docs/matrix/ops.json` 已记录的两个真实形状点（C=2 relL2 3.185e-03、C=4 3.248e-03）用数字匹配方式核实为 hf32=OFF 测得（若 ON 本应记为 3.195e-03/3.266e-03）——**这两点未被污染**；C=8/C=16、GQA、长上下文、layer 级数字、bd1-vs-bd4 逐位行仍未重测，污染状态未知。`kda_bwd_stable` 自身 5 个 cubekernel 的 6 个梯度在 hf32 强制 ON/OFF 下逐位相同（SHA256 相同）——自身结构性零风险；但其输入来自 `kda_fwd_stable` 的检查点，链路层面不是零风险（前向被污染时六个梯度各有0.005%~0.08% 扰动，远小于预算余量）。`kda_scan_diag` 静态零处 FP32 cube matmul，同进程内 hf32 强制 ON/OFF 与未改动的 production `scan_fused` 三者输出哈希完全一致——结构性零风险，A5K-03 的可复现性结论不受影响。
+
+两个单元『源头』验收会话（2026-09-11，产生 ops.json 现在这些数字的那次）的占用状态无法回溯（commit message 未留卡号/占用记录），如实记为『无法回溯』。
+
+**本次诊断顺带发现的仓库级暴露**（仅静态审计，未实测）：`gdn_fwd/kernels/inverse.py` 10 处、`delta_rule_fwd/kernels/inverse.py` 10 处、`gdn_bwd/kernels/finalize.py` 3 处、`gdn_fwd/kernels/preprocess.py` 1 处——repo 内 FP32 cube 位点共 38 处，几乎全在上游。
+- **建议** ① **已做**：PK-07 的 PKDA output cube port 已经在自己的改动范围里加了 `set_hf32(False)`（PR #148，尚未合入），零代价。
+② **要做但不是一行能改**：`kda_fwd_stable` 真正占主导的暴露点（`triangular_inverse.py` 11 处）是上游 ascriptor 固定修订的只读代码——按 AGENTS.md §3『本仓不改 ascriptor 仓』，需要建本仓自己的派生单元（kernels/projects/a5/ 下按 unit 协议）或走 ascriptor 侧流程，不是简单补一行 `set_hf32`。`intra.py` 的 2 处是本仓自建派生单元，可以直接补。
+③ **要做（静态守卫）**：和 `tests/test_a2_accumulate_barriers.py` 同类的静态检查——**必须解析操作数 dtype 来判断是否暴露，不能靠 grep `matmul(`**（HF-01 的三处更正正是 dtype-blind 审计会犯的错误，守卫如果也用这个判法会重复同样的错）。
+④ **留给用户决定（HF-01 已把诊断做完，结论见上）**：是否现在就给 `intra.py` 补`set_hf32(False)`、要不要为 `triangular_inverse.py` 的暴露建派生单元、`kda_fwd_stable` 未重测的形状（C=8/C=16/GQA/长上下文/layer 级）要不要补测——这些都会扩大写集（`kernels/projects/a5/kda_fwd_stable/**`），按 D-PM-33 先问用户。
 
 ### P1
 
