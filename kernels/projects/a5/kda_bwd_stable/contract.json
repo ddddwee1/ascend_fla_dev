@@ -288,6 +288,18 @@
       },
       "note": "ascriptor check 报的 IR op 数，**不是周期数**，只用来界定改动规模。多出的 4 个是 2 个 RegList lane 的乘法，且在 64 行循环外，每 chunk 只算一次。"
     },
+    "vector_partition_fix": {
+      "task": "KDA-P1",
+      "applies_to": ["finalize_pre_stable_kernel", "finalize_post_stable_kernel"],
+      "change": "Partition the item space over GetVecNum()/GetVecIdx() instead of GetCubeNum()/GetCubeIdx() plus an `if GetSubBlockIdx() == 0` guard. Neither kernel issues a matmul (measured cube_utilization 0.066% / 0.035%), so the old form left half the vector subblocks idle. A worker still owns a whole item, so the duplicate-GM-write hazard the guard was added for cannot return: finalize_pre's item is (b, hv, c) with six disjoint contiguous BHCLD outputs of >=8 KiB, and finalize_post's item is (b, c) with ALL of that chunk's HV heads and all 64 tokens on one worker, which is what keeps a 32-byte GM write granule from spanning two workers in the token-major dbeta_out/dg_out. The per-chunk reverse cumsum in finalize_post_vf is untouched. Arithmetic, buffers, read pitches and per-item store order are unchanged.",
+      "static_cost": {
+        "finalize_pre": {"before_ops": 251, "after_ops": 248},
+        "finalize_post": {"before_ops": 372, "after_ops": 369},
+        "note": "The three removed ops per kernel are the dropped GetSubBlockIdx branch. ascriptor check: 0 error / 0 warning before and after."
+      },
+      "qualification": "A5/950PR, CANN 9.1.0 with the ascend950 opp package, library pin 90cfcdc, one build per process, one card under the shared advisory lock. models.json kimi_linear_layer (B1/T1024/H32/HV32) at block_dim 4, Level1 + PipeUtilization: finalize_pre 241.89 -> 124.96/130.29 us (1.90x), finalize_post 470.08 -> 295.44/310.83 us (1.55x), nine-kernel backward device sum 2413.70 -> 2128.89/2143.18 us (1.13x). All six gradients bitwise identical to the base build (SHA-256 dq c923cd09a388f146..., dk 886ba1ae1566f112...) with identical relative L2 against this unit's ref.oracle; existing 0.05 / dk 0.15 / dg 0.25 budgets unchanged. Emitted CCE compared file by file across all 48 built kernels: 46 byte-identical, only these two differ.",
+      "not_qualified": "This does NOT reach the 85% pipe-utilization acceptance bar. Pipe utilization is per-core busy time over the kernel window and doubling the worker count halves both, so finalize_pre stays at aiv_vec 0.523 and finalize_post's top pipe moves to aiv_mte2 0.536 -- about 31-33 points short. The remaining per-core bound is that both kernels use single-slot UB tiles, so a GM load and the VF that consumes it do not overlap (occupancy sums 0.976 and 0.987). Double buffering does not fit the 256 KiB UB at the current 64-row tile sizes. See docs/research/kda_perf_bwd.md."
+    },
     "inverse_mm_resource_fix": {
       "task": "A5K-02 / D-PM-24",
       "source": "a5.kda_bwd/kernels/inverse_mm.py",
