@@ -305,7 +305,42 @@ byte-identical. Public output SHA-256 equals the baseline's at both shapes
 
 #### Both together (candC)
 
-<!-- MEASURED_KERNEL_TABLE -->
+| stage | base, T1024 bd1 | candC, T1024 bd1 | ratio | base, T4096 bd1 | candC, T4096 bd1 | ratio |
+|---|---:|---:|---:|---:|---:|---:|
+| `gdn_bf01_scores`      | 13849.094 |  7505.074 | 1.845x | 55337.894 | 29950.012 | 1.848x |
+| `gdn_bf01_wy`          | 11333.607 |  3291.336 | 3.443x | 45300.040 | 13126.103 | 3.451x |
+| `gdn_bf01_scan`        |  7949.083 |  7949.979 | 0.9999x | 31800.207 | 31823.208 | 0.9993x |
+| `gdn_bf01_output_f32`  |  5322.317 |  5322.779 | 0.9999x | 21222.263 | 21241.638 | 0.9991x |
+| `gdn_bf01_prepare_f32` |   675.027 |   683.072 | 0.9882x |  2719.709 |  2722.282 | 0.9991x |
+| **kernel total**       | **39136.644** | **24757.934** | **1.581x** | **156379.760** | **98865.456** | **1.582x** |
+
+**The two changes compose exactly.** Predicted from the independent candB and
+candD measurements: 39136.644 − 6315.703 − 8043.100 = 24777.8 us, i.e. 1.579x.
+Measured: 24757.934 us, 1.581x — 0.08 % from the prediction, so neither change
+steals the other's gain. Public output SHA-256 still equals the baseline's at
+both shapes, and worst relative L2 is unchanged (4.444e-07 / 4.503e-07).
+
+#### Summary of the forward headroom
+
+| configuration | T1024 device us | vs shipped `bd2` | T4096 device us | vs shipped `bd2` |
+|---|---:|---:|---:|---:|
+| shipped ceiling: base, bd2 | 19597.633 | 1.00x | 78247.037 | 1.00x |
+| change A only, bd16 | 2480.180 | 7.90x | 10174.896 | 7.69x |
+| change A only, bd28 | 1820.993 | 10.77x | — | — |
+| change A + scores, bd16 | 2085.500 | 9.40x | — | — |
+| change A + wy, bd16 | 1975.800 | 9.92x | — | — |
+| **change A + both, bd16** | **1577.300** | **12.42x** | — | — |
+
+Change A alone is committed. The two kernel changes are measured but not
+committed (§0 / §3).
+
+One consequence worth recording for whoever picks this up: once both kernel
+changes are in, **`gdn_bf01_scan` becomes the largest stage** (32.44 % at
+T=1024/bd16, 511.624 us) and it is also the one launch that saturates at bd16,
+because it partitions `B*HV = 32`. So the next forward bottleneck is `scan`, and
+it is a *different* kind of problem from `scores`/`wy`: its inner loops are a
+genuine sequential recurrence over chunks, not a triangle with a removable
+guard, and its parallelism ceiling is `B*HV` rather than `B*N*HV`.
 
 ## 4. Verdict against the 85 % line
 
@@ -327,7 +362,173 @@ byte-identical. Public output SHA-256 equals the baseline's at both shapes
 
 ## 5. Patches as measured (not committed)
 
-<!-- PATCH_TEXT -->
+Both edits apply to `kernels/projects/a5/gdn_chunk_fwd_bf16/kernels/stages.py`
+and require `BLK = 8` next to the existing `SCALE` constant. The call sites in
+`gdn_bf01_scores` and `gdn_bf01_wy` drop the now-unused `count` argument (and the
+`count = Var(Min(C, T - cc * C))` line where it has no other consumer).
+
+#### `scores_vf` as measured (candB / candC)
+
+```python
+@vf()
+def scores_vf(q: Tensor, k: Tensor, g: Tensor, b: Tensor, lower: Tensor,
+              score: Tensor):
+    qr = RegList(DT.float, 2)
+    kr = RegList(DT.float, 2)
+    gi = RegList(DT.float, 2)
+    gj = RegList(DT.float, 2)
+    br = RegList(DT.float, 2)
+    tmp = RegList(DT.float, 2)
+    dot = Reg(DT.float)
+    z = Reg(DT.float)
+    z <<= 0.0
+    for i in range(C):
+        lower[i:i+1, 0:C] <<= z
+        score[i:i+1, 0:C] <<= z
+    # The causal triangle is walked as BLK x BLK blocks instead of as a row loop
+    # bounded by the enclosing induction variable. A sub-diagonal block is
+    # entirely causal (its largest column ibase-1 is below its smallest row
+    # ibase), so it carries no guard and stores `lower` unconditionally, which is
+    # what the flat `j < i` guard evaluated to there. Only the diagonal block
+    # keeps guards, and there they compare the two VF induction variables, never
+    # a dynamic bound derived from the enclosing one. The row count is the full
+    # C: the public entry rejects T that is not a multiple of 64, so the former
+    # `count` was always exactly C. Each (i, j) evaluates the same expression and
+    # stores to its own address with no accumulation across j, so every stored
+    # value is bitwise unchanged and the store order is irrelevant.
+    for ibase in unroll(0, C, BLK):
+        for ii in range(BLK):
+            qr <<= q[ibase+ii:ibase+ii+1, 0:D]
+            gi <<= g[ibase+ii:ibase+ii+1, 0:D]
+            br <<= b[ibase+ii:ibase+ii+1, 0:D]
+            for jbase in unroll(0, ibase, BLK):
+                for jj in range(BLK):
+                    kr <<= k[jbase+jj:jbase+jj+1, 0:D]
+                    gj <<= g[jbase+jj:jbase+jj+1, 0:D]
+                    gj <<= gi - gj
+                    gj <<= gj.exp()
+                    kr <<= kr * gj
+                    tmp <<= qr * kr
+                    dot <<= tmp.cadd()
+                    score[ibase+ii:ibase+ii+1, jbase+jj:jbase+jj+1] <<= dot.single_value()
+                    tmp <<= br * kr
+                    dot <<= tmp.cadd()
+                    lower[ibase+ii:ibase+ii+1, jbase+jj:jbase+jj+1] <<= dot.single_value()
+            for jj in range(BLK):
+                if jj <= ii:
+                    kr <<= k[ibase+jj:ibase+jj+1, 0:D]
+                    gj <<= g[ibase+jj:ibase+jj+1, 0:D]
+                    gj <<= gi - gj
+                    gj <<= gj.exp()
+                    kr <<= kr * gj
+                    tmp <<= qr * kr
+                    dot <<= tmp.cadd()
+                    score[ibase+ii:ibase+ii+1, ibase+jj:ibase+jj+1] <<= dot.single_value()
+                    if jj < ii:
+                        tmp <<= br * kr
+                        dot <<= tmp.cadd()
+                        lower[ibase+ii:ibase+ii+1, ibase+jj:ibase+jj+1] <<= dot.single_value()
+    vf_barrier(VfPipe.STORE, VfPipe.LOAD)
+```
+
+#### `wy_vf` as measured (candD / candC)
+
+```python
+@vf()
+def wy_vf(lower: Tensor, g: Tensor, b: Tensor, v: Tensor,
+          u: Tensor, wy: Tensor):
+    ur = RegList(DT.float, 2)
+    wr = RegList(DT.float, 2)
+    un = RegList(DT.float, 2)
+    wn = RegList(DT.float, 2)
+    decay = RegList(DT.float, 2)
+    prev = RegList(DT.float, 2)
+    tmp = RegList(DT.float, 2)
+    weight = Reg(DT.float)
+    next_weight = Reg(DT.float)
+    zero = RegList(DT.float, 2)
+    zero <<= 0.0
+    for i in range(C):
+        u[i:i+1, 0:D] <<= zero
+        wy[i:i+1, 0:D] <<= zero
+    vf_barrier(VfPipe.STORE, VfPipe.LOAD)
+    # Two rows share every earlier U/W load. Even i keeps i+1 inside C.
+    # The row count is the full C: the public entry rejects T that is not a
+    # multiple of 64, so the former `count` was always exactly C.
+    #
+    # CANN 9.2 / 950PR native control: a VF loop bounded directly by the
+    # enclosing VF induction variable omitted the last contribution, and a
+    # constant trip count with an explicit guard was the scoped workaround.
+    # Blocking the triangle keeps EVERY trip count constant, so that property
+    # is preserved - no dependent bound is reintroduced - while the guard is
+    # removed from the sub-diagonal blocks, where `j < i` is unconditionally
+    # true because the block's largest column ibase-1 is below its smallest row
+    # ibase. Only the diagonal block keeps a guard, comparing the two VF
+    # induction variables. The j order per row pair is unchanged (ascending
+    # 0..i-1 across the earlier blocks, then the diagonal block) and
+    # ur/un/wr/wn accumulate in that same order, so every stored value is
+    # bitwise unchanged. Executed inner iterations fall from 32*64 = 2048, all
+    # guarded, to 896 unguarded plus 256 guarded, with the same 992 doing work.
+    for ibase in unroll(0, C, BLK):
+        for ii in range(0, BLK, 2):
+            ur <<= v[ibase+ii:ibase+ii+1, 0:D]
+            wr <<= b[ibase+ii:ibase+ii+1, 0:D]
+            decay <<= g[ibase+ii:ibase+ii+1, 0:D]
+            decay <<= decay.exp()
+            wr <<= wr * decay
+            un <<= v[ibase+ii+1:ibase+ii+2, 0:D]
+            wn <<= b[ibase+ii+1:ibase+ii+2, 0:D]
+            decay <<= g[ibase+ii+1:ibase+ii+2, 0:D]
+            decay <<= decay.exp()
+            wn <<= wn * decay
+            for jbase in unroll(0, ibase, BLK):
+                for jj in range(BLK):
+                    weight <<= lower[ibase+ii:ibase+ii+1, jbase+jj:jbase+jj+1].single()
+                    next_weight <<= lower[ibase+ii+1:ibase+ii+2, jbase+jj:jbase+jj+1].single()
+                    prev <<= u[jbase+jj:jbase+jj+1, 0:D]
+                    tmp <<= prev * weight
+                    ur <<= ur - tmp
+                    tmp <<= prev * next_weight
+                    un <<= un - tmp
+                    prev <<= wy[jbase+jj:jbase+jj+1, 0:D]
+                    tmp <<= prev * weight
+                    wr <<= wr - tmp
+                    tmp <<= prev * next_weight
+                    wn <<= wn - tmp
+            for jj in range(BLK):
+                if jj < ii:
+                    weight <<= lower[ibase+ii:ibase+ii+1, ibase+jj:ibase+jj+1].single()
+                    next_weight <<= lower[ibase+ii+1:ibase+ii+2, ibase+jj:ibase+jj+1].single()
+                    prev <<= u[ibase+jj:ibase+jj+1, 0:D]
+                    tmp <<= prev * weight
+                    ur <<= ur - tmp
+                    tmp <<= prev * next_weight
+                    un <<= un - tmp
+                    prev <<= wy[ibase+jj:ibase+jj+1, 0:D]
+                    tmp <<= prev * weight
+                    wr <<= wr - tmp
+                    tmp <<= prev * next_weight
+                    wn <<= wn - tmp
+            # The last contribution of row i+1 uses completed FP32 row i.
+            # All per-row products/subtractions retain their original order.
+            next_weight <<= lower[ibase+ii+1:ibase+ii+2, ibase+ii:ibase+ii+1].single()
+            tmp <<= ur * next_weight
+            un <<= un - tmp
+            tmp <<= wr * next_weight
+            wn <<= wn - tmp
+            u[ibase+ii:ibase+ii+1, 0:D] <<= ur
+            wy[ibase+ii:ibase+ii+1, 0:D] <<= wr
+            u[ibase+ii+1:ibase+ii+2, 0:D] <<= un
+            wy[ibase+ii+1:ibase+ii+2, 0:D] <<= wn
+            vf_barrier(VfPipe.STORE, VfPipe.LOAD)
+```
+
+Both are bitwise neutral by construction and confirmed so on hardware: every
+`(i, j)` evaluates the same expression into its own destination address, `wy`'s
+ascending `j` accumulation order into `ur`/`un`/`wr`/`wn` is preserved, and the
+row count becomes the full `C` only because the public entry already rejects any
+`T` that is not a multiple of 64, which makes the former `count` identically 64.
+
 
 ## 6. Reproduction
 
