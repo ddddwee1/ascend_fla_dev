@@ -248,6 +248,42 @@ def test_independent_gate_parameter_dtypes(preparation_abi, types, selected):
     assert preparation_abi.count('gate_backward') == 1
 
 
+def _prep_runtime_module():
+    root = Path(__file__).resolve().parents[1] / 'kernels/projects/a5/kda_prep'
+    spec = importlib.util.spec_from_file_location('bf09p1_prep_runtime', root / 'runtime.py')
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+@pytest.mark.parametrize('namespace', ['chunk', 'decode'])
+def test_prep_block_dim_ceiling_tracks_the_platform_capability(namespace):
+    """``kda_prep`` keeps its OWN copy of the block_dim ceiling.
+
+    BF-09-P1 measured (A5 real hardware, card 2 serial, real shape
+    B1/T4096/HV32) that the prep backward chain scales essentially linearly
+    with ``block_dim`` all the way to 28 — 56 of 56 physical vector cores —
+    and that every ``block_dim`` in 1..28 returns BITWISE IDENTICAL gradients.
+    The chunk ceiling of 4 is therefore not a limit of these kernels; it is
+    inherited from the upstream ``kda_fwd``/``kda_bwd`` contract that governs
+    *different* kernels (``gaps.json`` ``block-dim-ceiling``), and the decode
+    namespace of this very unit already runs the same factories at 28.
+
+    Nothing locked this duplicated literal to ``platform.py`` before, so a
+    future task could lift the ops-layer ceiling and leave the prep unit
+    silently pinned (or vice versa). Pin the two together so whoever lifts one
+    is pointed straight at the other.
+    """
+    from ascend_fla import platform
+
+    runtime = _prep_runtime_module()
+    assert tuple(runtime._BLOCK_DIMS[namespace]) == platform.supported_block_dim('a5', namespace), (
+        f"kda_prep/runtime.py _BLOCK_DIMS[{namespace!r}] = "
+        f"{tuple(runtime._BLOCK_DIMS[namespace])} but platform.supported_block_dim"
+        f"('a5', {namespace!r}) = {platform.supported_block_dim('a5', namespace)}; "
+        "lift both together or neither (see docs/research/kda_prep_backward_p1.md)")
+
+
 def test_chunk_compile_includes_future_training_vendors(monkeypatch):
     events = []
     runtime = SimpleNamespace(prepare=lambda *a: events.append('prep_forward'),
