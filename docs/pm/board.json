@@ -6709,6 +6709,55 @@
           "贡献者自己的上游仓（gitcode.com/MikejR2904/pypto-gy m）HEAD 已经领先于本仓合入的版本（v2 设计，3.5x faster than v1）——是否跟踪上游，留给用户决定。"
         ]
       }
+    },
+    {
+      "id": "BF-09-P1",
+      "title": "KDA raw flags 训练前处理反向 kernel：按 85% 管线利用率线回头复核",
+      "wave": "W0",
+      "soc": "a5",
+      "priority": "P1",
+      "status": "assigned",
+      "model": [],
+      "kernel": [
+        "kda_prep"
+      ],
+      "dtype": [
+        "bf16",
+        "fp32"
+      ],
+      "deps": [],
+      "write_set": [
+        "kernels/projects/a5/kda_prep/**",
+        "tests/test_kda_prep_backward.py",
+        "docs/research/kda_prep_backward_p1.md"
+      ],
+      "needs": {
+        "npu": true,
+        "ascriptor": true,
+        "fla": true
+      },
+      "spec": "docs/pm/tasks/BF-09-P1.md",
+      "issue": null,
+      "pr": null,
+      "assignee": "limjiunnbin",
+      "assignee_caps": {
+        "agent": "PM 直接调度（用户指示：继续起子 session 做性能优化，不要停下来）",
+        "session": "pm-dispatched-worktree-subagent-bf-09-p1",
+        "socs": "a5"
+      },
+      "branch": "task/BF-09-P1",
+      "timebox_h": 24,
+      "origin": {
+        "kind": "user",
+        "note": "用户直接指示：继续起子 session 做性能优化任务，覆盖已经声称达标但从未按 85% PipeUtilization 线复核过的历史记录（AGENTS.md §6 2026-10-27 用户给出的验收线明确要求覆盖所有 kernel）。BF-09（2026-09-21/22，done）的优化对比基准是墙钟耗时比值，不是 PipeUtilization，ops.json 没有这个单元的记录。"
+      },
+      "reports": [
+        {
+          "at": "2026-10-30T15:50",
+          "summary": "PM 直接调度派发（用户指示，不等外部 APPLY）。BF-09 自己的收尾给出一个有用起点：profiler 条件下界 164.4ms（gate 第一阶段），本任务从这里开始测 PipeUtilization，不从零找瓶颈。写集避开 A2-15 正在改的 ascend_fla/ops/kda/*.py 与 kernels/projects/a2/kda_prep/（不同 SoC 目录，确认无交集）。"
+        }
+      ],
+      "result": null
     }
   ],
   "label_github_login": "ascend-fla-pm-bot",
