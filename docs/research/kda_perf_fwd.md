@@ -240,6 +240,48 @@ SHA-256 判等来验证改动没有改数学）。
 的 host 算术（`D-PM-42` 登记的例外之一，且该文件是 A2-15 的写集，本任务不碰）。
 登记在这里是因为它和 kernel 时间混在同一个 profile 里，不说明就会被误读成 kernel 成本。
 
+## 工具链那一项：`pypto-pro-op-orchestrator` 取到了、读了、没装
+
+验收线要求"开始优化前先装最新 PyPTO-Pro 框架 + 官方插件
+[`pypto-pro-op-orchestrator`](https://gitcode.com/cann/pypto-gym/tree/master/cannbot-skills/plugins-official/pypto-pro-op-orchestrator)"，
+同时说"如果装不上或者发现它对这次任务不是必需的，如实记录下来，不要为了'装了'而硬套"。
+如实记录如下。
+
+`cann/pypto-gym` 从这台机器**可达**（`git ls-remote` 通，HEAD `d2604896`），已 sparse
+clone 到任务工作区并读了 `quickstart.md`、`AGENTS.md`、六个 agent 定义与
+`references/{kernel-core-principles,kernel-perf-pypto-pro-a5,performance-constraints,multi-agent-workflow}.md`。
+**没有安装**，理由是适用面不对，不是装不上：
+
+- 它的 `quickstart.md` 开门第一句就是"本插件用于**原生 PyPTO-Pro 算子**开发、验证、
+  调试与性能优化"，开发内容是"PyPTO-Pro kernel + golden + test"。本任务的三个单元是
+  **ascriptor / CCE** kernel（`from ascriptor.a5 import *`、`@kernel()` / `@vf()`），
+  不是 PyPTO-Pro DSL。
+- 它的门禁 `hooks/pypto-pro-op-lint` 按 PyPTO-Pro 的 API 形状（`make_tile_group`、
+  `pl.set_validshape`、`auto_mutex` 等）做 AST 检查，对 ascriptor 源码没有可判项；
+  装它的 D1–D4 检查会对本任务的文件全部空转。
+- 安装入口是把六个 agent 与 hook 装进 **OpenCode** 宿主（`scripts/install_opencode.py`），
+  那是换 agent 运行环境，不是本会话能在任务范围内完成的事。
+
+**真正拿来用了的是它的方法论参考**，那部分与框架无关：
+`references/kernel-perf-pypto-pro-a5.md` §2 的 `G1`–`G6` 自检清单当作"还有哪里没看"的
+清单走了一遍，本文与 `kda_perf_bwd.md` / `kda_perf_decode.md` 的结论结构就是按它组织的 ——
+`G1` 正确性前置（每次 profile 之前先过预算）、`G3`"`max(pipe_ratio) < 0.8` 时检查同步、
+依赖链与启动/排空"（正是 `wy` / `recurrent` / 两个 finalize / decode T=1 的落点）、
+`G4` 多核均衡（`finalize_post` 在 `B*C=16` 上 8 个 worker 整除，`η_tail = 1.0`，
+所以 1.55× 的缺口不是尾部不均衡）、`M5`/`M6`（估计值要用可复现实测校准；没有证据路径的
+按 `unknown` 计，不当已验证）。
+
+### 读它的时候发现一条与验收线的张力，不自行处置
+
+同一份参考在 `G` 表下面写着：**"这些阈值仅是诊断参考，可随平台、工作负载和计量口径
+调整，不能作为验收或停止调优的依据"**；`G3` 还补了一句 **"高占比本身不证明吞吐最优
+或已经重叠"**。而用户 2026-10-27 给的验收线正是把 `PipeUtilization` ≥85% 当作停止线。
+
+本任务**按用户给的线执行**（用户指示优先），但把这条张力如实记下来，因为它影响怎么读
+上面"已达标"那两格：`gate` 的 `aiv_mte3` 0.957 与 `scores` 的 `aic_mac` 0.981 **满足
+用户给的停止线**；它们**不等于**"这两个 kernel 已到硬件吞吐上限" —— 后者还要 Roofline
+对照（`G6`），本轮没做。要不要把插件那句话纳入验收线的表述，是用户的决定，不是 assignee 的。
+
 ## 复现
 
 ```sh
