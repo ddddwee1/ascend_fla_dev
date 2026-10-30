@@ -11,6 +11,9 @@ import pathlib
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 UNIT = ROOT / "kernels/projects/a5/kda_fused_recurrent"
+#: The unit the PUBLIC decode entry actually compiles and launches. See
+#: ``test_public_decode_path_is_the_unit_this_file_thinks_it_is``.
+NATIVE_UNIT = ROOT / "kernels/projects/a5/kda_fused_recurrent_bf16"
 
 
 def _kernel_source() -> str:
@@ -70,6 +73,36 @@ def test_t_max_matches_between_kernel_and_wrapper():
     # 缓冲行数必须用这个常量，不能再写字面量
     assert "DBuff(DT.float, [16," not in _kernel_source(), \
         "kernel 里还有写死的 16，应当用 T_MAX"
+
+
+def test_public_decode_path_is_the_unit_this_file_thinks_it_is():
+    """公共 decode 入口加载的是 ``kda_fused_recurrent_bf16``，**不是** ``kda_fused_recurrent``。
+
+    KDA-P1 的真机 profile 顺手证实了这件事：`fused_recurrent_kda` 一次调用只产生一个
+    设备 kernel，名字是 ``KdaDecodeFp32Kernel``。读源码对得上 ——
+    ``ops/kda/fused_recurrent.py`` 的 ``_native_kernel()`` 从
+    ``kda_fused_recurrent_bf16/kernels/step.py`` 取 ``kda_decode_{fp32,bf16}_kernel``，
+    而同文件里指向本单元的 ``kda_fused_recurrent_kernel()`` **没有任何调用点**。
+
+    这不是吹毛求疵，它让本文件最上面那条 ``T_MAX`` 守卫**守错了对象**：入口放过的 T
+    由入口的 ``T_MAX`` 决定，而真正按 ``T_MAX`` 开流式缓冲的是 bf16 单元那份 kernel。
+    两者漂移的后果仍然是越界读而不是报错（本文件 docstring 说的那一类），
+    所以这里把入口与**实际被加载的那份** kernel 钉在一起。
+    """
+    entry = (ROOT / "ascend_fla/ops/kda/fused_recurrent.py").read_text(encoding="utf-8")
+    assert "kda_fused_recurrent_bf16/kernels" in entry, (
+        "入口不再从 kda_fused_recurrent_bf16 取 kernel —— 本测试的前提变了，"
+        "请同时更新下面的断言与 docs/research/kda_perf_decode.md"
+    )
+    native_t_max = _module_consts(NATIVE_UNIT / "kernels/step.py").get("T_MAX")
+    assert native_t_max is not None, "被实际加载的 kernel 里找不到 T_MAX"
+    assert native_t_max == _op_consts()["T_MAX"], (
+        f"入口声明 T_MAX={_op_consts()['T_MAX']}，而实际被加载的 "
+        f"kda_fused_recurrent_bf16/kernels/step.py 是 {native_t_max}"
+    )
+    # 两份 kernel 的 T_MAX 也必须一致：本单元的那份仍被 contract / A2 派生单元引用，
+    # 漂移了会让上面那条针对本单元的守卫与现实脱节。
+    assert _module_consts(UNIT / "kernels/step.py")["T_MAX"] == native_t_max
 
 
 def test_block_dim_domain_matches_contract():

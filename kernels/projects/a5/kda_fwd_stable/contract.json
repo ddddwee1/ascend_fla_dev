@@ -358,6 +358,15 @@
       "wy：收 g_cumsum；kg 由 eg_last/eg 改为 exp(gc_last - gc)，先减后指数。qg/kexp 仍是绝对量，下溢到 0 即正确。"
     ],
     "measured_at": "2026-09-11, Ascend950PR / CANN 9.2.0",
+    "hf32_pin": {
+      "task": "KDA-P1",
+      "applies_to": ["kda_sub2_score_stable_kernel"],
+      "change": "Add `with cube_scope(): set_hf32(False)` before the pipelined loop. intra.py holds the only FP32-operand cube matmul in kda_fwd_stable / kda_bwd_stable / kda_fused_recurrent: l1_qg, l1_kbg and l1_kgneg are DT.float. wy.py's two matmuls, recurrent.py's four mmads and all five matmuls in kda_bwd_stable/inverse_mm.py take BF16 operands, and the HF32 rounding bit only governs FP32 cube multiplies, so intra.py is the whole exposure in these three units. Fix shape follows PK-07 round 2's pkda_chunk_fwd/kernels/output.py. Addresses gaps.json a5-fp32-cube-matmul-inherits-hf32 (P0) for this file.",
+      "static_cost": {"before_ops": 276, "after_ops": 278, "note": "cube_scope() plus the set_hf32 itself. ascriptor check 0 error / 0 warning before and after."},
+      "qualification": "A5/950PR, CANN 9.1.0, one card, one build per process, models.json kimi_linear_layer at block_dim 4. Chronological A/B/C: (1) committed main, unpinned -> o SHA ded5953ee7e3b477..., scores 325.75/325.96 us, aic_mac 0.981/0.980; (2) set_hf32(False) -> identical SHA, 324.78 us, aic_mac 0.983; (3) a deliberate set_hf32(True) control -> o SHA 7590af999f19ebe2..., 295.60 us, aic_mac 0.229; (4) committed main, unpinned, run straight after (3) -> SHA and profile identical to (3), i.e. it INHERITED the bit the previous process left on that core; (5) set_hf32(False) again -> back to ded5953e..., 325.69 us, aic_mac 0.981. Pinning is therefore immune in both directions and costs nothing (<=0.4%, run-to-run noise).",
+      "why_it_is_silent": "In the HF32 state o's relative L2 is 3.969e-03 against the 0.05 budget and allclose(rtol=atol=0.02) also passes, so no existing check fires. The only observable differences are the output SHA-256 and the pipe profile -- and the profile difference is large enough to invert the engineering conclusion: aic_mac_ratio reads 0.229 instead of 0.981, which would be reported as 'not compute bound' instead of 'compute bound, meets the bar'.",
+      "cost": "The pinned Ascriptor reference interpreter does not implement core.set_hf32, so this unit's sim and pipesim launchers cannot execute this kernel. native and reference are unaffected. Same trade PK-07 accepted."
+    },
     "aqk_repair": {
       "task": "A5K-01",
       "baseline_project_revision": "d0ae60f",
