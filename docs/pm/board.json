@@ -6716,7 +6716,7 @@
       "wave": "W0",
       "soc": "a5",
       "priority": "P1",
-      "status": "assigned",
+      "status": "done",
       "model": [],
       "kernel": [
         "kda_prep"
@@ -6755,9 +6755,29 @@
         {
           "at": "2026-10-30T15:50",
           "summary": "PM 直接调度派发（用户指示，不等外部 APPLY）。BF-09 自己的收尾给出一个有用起点：profiler 条件下界 164.4ms（gate 第一阶段），本任务从这里开始测 PipeUtilization，不从零找瓶颈。写集避开 A2-15 正在改的 ascend_fla/ops/kda/*.py 与 kernels/projects/a2/kda_prep/（不同 SoC 目录，确认无交集）。"
+        },
+        {
+          "at": "2026-10-30T18:08",
+          "summary": "PM 独立复核真机证据（host 238，BF09P1-summary.json/BF09P1-pipe-table.json 的 SHA-256 与报告逐字匹配，gate 反向 kernel 在 bd1/4/28 下的 device_us/aiv_vec_ratio 与报告表格逐位匹配，HF32 正控哈希在原始日志中核实存在）后按 D-PM-33 自行合入。PR #156 → d8155b96（squash，2026-10-30T18:07:59Z）。assigned → done。未改任何生产代码，只加了一个防御性guard test（负控验证过）与研究文档。"
         }
       ],
-      "result": null
+      "result": {
+        "commits": [
+          "d8155b96"
+        ],
+        "merged_commit": "d8155b967fc1122a9f568e315ff76dbcdf3baf88",
+        "merged_at": "2026-10-30T18:07:59Z",
+        "pr": 156,
+        "head_sha_reviewed_and_merged": "65cc1f85d61690e1a68e8cb626b76524435841bc",
+        "summary": "kda_prep 反向：3/5 kernel 达标（gate 0.996、norm 0.940、beta 0.952，全部计算 bound）；未达标的两个占总设备时间 0.069%，测过判定不值得优化。前向三个 kernel 全部未达标但只占 2.70ms 对反向 190.83ms。跨 7 个 block_dim（1~28）梯度逐位相同，backward_budgets.json 字节不变。HF32：结构性（0 处 matmul/mmad/splitk，13 次采集 aic_mac_ratio 逐次为 0）与实证性（跨进程正控，对照组自己的哈希确认翻转、kda_prep 输出不受影响）双重排除，不需要守卫。",
+        "review": "PM 读 diff（2 文件，478 行，全部在声明写集内）。独立 SSH 复核（host 238）：BF09P1-summary.json/BF09P1-pipe-table.json 的 SHA-256 逐字匹配报告（e2bcd305…/7c7e4a08…）；pipe-table.json 里 KdaPrepBackwardGateBf16F32F32Kernel 在 bd1/4/28 的 device_us（645813.07/164801.8/24379.79）与 aiv_vec_ratio（均 0.996）与报告表格逐位匹配；grep 原始日志确认 HF32 正控的两个哈希（b23e462e/15b9ccc3）均存在。确认真实、非自述。无争议。按 D-PM-33 自行合入。",
+        "known_gaps_not_blocking": [
+          "**本轮最尖锐的方法论发现，已转达用户，未自行采纳**：同一 kernel、同一形状、输出逐位相同，aiv_vec_ratio 在 block_dim=1/4/28 下恒为 0.996，而真实设备耗时相差 26.5 倍——指标对\"用了多少核\"这整条轴完全不敏感，不只是不充分（比 DR-P1 当天测到的 1.13~1.69x 反例更极端）。",
+          "kda_prep 自己的 block_dim 上限是从 kda_fwd/kda_bwd 复制粘贴来的声明耦合，不是实现限制——真机验证线性穿过上限 4 到 28（反向 7.047x、前向 5.986x，逐位相同）。要不要抬高、怎么抬高（需要改 A2-15 写集内的 autograd.py 与 platform.py，ABI/架构决定）留给用户。已记入 gaps.json 的 block-dim-ceiling，加了一个防御性 guard test 防止声明进一步漂移，没有自己抬高上限。",
+          "环境披露，未裁决：本任务在 host 238 上以 host-native（非 Docker）方式运行，与 machine_specs.md 的 Docker 边界要求不一致，同日三个姊妹任务也是这样——按 D-PM-28 不仲裁，只记录。共享机器礼仪（健康/占用检查、锁）本身遵守良好。",
+          "BF-09 原有的训练步墙钟数字（428.86→223.06ms）未重测——本次的 7.047x/5.986x 只是 kda_prep 反向/前向链本身，不能读成训练步提速。"
+        ]
+      }
     }
   ],
   "label_github_login": "ascend-fla-pm-bot",
