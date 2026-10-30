@@ -195,7 +195,7 @@ _Upstream ascriptor units (delta_rule_fwd/bwd) still unscheduled; DR-01 is a sep
 | task | issue | SoC | dtype | status | note |
 |---|---|---|---|---|---|
 | DR-01 | — | `a5` | fp32、bf16 | ✅ done | ★ start |
-| DR-P1 | — | `a5` | fp32、bf16 | 🔵 assigned | ★ start |
+| DR-P1 | [#153](https://github.com/ddddwee1/ascend_fla_dev/issues/153) | `a5` | fp32、bf16 | 🔵 assigned | ★ start |
 
 </details>
 

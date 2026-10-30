@@ -194,7 +194,7 @@ _上游 ascriptor 单元（delta_rule_fwd/bwd）仍未排任务；DR-01 是另�
 | 任务 | issue | SoC | dtype | 状态 | 说明 |
 |---|---|---|---|---|---|
 | DR-01 | — | `a5` | fp32、bf16 | ✅ done | ★ 起点 |
-| DR-P1 | — | `a5` | fp32、bf16 | 🔵 assigned | ★ 起点 |
+| DR-P1 | [#153](https://github.com/ddddwee1/ascend_fla_dev/issues/153) | `a5` | fp32、bf16 | 🔵 assigned | ★ 起点 |
 
 </details>
 
