@@ -1600,6 +1600,116 @@
       "profile": "Level-1 PipeUtilization：device total2665.141→2576.490us/token，rows273→219；mixed kernel 54样本mean/median42.339/42.168us，AIC MTE2平均/中位91.880%/92.150%，cube utilization平均87.914%。native GEMV+mixed W12合计2323.348us/token，占90.175%。",
       "pending": "决定是否用约1.030GB派生权重换2.6%吞吐，或先设计prompt/decode共用布局再改默认；下一次大步优化需要weight-only低精度及独立任务质量预算。",
       "evidence": "kernels/projects/a5/gdn2_norm2_w12_swiglu/contract.json；benchmarks/verify_gdn2_mixed_mlp.py；tmp/gdn2-rmsnorm-swiglu/{gamma-fold-real95b-v1.json,gemv-static-sim-v1.json,gemv-hardware-*.json,mixed-mlp-hardware-v*.json,conservative-whole-cce-first-v2.json,conservative-graph-*.json,profile-conservative-v1,performance-analysis.md}/（git-ignored）"
+    },
+    "kda_p1_pipe_utilization": {
+      "recorded_at": "2026-10-30",
+      "task": "KDA-P1",
+      "note": "AGENTS.md §6「性能优化任务的验收线」要求的 pipe 利用率记录：kda_fwd_stable/kda_bwd_stable/kda_fused_recurrent 三个单元在 A5 真机上用 aic_metrics=PipeUtilization 实测。此前这一项是「未验证」。完整表格、HF32 现场复现、与 HF-01 的对账见 docs/research/kda_perf_{fwd,bwd,decode}.md。",
+      "environment": "A5 / Ascend950PR（28 cube / 56 vec），CANN/opp 9.1.0 含 ascend950，python 3.12.14 / torch 2.12.0+cu130 / torch_npu 2.12.0，ascriptor 0.1.0 library pin 90cfcdc720bbcd66e8bd4361c4dd4fbc1a2a57b5，kernels 源码核查 pin b3b3f9c16df7c4626ed3c081032a1be5a753d0b1",
+      "conditions": "FP32；形状取 models.json 的 kimi_linear_layer(B1/T1024/H32/HV32/C16) 与 long_context(T4096/H16/HV32/C64)，decode 另测；每行一个独立进程、独立 vendor 树与编译缓存，持设备锁，同一张物理卡；Level1 + aic_metrics=PipeUtilization，每进程只采一次，先过正确性再采；正确性预算沿用各单元 contract.json 的 comparison（rtol=atol=0.02, max_relative_l2=0.05），未放宽。",
+      "fwd_pipe_utilization": {
+        "shape": "kimi_linear_layer B1/T1024/H32/HV32/C16, block_dim 4",
+        "kernel_total_us": 2501.75,
+        "stages": [
+          {
+            "entry": "kda_sub1_gate_stable_kernel",
+            "us": 51.5,
+            "aiv_mte3_ratio": 0.957,
+            "verdict": "搬运 bound，达标"
+          },
+          {
+            "entry": "kda_sub2_score_stable_kernel",
+            "us": 325.75,
+            "aic_mac_ratio": 0.981,
+            "verdict": "计算 bound，达标（仅在 HF32 位钉为 off 时成立，见 hf32_pin）"
+          },
+          {
+            "entry": "kda_sub3_wy_stable_kernel",
+            "us": 145.05,
+            "aic_fixpipe_ratio": 0.671,
+            "verdict": "未达标，差 17.9 点；定位到位（flat loop 无软流水），'显而易见的改法'算过是搬运平移不是净收益，本轮未改"
+          },
+          {
+            "entry": "kda_sub45_aqk_repaired_kernel",
+            "us": 321.4,
+            "aiv_mte3_ratio": 0.623,
+            "verdict": "未达标，差 22.7 点；瓶颈是重复过两次 MTE3 的 ub_to_l1 nd2nz，本轮未改"
+          },
+          {
+            "entry": "kda_layout (两个 kernel，布局转换，不在本任务写集)",
+            "us": "1174.58~1202.77（kimi，48.1%）/ 4022.18（long_context，43.9%）",
+            "aiv_mte2_ratio": "0.749~0.849",
+            "verdict": "接近搬运 bound，前向最大单项头寸，需 ABI 级改动才能再挤"
+          },
+          {
+            "entry": "aclnn 门控跨度检查（host 侧，不是 kernel）",
+            "us": "69.66~70.34（kimi）/ 281.44（long_context）",
+            "verdict": "host 算术，A2-15 写集，本任务不碰"
+          }
+        ],
+        "accuracy": "o 相对 L2 3.962e-03（kda_chunk_ref）/3.963e-03（kda_recurrent_ref），final_state 3.245e-03；long_context：o 4.169e-03、final_state 3.238e-03。预算 0.05。block_dim=1 与 block_dim=4 管线比值几乎不变（kernel 固有性质）。",
+        "cube_utilization_caveat": "两个计算 bound 的 cube kernel 的 cube_utilization 只有 13~14%（block_dim=4，28 个物理 cube 核中只用 4 个）。『计算 bound』说的是这 4 个核的 MAC 口打满，不是芯片算力用满——芯片级还有约 7 倍头寸，是 block-dim-ceiling（platform.py，不在本任务写集）。"
+      },
+      "bwd_pipe_utilization": {
+        "shape": "kimi_linear_layer, block_dim 4",
+        "stages": [
+          {
+            "entry": "kda_bwd_stable/inverse_mm",
+            "aic_mte2_ratio": "0.934~0.972",
+            "verdict": "搬运 bound，达标"
+          },
+          {
+            "entry": "kda_bwd_stable/finalize_pre",
+            "aiv_vec_ratio": "0.535 → 0.523（改后）",
+            "verdict": "未达标，差 32.7 点（改后）。原来按 GetCubeNum()+子块0守卫分区，半数向量子块空转"
+          },
+          {
+            "entry": "kda_bwd_stable/finalize_post",
+            "aiv_vec_then_mte2_ratio": "0.571 → 0.536（改后）",
+            "verdict": "未达标，差 31.4 点（改后）。同上"
+          }
+        ],
+        "accuracy": "九个梯度 relative L2 对单元自带独立 CPU 解析 adjoint 全在预算内，改动前后逐位相同（SHA-256 相同）。",
+        "change": "finalize_pre / finalize_post 改为按 GetVecNum()/GetVecIdx() 分区（原按 GetCubeNum()/GetCubeIdx() + GetSubBlockIdx()==0 守卫，浪费一半向量子块；两个 kernel 均无 matmul，cube_utilization 0.066%/0.035%，守卫原本防的 GM 重复写冲突经核实在新分区下不会重现）。",
+        "qualification": "kimi_linear_layer bd4：finalize_pre 241.89→124.96/130.29us（1.90x），finalize_post 470.08→295.44/310.83us（1.55x），九 kernel 反向设备总和 2413.70→2128.89/2143.18us（1.13x）。六个梯度 SHA-256 全同（dq c923cd09…等）。CCE 发射 diff：48 个已构建 kernel 里只有这 2 个文件不同，其余 46 个逐字节相同。ascriptor check 0 error/0 warning。`pytest tests/ -q` 1510 passed/28 failed/93 skipped，28 个失败全部可归因于环境（缺 ascriptor 模块、A2-on-A5、PGDN/PKDA naive 缺失等），与改动无关，改动命中的 test_kda_bwd_npu 五个 case 全过。",
+        "not_qualified": "未达 85%：翻倍 worker 数会把 per-core 占用也减半；剩余瓶颈是两个 kernel 都用单槽 UB tile，GM load 与消费它的 VF 不重叠（occupancy 合计 0.976/0.987）。finalize_post 的 tile 已占 246KiB/256KiB UB（96%），双缓冲放不进去，需要先改 tile 高度。本轮一次只改一处，未做。"
+      },
+      "decode_pipe_utilization": {
+        "note": "公开入口走 kda_fused_recurrent_bf16/kernels/step.py；kda_fused_recurrent_kernel 本身在仓库里没有调用点（本任务写集按 kda_fused_recurrent 写，实际应为 kda_fused_recurrent_bf16，由 BF-06 持有且已 done——见 write_set_errata）。",
+        "stages": [
+          {
+            "entry": "decode T=16 bd4",
+            "aiv_vec_ratio": 0.879,
+            "verdict": "达标，计算 bound"
+          },
+          {
+            "entry": "decode T=1 bd4",
+            "max_pipe_ratio": 0.413,
+            "verdict": "未达标，差 43.7 点，三条管线合计 0.963（分散，不是单条占满）"
+          },
+          {
+            "entry": "decode T=1 bd28",
+            "max_pipe_ratio": 0.31,
+            "verdict": "未达标，差 54.0 点"
+          }
+        ],
+        "designed_not_applied": "T=1 的修法已设计未实施（超出写集）：给 state 做双缓冲，按发射出的 CCE 偏移估算 UB 占用 168.5/256 KiB，预期 ~2.4x 且 aiv_vec→~0.95（能过线），需要 PM/用户就写集归属做决定（见 decisions）。"
+      },
+      "hf32_pin": {
+        "change": "kda_fwd_stable/kernels/intra.py 加 `with cube_scope(): set_hf32(False)`。这是三个单元里唯一一处 FP32 操作数的 cube matmul（l1_qg/l1_kbg/l1_kgneg 为 DT.float），wy.py 两个 matmul 与 kda_bwd_stable/inverse_mm.py 五个 matmul 均为 BF16 操作数，不受 HF32 位影响。修法模板同 PK-07 round2 的 pkda_chunk_fwd/kernels/output.py。",
+        "live_reproduction": "同一张卡、同一会话、按时间顺序：base(未钉)两次给 FP32 结果（o SHA ded5953e…，scores 325.75/325.96us，aic_mac 0.980/0.981）→ hf32off(钉 off) 325.69~324.78us/0.981~0.983，同 SHA → hf32on(钉 on，负控) 295.60us/aic_mac 0.229，SHA 变 7590af99… → **紧跟着的 base(未钉) 跑出与 hf32on 逐位相同的 SHA 和几乎相同的管线画像（299.87us/aic_mac 0.227）**，即从上一个进程继承了 HF32 位 → hf32off 再钉回 off，恢复 FP32 结果。钉住后两个方向都免疫，耗时差 ≤0.4%（噪声量级）。静默：HF32 态 o 相对 L2 3.969e-03，预算 0.05 内，allclose(0.02) 也过，只有 SHA-256 与管线画像能看出区别。",
+        "corroborates_gaps_json": "同一次采集里上游只读的 triangular_inverse.py（TrilInverse64V2StrictBf16Kernel）画像也随 intra.py 的 HF32 位同步变化（off 聚在 357.87~385.96us/aic_mac 0.406~0.425，on 聚在 318.92~326.97us/aic_mac 0.309~0.312，分得很干净）——独立于 HF-01 的静态审计，用时序数据印证了 triangular_inverse.py 确有 11 处 FP32 cube matmul 暴露，且该核控制位跨 kernel 发射持续生效（intra 先于 inverse 发射，钉 intra 顺带钉住了之后发射的 inverse）。不能当作 triangular_inverse 的修复——依赖未写进契约的发射顺序。triangular_inverse.py 是上游只读代码，本任务未改。",
+        "coupling_to_bwd": "off→off 前向逐位相同（零扰动）；off→on 时 o 相对 L2 从 3.962497e-03 变 3.969099e-03（相对变化 0.17%），跨越这次翻转的两次反向采集六个梯度 SHA-256 不变——与 HF-01 的强制开关结果一致，量级远小于预算余量。",
+        "cost": "pin 的 ascriptor 参考解释器未实现 core.set_hf32，这个单元的 sim/pipesim 启动器无法跑这个 kernel；native/reference 不受影响。与 PK-07 接受的权衡相同。"
+      },
+      "gaps_json_corrections_confirmed": "独立核对（按操作数 dtype，不是 grep）与 HF-01 的更正结论一致：wy.py 与 kda_bwd_stable 全部 BF16 操作数，不暴露；kda_fwd_stable 的暴露面只有 intra.py 一处（本任务已修）。kda_scan_diag 不在本任务写集，未复核。",
+      "write_set_errata": "任务 spec/board.json 写的 kernels/projects/a5/{kda_fwd_stable,kda_bwd_stable,kda_fused_recurrent}/**——decode 的真实公开路径走 kda_fused_recurrent_bf16（BF-06 持有，已 done），kda_fused_recurrent 目录本身在仓库源码里没有调用点。PM 记录纠正，不影响本任务已提交的改动（均落在 kda_fwd_stable/kda_bwd_stable 内）。",
+      "pypto_gym_tension": "读取（sparse clone，未安装——适用面不对：它面向原生 PyPTO-Pro 算子开发，本仓三个单元是 ascriptor/CCE kernel，其 lint 对 ascriptor 源码无可判项）。用了它的方法论参考 G1-G6 自检清单组织结论。该参考原文写明『这些阈值仅是诊断参考...不能作为验收或停止调优的依据』『高占比本身不证明吞吐最优』，与验收线把 85% 当停止线的用法存在张力；按用户给的线执行，只如实记录张力，不自行处置。与 GDN-P1 独立给出的同类发现一致（scores 0.977→0.955 快 1.84x、wy 0.974→0.907 快 3.44x 的反例）。",
+      "decisions_needed": [
+        "T=1 decode 的双缓冲修法（预期 ~2.4x，能过 85% 线）需要写集决定：真实单元是 kda_fused_recurrent_bf16（BF-06 持有，已 done），不在 KDA-P1 或 HF-01 任何写集内。",
+        "gaps.json 的 a5-fp32-cube-matmul-inherits-hf32 proposed_action③ 要求的 A5 静态守卫（tests/test_a2_accumulate_barriers.py 同类）没有写集归属——需要新建 tests/ 文件的授权。",
+        "triangular_inverse.py 的上游 FP32 cube 暴露仍未处置（HF-01 与 KDA-P1 独立确认存在），处置路径（派生单元或 ascriptor 侧流程）由用户决定。"
+      ]
     }
   }
 }
