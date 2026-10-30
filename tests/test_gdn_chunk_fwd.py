@@ -86,7 +86,8 @@ def call(inp, **kwargs):
 @pytest.mark.parametrize('option,value,match',[
     ('initial_state',torch.ones(1,3,128,128),'initial_state'),
     ('head_first',True,'head_first'),('scale',1.,'scale'),
-    ('block_dim',8,'block_dim'),('block_dim',True,'block_dim'),('device','a2','a5')])
+    ('block_dim',3,'block_dim'),('block_dim',29,'block_dim'),
+    ('block_dim',True,'block_dim'),('device','a2','a5')])
 def test_options_reject_before_launch(option,value,match):
     with pytest.raises(ValueError,match=match):
         call(data(),**{option:value})
