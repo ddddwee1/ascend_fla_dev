@@ -33,6 +33,24 @@ flush，阈值 ``-ln(FLT_MIN_NORMAL) ≈ 87.3``），``k/0 = inf``，再乘上 `
 
 上三角的垃圾值无害：``apply_score_masks_vf`` 用的是 ``select`` 而不是乘零，所以 inf
 是被**替换**掉的，不会变成 ``inf × 0 = NaN``。
+
+**``set_hf32(False)`` 是必需的，不是保险。** 这个 kernel 的两个 ``matmul`` 的 L1 操作数
+（``l1_qg`` / ``l1_kbg`` / ``l1_kgneg``）都是 ``DT.float`` —— 这是本仓三个 KDA 单元里
+**唯一**一处 FP32 操作数的 cube matmul（``wy.py`` / ``recurrent.py`` / ``kda_bwd_stable``
+的矩阵乘操作数全是 bf16，不受影响）。而 FP32 cube ``matmul`` 的精度服从 AI core 的 HF32
+舍入位，kernel 发射不会重置它：不显式设置就会继承**这块核上一次跑的随便什么进程**留下的
+状态。共享卡上这意味着别的租户能把我们的精度静默降到 HF32（相对误差约 2^-11.75 量级），
+没有报错、没有 NaN、数值量级正常。根因与决定性复现见 PK-07 第二轮（``gaps.json`` 的
+``a5-fp32-cube-matmul-inherits-hf32``，P0），处置模板是它的
+``pkda_chunk_fwd/kernels/output.py``。
+
+它同时也是**性能测量的前提**：HF32 的 cube 吞吐与 FP32 不同，不钉住这一位，这个 kernel
+的耗时就随卡的历史状态变，profile 数字不可复现。KDA-P1 在真机上对 off/on 两份 build
+做了 A/B（见 ``docs/research/kda_perf_fwd.md``）。
+
+代价：pin 住的 ascriptor 参考解释器没有实现 ``core.set_hf32``，所以本单元的 ``sim`` /
+``pipesim`` 两条非真机 launcher 跑不了这个 kernel（``native`` 与 ``reference`` 不受影响）
+—— 与 PK-07 同一笔取舍。
 """
 
 from ascriptor.a5 import *
@@ -202,6 +220,12 @@ def kda_sub2_score_stable_kernel(
     pre_cnt = Var(0)
     cube_cnt = Var(0)
     post_cnt = Var(0)
+
+    # The two matmuls below take FP32 L1 operands, so they obey the AI core's
+    # HF32 rounding bit. Nothing in a launch resets it -- pin it. See the module
+    # docstring and gaps.json a5-fp32-cube-matmul-inherits-hf32.
+    with cube_scope():
+        set_hf32(False)
 
     with auto_sync():
         for pipe_work in range(work_begin, work_end + 2):
