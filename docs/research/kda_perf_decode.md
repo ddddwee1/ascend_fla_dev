@@ -89,9 +89,11 @@ for work in range(begin, end):                      # 每核 B*HV/GetVecNum() �
 那一段长 8 倍，串行的代价被摊薄到看不见；T=1 时它就是全部。
 
 **改法与预算（本轮未实施，写集之外）**：把 `state` 做成两槽 `DBuff`，让第 i+1 个头的
-GM→UB 与第 i 个头的 compute、第 i−1 个头的 UB→GM 三段重叠。UB 预算算得过来：
-state 双槽 128 KiB + `qu/ku/vu/gu/ou`（各 `T_MAX=16 × 128` FP32 = 8 KiB）40 KiB +
-`bu` 0.5 KiB ≈ **168.5 KiB < 256 KiB**（`950.json` 的 `capacities_kb.ub`）。
+GM→UB 与第 i 个头的 compute、第 i−1 个头的 UB→GM 三段重叠。UB 放得下，而且这个数
+**是从发射出来的 CCE 里读的，不是手算**：`kda_decode_fp32_kernel_vec.h` 里
+`state(0)`、`qu(65536)`、`ku(73728)`、`vu(81920)`、`gu(90112)`、`bu(98304)`、`ou(98816)`，
+末尾 `98816 + 8192 = 107008 B = 104.5 KiB`；`state` 本身占 65536 B = 64 KiB，
+再加一槽是 **168.5 KiB < 256 KiB**（`950.json` 的 `capacities_kb.ub`）。
 按忙时估算，窗口可从 19.09 µs 降到约 `max(7.9, 6.2, 4.3) ≈ 8 µs`（**约 2.4×**），
 `aiv_vec` 随之推到约 0.95 —— **这一条能把 T=1 也送过 85% 线**。
 BF16 入口 `kda_decode_bf16_kernel` 是同一个结构，同样适用。
