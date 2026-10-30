@@ -27,7 +27,7 @@ fla 系列线性注意力算子在昇腾 NPU 上的高效实现库。后端用
 | 算子族 | id | 归属 | kernel 数 | 任务进度 |
 |---|---|---|---|---|
 | KDA（Kimi Delta Attention） | `kda` | 可申领 | 7 | 15/24 |
-| GDN（Gated DeltaNet） | `gated_delta_rule` | 可申领 | 4 | 9/11 |
+| GDN（Gated DeltaNet） | `gated_delta_rule` | 可申领 | 4 | 10/11 |
 | DeltaNet | `delta_rule` | 可申领 | 3 | 1/1 |
 | GDN-2（Gated DeltaNet 2） | `gdn2` | 仓主轨道 | 6 | 4/5 |
 | 整网融合算子（模块 / 层级） | `fusion` | 可申领 | 4 | 1/4 |
@@ -127,24 +127,24 @@ _首个目标算子族，Kimi-Linear 用它_
 
 </details>
 
-<details><summary><b>GDN（Gated DeltaNet） —— 4 个 kernel，9/11 完成</b></summary>
+<details><summary><b>GDN（Gated DeltaNet） —— 4 个 kernel，10/11 完成</b></summary>
 
 _Qwen3-Next 用它，六项 ABI 缺口待补（第四期，与本条无关）。**GDN/PGDN 例外线**（D-PM-20/22）：GDA-01（非 GQA 前向）与 GDA-02（GQA/GVA 分组）均已合入，PK-03（PGDN 前向）已解锁，排期继续走 backward → decode → 性能_
 
 | kernel | 归属 | BF16 | FP32 | 进度 | 下一步 |
 |---|---|---|---|---|---|
-| `gdn_fwd` | 可申领 | ✅ 原生 · A5 真机 | — | 6/8 | [#35](https://github.com/ddddwee1/ascend_fla_dev/issues/35) A2-07 |
-| `gdn_bwd` | 可申领 | ✅ 原生 · A5 真机 | ✅ 原生 · A5 真机 | 5/7 | [#35](https://github.com/ddddwee1/ascend_fla_dev/issues/35) A2-07 |
-| `gdn_fused_recurrent` | 可申领 | — | — | 1/3 | [#150](https://github.com/ddddwee1/ascend_fla_dev/issues/150) GDN-P1 |
+| `gdn_fwd` | 可申领 | ✅ 原生 · A5 真机 | — | 7/8 | [#35](https://github.com/ddddwee1/ascend_fla_dev/issues/35) A2-07 |
+| `gdn_bwd` | 可申领 | ✅ 原生 · A5 真机 | ✅ 原生 · A5 真机 | 6/7 | [#35](https://github.com/ddddwee1/ascend_fla_dev/issues/35) A2-07 |
+| `gdn_fused_recurrent` | 可申领 | — | — | 2/3 | [#150](https://github.com/ddddwee1/ascend_fla_dev/issues/150) GDN-P1 |
 | `gdn_chunk_fwd_a5` | 可申领 | ✅ 原生 · A5 真机 | ✅ 原生 · A5 真机 | — | _窄范围例外（D-PM-20/22）：非 GQA 前向 + GQA/GVA 分组均已合入（GDA-01/02）；BF16 原生 + 分组由 kernel 内 head 索引完成、FP32 公共入口也改走新单元（输出逐字节不变）见 BF-01，已合入_ |
 
-<details><summary>gdn_fwd —— 6/8 完成，起点 A2-07、GDN-P1、GDA-01</summary>
+<details><summary>gdn_fwd —— 7/8 完成，起点 A2-07、GDN-P1、GDA-01</summary>
 
 | 任务 | issue | SoC | dtype | 状态 | 说明 |
 |---|---|---|---|---|---|
 | A2-07 | [#35](https://github.com/ddddwee1/ascend_fla_dev/issues/35) | `a2` | bf16、fp32 | ✅ done | ★ 起点 |
 | GDA-01 | [#73](https://github.com/ddddwee1/ascend_fla_dev/issues/73) | `a5` | bf16、fp32 | ✅ done | ★ 起点 |
-| GDN-P1 | [#150](https://github.com/ddddwee1/ascend_fla_dev/issues/150) | `a5` | fp32 | 🔵 assigned | ★ 起点 |
+| GDN-P1 | [#150](https://github.com/ddddwee1/ascend_fla_dev/issues/150) | `a5` | fp32 | ✅ done | ★ 起点 |
 | A2-K1 | [#44](https://github.com/ddddwee1/ascend_fla_dev/issues/44) | `a2` | bf16、fp32 | ✅ done |  |
 | GDA-02 | [#82](https://github.com/ddddwee1/ascend_fla_dev/issues/82) | `a5` | bf16、fp32 | ✅ done |  |
 | BF-01 | [#100](https://github.com/ddddwee1/ascend_fla_dev/issues/100) | `a5` | bf16 | ✅ done |  |
@@ -153,13 +153,13 @@ _Qwen3-Next 用它，六项 ABI 缺口待补（第四期，与本条无关）。
 
 </details>
 
-<details><summary>gdn_bwd —— 5/7 完成，起点 A2-07、GDN-P1、GDA-03</summary>
+<details><summary>gdn_bwd —— 6/7 完成，起点 A2-07、GDN-P1、GDA-03</summary>
 
 | 任务 | issue | SoC | dtype | 状态 | 说明 |
 |---|---|---|---|---|---|
 | A2-07 | [#35](https://github.com/ddddwee1/ascend_fla_dev/issues/35) | `a2` | bf16、fp32 | ✅ done | ★ 起点 |
 | GDA-03 | [#91](https://github.com/ddddwee1/ascend_fla_dev/issues/91) | `a5` | bf16、fp32 | ✅ done | ★ 起点 |
-| GDN-P1 | [#150](https://github.com/ddddwee1/ascend_fla_dev/issues/150) | `a5` | fp32 | 🔵 assigned | ★ 起点 |
+| GDN-P1 | [#150](https://github.com/ddddwee1/ascend_fla_dev/issues/150) | `a5` | fp32 | ✅ done | ★ 起点 |
 | BF-02 | [#101](https://github.com/ddddwee1/ascend_fla_dev/issues/101) | `a5` | bf16 | ✅ done |  |
 | A2-K1 | [#44](https://github.com/ddddwee1/ascend_fla_dev/issues/44) | `a2` | bf16、fp32 | ✅ done |  |
 | GDA-05 | [#96](https://github.com/ddddwee1/ascend_fla_dev/issues/96) | `a5` | bf16、fp32 | ✅ done |  |
@@ -167,13 +167,13 @@ _Qwen3-Next 用它，六项 ABI 缺口待补（第四期，与本条无关）。
 
 </details>
 
-<details><summary>gdn_fused_recurrent —— 1/3 完成，起点 GDN-P1、GDA-04、A2-20</summary>
+<details><summary>gdn_fused_recurrent —— 2/3 完成，起点 GDN-P1、GDA-04、A2-20</summary>
 
 | 任务 | issue | SoC | dtype | 状态 | 说明 |
 |---|---|---|---|---|---|
 | A2-20 | [#45](https://github.com/ddddwee1/ascend_fla_dev/issues/45) | `a2` | bf16、fp32 | 🔒 gated (kernel-batch-approval) | ★ 起点 |
 | GDA-04 | [#94](https://github.com/ddddwee1/ascend_fla_dev/issues/94) | `a5` | bf16、fp32 | ✅ done | ★ 起点 |
-| GDN-P1 | [#150](https://github.com/ddddwee1/ascend_fla_dev/issues/150) | `a5` | fp32 | 🔵 assigned | ★ 起点 |
+| GDN-P1 | [#150](https://github.com/ddddwee1/ascend_fla_dev/issues/150) | `a5` | fp32 | ✅ done | ★ 起点 |
 
 </details>
 
