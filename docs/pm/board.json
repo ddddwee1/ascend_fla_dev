@@ -6637,6 +6637,57 @@
           "方法论发现：aiv_vec_ratio≥0.85 不是『已到位』的充分证据（scores 0.977→0.955 的同时快 1.84x，wy 0.974→0.907 的同时快 3.44x——未实施，仅测量）；与 KDA-P1 独立给出同类发现一致，已转达用户，是否调整验收线表述由用户决定。"
         ]
       }
+    },
+    {
+      "id": "DR-P1",
+      "title": "DeltaNet（gated_delta_rule）真机独立复验 + 性能优化：先把数字坐实，再谈 85%",
+      "wave": "W0",
+      "soc": "a5",
+      "priority": "P2",
+      "status": "assigned",
+      "model": [],
+      "kernel": [
+        "gdr_chunk_fwd_bwd_pypto_pro"
+      ],
+      "dtype": [
+        "fp32",
+        "bf16"
+      ],
+      "deps": [],
+      "write_set": [
+        "kernels/projects/a5/gdr_chunk_fwd_bwd_pypto_pro/**",
+        "docs/research/dr_perf_fwd.md",
+        "docs/research/dr_perf_bwd.md",
+        "docs/matrix/gaps.json"
+      ],
+      "needs": {
+        "npu": true,
+        "ascriptor": false,
+        "fla": true,
+        "pypto_pro": true
+      },
+      "spec": "docs/pm/tasks/DR-P1.md",
+      "issue": null,
+      "pr": null,
+      "assignee": "limjiunnbin",
+      "assignee_caps": {
+        "agent": "PM 直接调度（用户指示：继续起子 session 做性能优化，不要停下来）",
+        "session": "pm-dispatched-worktree-subagent-dr-p1",
+        "socs": "a5"
+      },
+      "branch": "task/DR-P1",
+      "timebox_h": 24,
+      "origin": {
+        "kind": "user",
+        "note": "用户直接指示：继续起子 session 做性能优化任务，覆盖尚未做过性能优化的算子族；DeltaNet（gdr_chunk_fwd_bwd_pypto_pro）是 DR-01 合入以来唯一一个真机数字从未被独立复现、也从未进 ops.json 的单元。"
+      },
+      "reports": [
+        {
+          "at": "2026-10-30T13:15",
+          "summary": "PM 直接调度派发（用户指示，不等外部 APPLY）。DR-01 复核时已发现其真机数字是自述、从未独立复现，且有三处门控纪律与文档不符——本任务先坐实数字，再按 85% 线做性能优化；门控缺口记账不在本任务里改代码。"
+        }
+      ],
+      "result": null
     }
   ],
   "label_github_login": "ascend-fla-pm-bot",
