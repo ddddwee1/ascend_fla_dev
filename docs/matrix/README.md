@@ -208,7 +208,7 @@ kimi_linear_layer / bd=4 的拆分（ms）：fwd_kernels 1.314 · caches_host_si
 
 ## 缺口
 
-P0 3 项 · P1 24 项 · P2 16 项 · 已解决 13 项 · 共 56 项
+P0 3 项 · P1 27 项 · P2 16 项 · 已解决 13 项 · 共 59 项
 
 **第一期里程碑**：第一期五项已全部有结论，并补齐了同机性能对比：aclnn 编译、runtime 桥、kda_fwd 接线、KDA 本地基线均实测通过；自编译算子在 block_dim=4 下比 torch_npu 组合快 4.43x（kimi_linear_layer）/ 2.38x（long_context T=4096）/ 19.7x（smoke）。过程中修掉两个自己的 bug（bridge-per-call-overhead、op-name-collision-in-process），它们先后让 block_dim 的效果被完全掩盖。当前最大的性能项是 block-dim-ceiling（已升 P1）：扩展性一路线性到契约上限 4，而硬件有 28 cube。第二期的前置障碍 kda-fwd-bwd-dtype-mismatch 已量化（降 P2）。
 
@@ -238,13 +238,13 @@ P0 3 项 · P1 24 项 · P2 16 项 · 已解决 13 项 · 共 56 项
 | 算子族 | P0 | P1 | P2 |
 |---|---|---|---|
 | KDA | `c1-multihead-o-corrupt`<br>`ascriptor-gm-transfer-two-slice-row-gap`<br>`a5-fp32-cube-matmul-inherits-hf32` | `decode-call-overhead`<br>`decode-layer-overhead`<br>`fused-recurrent-missing`<br>`no-varlen`<br>`no-tail-path`<br>`block-dim-ceiling`<br>`qk-l2norm-not-in-kernel`<br>`state-layout-k-first`<br>`kda-bwd-inverse-mm-mutex-over-budget`<br>`a2-splitk-fp32-cube`<br>`a2-splitk-bf16-fp16-unsettled`<br>`a2-cast-blkstride-sim-blind`<br>`kda-bwd-scan-dh0-nondeterministic`<br>`kda-prep-backward-training-step-slowdown`<br>`a2-kda-bwd-gcumsum-bf16-precision` | `kda-fwd-bwd-dtype-mismatch`<br>`npu-builtin-ops-missing`<br>`fixed-kv-128`<br>`asymmetric-kv-dim`<br>`kernel-nd2nz-suboptimal`<br>`fwd-caches-not-emitted`<br>`modules-are-torch-not-kernels`<br>`stable-unit-no-harness`<br>`gate-span-still-bounded`<br>`a2-sim-vs-toolchain-blind-spots`<br>`a2-autosync-missing-cross-pipe-guards`<br>`a2-kda-bwd-pair-checkpoint-thin-margin`<br>`kda-prep-nearzero-output-underflow`<br>`kda-prep-backward-endpoint-disclosures`<br>`pkda-fp32-host-domain-validation-unregistered`<br>`soc-defaults-a5-outside-kda` |
-| GDN | `ascriptor-gm-transfer-two-slice-row-gap` | `gdn-no-gqa`<br>`layout-not-token-major`<br>`nonzero-initial-state`<br>`d-initial-state-absent`<br>`state-dtype-bf16`<br>`fused-recurrent-missing`<br>`no-varlen`<br>`scale-param-no-slot`<br>`no-tail-path`<br>`block-dim-ceiling`<br>`a2-splitk-fp32-cube`<br>`a2-splitk-bf16-fp16-unsettled` | `npu-builtin-ops-missing`<br>`fixed-kv-128`<br>`asymmetric-kv-dim`<br>`soc-defaults-a5-outside-kda` |
+| GDN | `ascriptor-gm-transfer-two-slice-row-gap` | `gdn-no-gqa`<br>`layout-not-token-major`<br>`nonzero-initial-state`<br>`d-initial-state-absent`<br>`state-dtype-bf16`<br>`fused-recurrent-missing`<br>`no-varlen`<br>`scale-param-no-slot`<br>`no-tail-path`<br>`block-dim-ceiling`<br>`a2-splitk-fp32-cube`<br>`a2-splitk-bf16-fp16-unsettled`<br>`gdr-v-domain-never-validated`<br>`gdr-b1-enforced-mid-chain`<br>`gdr-inference-fwd-no-domain-validation` | `npu-builtin-ops-missing`<br>`fixed-kv-128`<br>`asymmetric-kv-dim`<br>`soc-defaults-a5-outside-kda` |
 | GDN-2 | `ascriptor-gm-transfer-two-slice-row-gap` | `no-varlen`<br>`no-tail-path`<br>`gdn2-abi-not-gdn`<br>`gdn2-chunk-gate-range`<br>`gdn2-decode-fragmentation` | `npu-builtin-ops-missing`<br>`fixed-kv-128`<br>`asymmetric-kv-dim`<br>`modules-are-torch-not-kernels`<br>`soc-defaults-a5-outside-kda` |
 | DeltaNet | `ascriptor-gm-transfer-two-slice-row-gap` | `layout-not-token-major`<br>`nonzero-initial-state`<br>`d-initial-state-absent`<br>`fused-recurrent-missing`<br>`no-varlen`<br>`scale-param-no-slot`<br>`no-tail-path` | `npu-builtin-ops-missing`<br>`fixed-kv-128`<br>`asymmetric-kv-dim` |
 
 ### 待统一修复的 kernel 问题
 
-> **kernel 源码层面的问题统一修一轮，不零散改。** 这是 2026-09-11 定的：发现一条就去改一条，会在 ascriptor 侧留下一串互相干扰的小改动，而且每改一次都要重跑全部 case。做法：发现时把它记进本表并打 `requires_kernel_change`，本仓侧先按 AGENTS.md §7 **装闸报错或记为声明限制**，保证不静默出错；等攒够一批再统一进 ascriptor 侧（§3：本仓不改那个仓，要改走那一侧的流程或建本仓派生单元）。当前队列 29 项，见下表。
+> **kernel 源码层面的问题统一修一轮，不零散改。** 这是 2026-09-11 定的：发现一条就去改一条，会在 ascriptor 侧留下一串互相干扰的小改动，而且每改一次都要重跑全部 case。做法：发现时把它记进本表并打 `requires_kernel_change`，本仓侧先按 AGENTS.md §7 **装闸报错或记为声明限制**，保证不静默出错；等攒够一批再统一进 ascriptor 侧（§3：本仓不改那个仓，要改走那一侧的流程或建本仓派生单元）。当前队列 32 项，见下表。
 
 | 缺口 | 级别 | 要在 kernel 侧改什么 |
 |---|---|---|
@@ -260,6 +260,9 @@ P0 3 项 · P1 24 项 · P2 16 项 · 已解决 13 项 · 共 56 项
 | `gdn2-abi-not-gdn` | P1 | recurrent 已由本仓 a5.gdn2_fused_recurrent 解决；队列中只剩独立 gdn2 chunk fwd/bwd，正式 ABI 需要 channel-wise g[B,T,H,K]、b[B,T,H,K]、w[B,T,H,V]。 |
 | `gdn2-chunk-gate-range` | P1 | 新建 gdn2 chunk fwd/bwd 时必须从一开始采用覆盖至少已观测 1461 局部跨度的数值表示；禁止直接复制 KDA stable 的 105/155 跨度实现。 |
 | `gdn2-decode-fragmentation` | P1 | BF16 raw-gate recurrent+output-norm、qkv short-conv+cache、RMSNorm2+paired W1/W2+SiLU×Mul三个模型专用CCE单元均已通过整网/profile。后续大步优化需新建weight-only低精度GEMV及质量验证链。 |
+| `gdr-b1-enforced-mid-chain` | P1 | `kernels/projects/a5/gdr_chunk_fwd_bwd_pypto_pro/kernels/gdr_fwd_train_wy_impl.py` 的 `gdr_fwd_train_wy_wrapper`（约 L998-1006，与 K/H 的 assert 并列加 B 的显式校验），外加 `README.md`「Supported domain」小节正文那句「`B > 1` fails tensor validation before any kernel launches」。不要改 `gdr_bwd_dqkw_impl.py:335-336` 的 `_B1_DYN4`/`_B1_DYN3`——那是真实的 kernel 侧约束来源，是它让 B=1 成为硬限制。配套新增拒绝面测试到该单元 `tests/` 下。 |
+| `gdr-inference-fwd-no-domain-validation` | P1 | `kernels/projects/a5/gdr_chunk_fwd_bwd_pypto_pro/kernels/gated_delta_rule_fwd_impl.py` 的 `gated_delta_rule_fwd`（L1385-1441，函数体开头加域校验；并把签名的 `v=None, g=None, beta=None` 默认值去掉或补缺失输入的显式报错），外加 `README.md` 的「Supported domain」表（给这个 kernel 单列一行真实域）与 `docs/VALIDATION.md`「The goldens in this directory」一节那句「Per kernel there is a float32 CPU golden and an NPU golden」。配套新增拒绝面测试到该单元 `tests/` 下。 |
+| `gdr-v-domain-never-validated` | P1 | 要改两处之一或两处：(a) `kernels/projects/a5/gdr_chunk_fwd_bwd_pypto_pro/README.md` 的「Supported domain」表（把 V 那一行与 enforced-by 列改成真实行为）；(b) `kernels/projects/a5/gdr_chunk_fwd_bwd_pypto_pro/kernels/gdr_fwd_train_wy_impl.py` 的 `gdr_fwd_train_wy_wrapper`（约 L1005，在现有 K/H assert 旁补 V 的域校验），并同步把 `gdr_fwd_train_scan_impl.py:672` 的上界校验保留为第二道。配套新增拒绝面测试到该单元 `tests/` 下。 |
 | `kda-bwd-inverse-mm-mutex-over-budget` | P1 | 要改 ascriptor 的 `a5.kda_bwd/kernels/inverse_mm.py`：`l0c_dvh`、`l0c_dvbeta` 由 `DBuff` 改为单槽 `Tensor`（并去掉这两块在使用点的 `[pipe_work]` 下标），互斥锁 34→32；算式、事件信用、循环、lookahead 不动。本仓派生单元已落地并通过原生验证（见 proposed_action），上游源码仍未改。 |
 | `kda-bwd-scan-dh0-nondeterministic` | P1 | 疑在上游只读 `kda_bwd/kernels/scan_fused.py`：`seed_ub`（241 行声明）在每个 BHV 边界重置槽 0，与 `seed_mutex`（212 行，`CvMutex(3, depth=2)`）的跨 BHV 连续信用流转冲突，在奇数 chunk 数时对下一 BHV 首次发布（277 行）与上一 BHV 最终 VF 读取（358 行，实际 load 160-161 行）之间产生 WAR。A5K-03 已给出精确机制与两个可证伪预测的正向证据（详见 evidence 字段），修法方向已提出但未验收（维持跨 BHV 槽相位连续，或设计归还协议；信用不能简单降到 1）。修法只能是本仓派生 scan 单元，不改上游；要用户批准 kernel 批次。 |
 | `layout-not-token-major` | P1 | gdn / delta_rule 的公开布局改 token-major。 |
@@ -618,6 +621,44 @@ PM 在权威 workspace 上独立跑了 `benchmarks/diag_c1_multihead.py`，**上
 该定位对照本身**不是**"改后 kernel 真机通过"的声明——现有 kernel 的 GM 输入与 `unit.validate_inputs` 强制 g_cumsum 为 BF16，测试侧不能绕过 ABI 直接喂 FP32 值给现有kernel，所以这不是能在现有写集内修的东西。另附带发现（如实记录，不隐藏）：normalized-input 的 span24/28/32 在 `finalize_pair` 中间检查上也超出既有 1e-5 界（最坏 t_beta 9.2949e-5）；FP64 诊断显示该残差远小于 FP32（0/8.97e-7/2.84e-9），提示是 FP32 累加/前级舍入敏感，但FP64 不替代 golden，1e-5 失败原样保留，不构成"已修复"的证据。
 - **影响** A2 上 `kda_bwd_stable`（KDA 反向的正式 backward kernel）在真实默认初始化会产生的门控跨度（fla 默认初始化 8 seed 实测下界 max≈106.4，本条在 span32 起就已超预算）下，`dg` 梯度相对 CPU FP32 完整自动微分的误差可能静默超出 0.05 验收预算而不报任何错误（有限值，量级正常，只是数值偏了）——这正是 §7 要求装闸防的那类问题。目前 A2-13 尚未给 A2 的 `max_gate_span["stable"]["backward"]` 填任何数字、`qualified` 仍是 `False`，公开 `ascend_fla.ops.kda` 未接 A2，所以**当前没有产品路径会静默吃到这个错误**——风险仅存在于"如果不管这个发现直接填一个只看有限性、不看这条精度曲线的闸值"这种假设路径，实际未发生。
 - **建议** 申领人提议（评论 5876471263）：保留现有 BF16 `kda_bwd_stable` 单元及其历史资格不动，新增一个 A2 派生的 FP32-g_cumsum 反向单元——只改四个消费者（`scan_fused`、`inverse_epilogue`、`finalize_pre`、`finalize_post`）的 GM/UB 类型与相应载入/转换，新 unit.py/reference.py/contract.json，其余 8 项缓存与返回梯度仍 BF16，五个非 gc 消费者复用冻结实现。gc 缓存会从 32MiB 增到 64MiB（B1/T4096/HV32，仅张量字节数，非性能数字）。需要全新 UB/ABI/同步 preflight、全部 vendor 预编译、完整原始+真实工作负载+范围真机验收。**这是新建 kernel 代码（不是本仓不改 ascriptor 那条边界内的事——是本仓自己在 `kernels/projects/a2/` 下建派生单元，符合 AGENTS.md §3 的路径，但超出 A2-13 当前写集与"单元级资格化、不碰 kernel"的范围），按 §6.5 记账，攒批或获批准后再动手；PM 已把"批准新建这个 kernel 单元 / 是否纳入一次 kernel 批次"这个决定转给用户，assignee 在裁定前保持kernel 只读，继续独立定位与文档化。**另一条不冲突的路径：A2-13 本身可以不等这个修复，以"资格化未通过、根因已定位并归档"收尾，把 kernel 修复列为独立的后续候选（由用户决定是否、何时纳入 kernel 批次）。
+
+#### `gdr-v-domain-never-validated` — 【P1·文档过度承诺】DeltaNet（gdr_chunk_fwd_bwd_pypto_pro）的 V 维域约束一次都没有被代码校验，而 README 声称 `gdr_fwd_train_wy` 会 assert 它；两边的说法还互相矛盾
+
+- **类别** validation · **适用于** GDN · **阻塞** —
+- **依据** **DR-01（PR #145）PM 复核发现，DR-P1 在 A5 真机环境逐行复核确认（2026-10-30）。** `kernels/projects/a5/gdr_chunk_fwd_bwd_pypto_pro/README.md` 的「Supported domain」表写着 `K`, `V` → 「multiples of 64 up to 128」，enforced by 「`gdr_fwd_train_wy` asserts it」。实际源码（DR-P1 读的是合入后的 f16c1225 树）：
+
+- `kernels/gdr_fwd_train_wy_impl.py:1005` 只有 `assert K % SUB == 0 and K <= KMAX`（`SUB=64`、`KMAX=128`，L108-110）——**只校验 K，不校验 V**；`V = v.shape[3]`（L1000）读出来就直接用。
+- 整条 8-kernel 训练链里对 V 的唯一判定在**第二个** kernel：`kernels/gdr_fwd_train_scan_impl.py:672` 的 `if K > KMAX or V > KMAX: raise ValueError`——只是上界，**没有「64 的倍数」这一条**，而且已经晚于 kernel 1 的发射。
+- 「64 的倍数」这句话本身与单元自己验证通过的 case 矛盾：`tail_vlt_b1_t200_h3_k128_v96`（V=96，96 不是 64 的倍数）在 `docs/VALIDATION.md` 的五个 composition case 里，DR-P1 在 A5 真机（238 卡 3，Ascend950PR_957b，CANN 9.1.0-beta.1）重跑 5/5 全 PASS、180 项比对 0 FAIL。所以不是「闸漏了该拒的输入」，是**README 把一条不存在、而且不该存在的约束写成了已校验**。
+- `docs/VALIDATION.md` 自己的措辞比 README 准确，没有重复这条。
+- **影响** 当前不构成计算风险：本仓没有任何代码 import 这个单元（DR-P1 复核：`ascend_fla/ops/` 下没有 delta_rule 相关文件，`tests/` 下也没有）。风险在于**支持矩阵说谎**（AGENTS.md §7：隐藏缺失能力比缺失能力本身更糟）——读 README 的人会以为 V 已被把关，于是把一个 V 既非 64 倍数又 >128 的输入送进去，结果是 kernel 1 先跑完一整轮（17 个 fp32 中间张量全部写出），到 kernel 2 才报错；而 V 在 (128, ∞) 之外的下界行为（例如 V=40）无人测过，不保证是报错而不是算错。接进 `ascend_fla` 公开 API 之前必须先把这条对齐。
+- **建议** P1，按 AGENTS.md §6.5 攒批后统一改，**不在 DR-P1 里改**（外部贡献代码，且门控改动必须与性能改动分开验证）。两件事二选一，由 PM/用户定：
+① **按真实能力改 README**：把 `V` 一行写成「上界 128（`gdr_fwd_train_scan` 校验）；非 64 倍数的 V 已验证到 V=96；V 的下界与非 64 倍数的一般情形未验证」，并把 enforced-by 从 `gdr_fwd_train_wy` 改成 `gdr_fwd_train_scan`。
+② **把闸前移并补全**：在 `gdr_fwd_train_wy_impl.py` 的 host 入口补 V 的域校验，闸的上下界**照实测数据钉死**（AGENTS.md §6.5 第 2 条），即至少覆盖已验证的 V ∈ {64, 96, 128}；再补 `tests/` 下一条拒绝面测试，否则闸被改松没有任何东西会报警。
+推荐 ①+② 都做：先改文档止血（零风险），再在 kernel 批次里把闸前移。验收：非法 V 在任何 kernel 发射之前报错，错误信息给出实际值与违反的那一条；已验证的三个 V 仍然 5/5 PASS 且逐位不变。
+
+#### `gdr-b1-enforced-mid-chain` — 【P1·文档过度承诺】DeltaNet（gdr_chunk_fwd_bwd_pypto_pro）的 B=1 限制只由链上第 5 个 kernel 的静态 shape 标注生效，README 声称「B>1 在任何 kernel 启动前就被拒」——实际前 4 个 kernel 会先跑完
+
+- **类别** validation · **适用于** GDN · **阻塞** —
+- **依据** **DR-01（PR #145）PM 复核发现，DR-P1 在 A5 真机环境逐行复核确认（2026-10-30）。** README.md 的「Supported domain」表把 batch `B` 的 supported 值写成 1，enforced by 「`gdr_bwd_dqkw` pins the batch axis of every tensor to 1」，紧接着的正文又写「`B > 1` fails tensor validation **before any kernel launches**」。这两句互相矛盾，而后一句是错的：
+
+- 唯一的 B=1 约束是 `kernels/gdr_bwd_dqkw_impl.py:335-336` 的 `_B1_DYN4 = [1] + [pl.DYNAMIC]*4` / `_B1_DYN3 = [1] + [pl.DYNAMIC]*3`，用在 `@pl.jit` 的 `gdr_bwd_dqkw_kernel` 的 14 个 `pl.Tensor[...]` 标注上（L341-354）。那是**第 5 个** kernel。
+- 链上前 4 个（`gdr_fwd_train_wy`、`gdr_fwd_train_scan`、`gdr_bwd_dv_local`、`gdr_bwd_reverse_scan`）与后 3 个（`wy_matmuls`、`wy_reduce`、`finalize`）对 B 没有任何限制：DR-P1 grep 过这 7 个 impl 文件的全部 `assert`/`raise`，没有一条涉及 B。`docs/VALIDATION.md` 自己也写「`gdr_fwd_train_scan` passes a B=3 case，`dv_local`/`wy_reduce`/`finalize` take a dynamic batch」。
+- 所以 B=2 的调用会**先发射 4 个 kernel、写出全部 20 个 fp32 中间张量**，到第 5 个才以一条框架层的 shape 类型错误失败——不是入口拒绝，错误信息也不会说「这个算子只支持 B=1」。
+- `docs/VALIDATION.md` 的措辞准确（明确把 B=1 限定在 `gdr_bwd_dqkw` 这一个 kernel 上），README 的正文不准确。
+- **影响** 当前不构成计算风险（本仓无任何调用方）。代价是：① 支持矩阵说谎（AGENTS.md §7）；② 失败发生在链路中段，调用方拿到的是框架层 shape 报错而不是能力声明，排查成本高；③ 浪费一整轮前向 + 两个反向 kernel 的设备时间与显存。接进公开 API 前必须前移。
+- **建议** P1，按 AGENTS.md §6.5 攒批后统一改，**不在 DR-P1 里改**。做法：在链路第一个 host 入口（`gdr_fwd_train_wy_wrapper`）加 `B == 1` 的显式校验并给出实际值与原因（「this operator pins the batch axis to 1; gdr_bwd_dqkw's kernel signature requires it」），同时把 README 正文那句 enforced-by 改成真实位置，或在改完闸之后让它成真。配套：新增一条拒绝面测试断言 B=2 在**第一个** kernel 之前就被拒，并断言错误信息包含约束名——否则闸被改松没有任何东西会报警（§6.5 第 2 条）。验收：B=2 零 kernel 发射即报错；现有 38 项 `torch.equal` 与 5 个 composition case 逐位不变。
+
+#### `gdr-inference-fwd-no-domain-validation` — 【P1·零门控】DeltaNet 的第 9 个 kernel（独立推理前向 `gated_delta_rule_fwd`）的 host 入口没有任何域校验，而它是 9 个里唯一支持 K=V=256 的，域也与其余 8 个不同
+
+- **类别** validation · **适用于** GDN · **阻塞** —
+- **依据** **DR-01（PR #145）PM 复核发现，DR-P1 在 A5 真机环境逐行复核确认 + 真机复跑（2026-10-30）。** `kernels/gated_delta_rule_fwd_impl.py:1385` 的 `gated_delta_rule_fwd(q, k, v=None, g=None, beta=None)` 是这个 kernel 的唯一 host 入口。DR-P1 读了它的全部 57 行函数体（L1385-1441）：**一条 `assert` 都没有，一条 `raise` 都没有**；`B, T, H, K = q.shape` / `V = v.shape[3]` 读出来就直接分配 GM 工作区并发射。全文件的 `assert`/`raise` 统计为 0（DR-P1 对 10 个 impl 文件做的 grep，只有 `gdr_fwd_train_wy_impl.py` 的 6 条和 `gdr_fwd_train_scan_impl.py` 的 2 条）。签名默认值 `v=None, g=None, beta=None` 还意味着漏传任一个会在 `v.shape[3]` 上抛 `AttributeError`，而不是说明缺了哪个输入。
+
+这个 kernel 的域与其余 8 个**不一样**，所以不能靠训练链的闸兜住它：它的 module docstring 与 README「9. `gated_delta_rule_fwd`」一节说状态走 GM workspace 而不是常驻 L1，「which is what lets `K` and `V` reach 256 here」。DR-P1 在 A5 真机跑 `tests/test_gated_delta_rule_fwd.py`：8 个 case 全 PASS，**含 `wide_kv K256 V256`**（o 对 fp32 CPU golden，matched_ratio=1.000000、our_max_abs=5.7158e+01 ≤ peak·2⁻⁶=3.1678e+02 且 ≤ 理想 bf16 舍入 1.05 倍）与 `batch B3 T192 K128 V96`（B=3 真的能跑，matched_ratio=1.000000）。也就是说它**确实**有一个更宽的合法域（K,V 到 256、B>1），而这个域一个字都没有被校验、也没有写进 README 的「Supported domain」表（那张表只讲训练链）。
+
+顺带（官方 `pypto-pro-op-orchestrator` 插件的硬门禁 lint，DR-P1 实际跑了 `--lint-test`/`--lint-golden`，9 个算子逐个）：这 9 个里只有这一个在 PL15/PL16 上 FAIL——它的精度断言函数叫 `_assert_precision_o` 而不是约定的 `_assert_precision`，golden 文件叫 `gated_delta_rule_fwd_golden.py` 而不是 `..._golden_cpu.py`。**这两条是命名约定偏差，不是缺 CPU 参考**：DR-P1 读过 `tests/test_gated_delta_rule_fwd.py:50-92`，它确实在 `.cpu()` 张量上调 fp32 golden，也确实用了共享的 `precision_compare.check_precision`。但由此派生出一条真实出入：`docs/VALIDATION.md` 写「Per kernel there is a float32 CPU golden and an NPU golden」，而这个 kernel 只有一个 golden 文件，**没有 NPU golden**——那句「per kernel」对第 9 个不成立。
+- **影响** 当前不构成计算风险（本仓无任何调用方）。它是三条里最该先修的一条：另外两条是「闸的位置/文案不对」，这一条是**完全没有闸**，而且它的域比训练链宽（K=V 到 256、B 可 >1），所以任何「训练链已经把关了」的推理对它都不成立。超域输入的行为未知——`kernels/gated_delta_rule_fwd_impl.py` 的 module docstring 自己记了三条「靠错误数值而不是编译错误才发现」的 build 行为（N<64 的 matmul 返回错值、128 行声明但只有 64 行有效的 L0A/L0C 瓦片返回错值、transpose-load 的瓦片不能作左操作数），这正是「静默算错」而不是「报错」的那一类风险。
+- **建议** P1，按 AGENTS.md §6.5 攒批后统一改，**不在 DR-P1 里改**。做法：给 `gated_delta_rule_fwd` 的 host 入口加显式域校验，闸的边界**照实测数据钉死**（§6.5 第 2 条），即 K, V ∈ 已验证集（真机跑过 64/96/128/256）、T 任意、B 已验证到 3、必传 `v`/`g`/`beta`（去掉 `=None` 默认值，或缺失时明确报哪个输入缺了）；并把它**自己的**支持域作为独立一行写进 README 的「Supported domain」（现在那张表只描述训练链，读者会把训练链的 B=1/KV≤128 误套到这个 kernel 上，既过严又不是它的真实约束）。配套：拒绝面测试 + 把 `docs/VALIDATION.md` 的「per kernel there is a float32 CPU golden and an NPU golden」改成真实情况（第 9 个只有一个 golden）。要不要同时把命名对齐到插件 lint 的 PL15/PL16（`_assert_precision`、`..._golden_cpu.py`）是风格选择，由 PM 定，与正确性无关。验收：超域输入在发射前报错并说明违反哪一条；现有 8 个 case（含 K=V=256、B=3）逐位不变。
 
 ### P2
 
