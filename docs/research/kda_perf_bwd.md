@@ -197,10 +197,18 @@ tile，取数口先顶上来。（item 空间的粒度本身是这个 kernel 的
 
 | kernel | 输入 tile | 输出 tile | 合计 | 双缓冲后 | UB 容量 |
 |---|--:|--:|--:|--:|--:|
-| `finalize_pre` | 66 KiB | 72 KiB | 138 KiB | 276 KiB | **256 KiB** |
-| `finalize_post` | 164 KiB | 82 KiB | 246 KiB | 492 KiB | **256 KiB** |
+| `finalize_pre` | 66 KiB | 72 KiB | **138.0 KiB** | 276 KiB | **256 KiB** |
+| `finalize_post` | 164 KiB | 82 KiB | **246.0 KiB** | 492 KiB | **256 KiB** |
 
-（`ascriptor/devices/profiles/950.json` 的 `capacities_kb.ub = 256`。）
+容量来自 `ascriptor/devices/profiles/950.json` 的 `capacities_kb.ub = 256`。
+占用量**不是手算的，是从发射出来的 CCE 里读的** —— 编译器把每个 UB tile 的字节偏移
+写在声明里，最后一个 tile 的偏移加它自己的大小就是总占用：
+
+- `finalize_pre_stable_kernel_vec.h`：`q_ub(0)` … `mbeta_ub(133120)`，
+  `133120 + 8192 = 141312 B = 138.0 KiB`。
+- `finalize_post_stable_kernel_vec.h`：`g_ub(0)`、`qkl_ub(16384)` …
+  `dkhv_out_ub(200704)`、`dbeta_out_ub(233472)`、`dg_out_ub(235520)`，
+  `235520 + 16384 = 251904 B = 246.0 KiB` —— **已经用掉 96% 的 UB，一个槽都加不了。**
 
 - `finalize_pre` 整体双缓冲**不够**（276 > 256）。只双缓冲输入（66→132，输出仍 72）
   能放下（204 KiB），但那只让 MTE2 重叠、MTE3 仍串行，按忙时估算
